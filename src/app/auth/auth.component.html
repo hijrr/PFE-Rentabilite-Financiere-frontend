@@ -1,0 +1,75 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="image-panel">
+      <div class="hero-image">
+        <img src="assets/bb.avif" alt="Elzei Consulting">
+        <div class="green-overlay"></div>
+      </div>
+      <div class="image-content">
+        <div class="logo-container">
+          <img src="assets/logo.webp" alt="Elzei Consulting" class="logo-image">
+          <div class="logo-text">
+            <span class="logo-main">ELZEI</span>
+            <span class="logo-sub">consulting</span>
+          </div>
+        </div>
+
+        <h1 class="image-title">Conseil en<br>transformation</h1>
+        <div class="elzei-message animated">
+          <div class="message-icon">
+          </div>
+          <div class="rotating-text">
+            <span class="word active">Stratégie</span>
+            <span class="word">Innovation</span>
+            <span class="word">Performance</span>
+            <span class="word">Excellence</span>
+          </div>
+          <p class="message-line">au cœur de votre transformation</p>
+          <div class="message-footer">
+            <span class="separator"></span>
+            <span class="signature">ELZEI Consulting</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-panel">
+      <div class="form-header">
+        <h2>Bienvenue</h2>
+        <p>Connectez-vous à votre espace</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="loginUser()" class="auth-form">
+        <div class="input-group">
+          <label>Nom d'utilisateur</label>
+          <div class="input-field">
+            <i class="far fa-user"></i>
+            <input type="text" placeholder="marie.fr" formControlName="username">
+          </div>
+          <p class="erreur" *ngIf="username?.invalid && username?.touched">
+            Nom d'utilisateur obligatoire
+          </p>
+        </div>
+
+        <div class="input-group">
+          <label>Mot de passe</label>
+          <div class="input-field">
+            <i class="fas fa-lock"></i>
+            <input type="password" placeholder="··········" formControlName="password">
+          </div>
+          <p class="erreur" *ngIf="password?.invalid && password?.touched">
+            <span *ngIf="password?.errors?.['required']">Mot de passe obligatoire</span>
+            <span *ngIf="password?.errors?.['minlength']"> Le mot de passe doit contenir au moins 4 caractères</span>
+          </p>
+        </div>
+
+        <button type="submit" class="btn-auth" [disabled]="loginForm.invalid">
+          <span>Se connecter</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="elegant-separator"></div>
+    </div>
+  </div>
+</div>

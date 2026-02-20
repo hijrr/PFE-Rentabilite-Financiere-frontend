@@ -1,0 +1,564 @@
+/* app.component.css - Version finale avec vert clair comme elzei.fr */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.auth-container {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #F5FAF5;
+  position: relative;
+}
+
+.auth-card {
+  max-width: 1300px;
+  width: 100%;
+  background: white;
+  border-radius: 2rem;
+  box-shadow: 0 30px 60px -15px rgba(0, 40, 0, 0.25);
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== PANEL GAUCHE - IMAGE AVEC EFFET VERT CLAIR ELZEI.FR ===== */
+.image-panel {
+  flex: 1 1 50%;
+  position: relative;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+.hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.6s ease;
+}
+
+.image-panel:hover .hero-image img {
+  transform: scale(1.05);
+}
+
+/* Overlay vert CLAIR signature elzei.fr */
+.green-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg,
+    rgba(210, 240, 210, 0.55) 0%,
+    rgba(190, 230, 190, 0.45) 30%,
+    rgba(170, 220, 170, 0.35) 60%,
+    rgba(150, 210, 150, 0.25) 100%);
+  mix-blend-mode: soft-light;
+  animation: softGreenWave 10s ease infinite;
+  z-index: 1;
+}
+
+@keyframes softGreenWave {
+  0%, 100% {
+    opacity: 0.6;
+    background-position: 0% 50%;
+  }
+  50% {
+    opacity: 0.7;
+    background-position: 100% 50%;
+  }
+}
+
+/* Contenu overlay sur l'image */
+.image-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #1B4D1B;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(1.2px);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.logo-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  animation: logoPulse 3s infinite ease-in-out;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-main {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1e1d;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  text-shadow: 0 2px 5px rgba(255, 255, 255, 0.5);
+}
+
+.logo-sub {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: #000000;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.image-title {
+  font-size: 2.8rem;
+  font-weight: 500;
+  color: #113109;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(255, 255, 255, 0.5);
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== TEXTE INSPIRÉ D'ELZEI.FR ===== */
+.elzei-message {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  animation: messageFadeIn 1s ease-out;
+}
+
+.elzei-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #4CAF50, #81C784);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.message-icon {
+  margin-bottom: 1rem;
+}
+
+.message-icon i {
+  font-size: 1.8rem;
+  color: #2E7D32;
+  opacity: 0.7;
+}
+
+.rotating-text {
+  height: 40px;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.word {
+  position: absolute;
+  left: 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1B4D1B;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+.word.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.message-line {
+  font-size: 1.2rem;
+  color: #2E5A2E;
+  margin: 1rem 0 1.5rem 0;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.message-footer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.separator {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+}
+
+.signature {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1B4D1B;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.elzei-message:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+@keyframes messageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== PANEL DROIT - FORMULAIRE ===== */
+.form-panel {
+  flex: 1 1 50%;
+  padding: 3.5rem;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-header {
+  margin-bottom: 2.5rem;
+  animation: fadeInRight 0.8s ease-out;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-header h2 {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #1B4D1B;
+  margin-bottom: 0.5rem;
+}
+
+.form-header p {
+  color: #2E7D32;
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: slideInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.input-group:nth-child(1) { animation-delay: 0.2s; }
+.input-group:nth-child(2) { animation-delay: 0.3s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.input-group label {
+  font-weight: 500;
+  color: #2E5A2E;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.input-field {
+  display: flex;
+  align-items: center;
+  background: #F8FBF8;
+  border: 2px solid #E8F3E8;
+  border-radius: 14px;
+  padding: 0.8rem 1.2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.input-field::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #4CAF50, #81C784);
+  transition: width 0.3s ease;
+}
+
+.input-field:focus-within::after {
+  width: 100%;
+}
+
+.input-field:hover {
+  border-color: #C8E6C9;
+  background: white;
+}
+
+.input-field:focus-within {
+  border-color: #4CAF50;
+  background: white;
+  box-shadow: 0 5px 15px -5px rgba(76, 175, 80, 0.2);
+}
+
+.input-field i {
+  color: #81C784;
+  font-size: 1.1rem;
+  width: 24px;
+  transition: all 0.3s ease;
+}
+
+.input-field:focus-within i {
+  color: #4CAF50;
+  transform: scale(1.1);
+}
+
+.input-field input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background: transparent;
+  color: #1B4D1B;
+}
+
+.input-field input::placeholder {
+  color: #B0D9B0;
+  font-weight: 300;
+}
+
+.erreur {
+  color: #D32F2F;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+  padding-left: 0.5rem;
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.erreur i {
+  font-size: 0.9rem;
+}
+
+.btn-auth {
+  background: #4CAF50;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 20px -5px rgba(76, 175, 80, 0.3);
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 0.8s ease-out 0.7s both;
+}
+
+.btn-auth::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-auth:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-auth:hover:not(:disabled) {
+  background: #2E7D32;
+  transform: translateY(-2px);
+  gap: 1.2rem;
+  box-shadow: 0 15px 25px -5px rgba(46, 125, 50, 0.4);
+}
+
+.btn-auth:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #B0D9B0;
+}
+
+.elegant-separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 2rem 0;
+  animation: fadeIn 0.8s ease-out 1s both;
+}
+
+.elegant-separator::before,
+.elegant-separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #E8F3E8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .auth-card {
+    flex-direction: column;
+  }
+
+  .image-panel {
+    min-height: 400px;
+  }
+
+  .image-content {
+    padding: 2rem;
+  }
+
+  .image-title {
+    font-size: 2.2rem;
+  }
+
+  .form-panel {
+    padding: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 1rem;
+  }
+
+  .image-panel {
+    min-height: 350px;
+  }
+
+  .image-content {
+    padding: 1.5rem;
+  }
+
+  .image-title {
+    font-size: 1.8rem;
+  }
+
+  .form-panel {
+    padding: 2rem;
+  }
+
+  .form-header h2 {
+    font-size: 1.8rem;
+  }
+}

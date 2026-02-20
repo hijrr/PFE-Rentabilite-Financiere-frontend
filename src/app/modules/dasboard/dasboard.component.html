@@ -1,0 +1,79 @@
+<aside class="elzei-sidebar" [class.collapsed]="isCollapsed">
+
+  <div class="sidebar-logo">
+    <div class="logo">
+     <img src="assets/logo.webp" alt="Elzei Consulting" class="logo-img" />
+      <span class="logo-text" [class.hidden]="isCollapsed">elzei consulting</span>
+    </div>
+    <button class="toggle-btn" (click)="toggleMenu()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path d="M4 6H20M4 12H20M4 18H20" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+
+  <div class="sidebar-profile">
+    <div class="profile-avatar">
+      <span>{{ user.initials }}</span>
+    </div>
+    <div class="profile-info">
+      <span class="profile-name">{{ user.name }}</span>
+      <span class="profile-email">{{ user.email }}</span>
+    </div>
+  </div>
+
+
+  <nav class="sidebar-nav">
+   <ul class="nav-list">
+    <li class="nav-item"
+      [class.active]="activeItem === 'accueil'">
+
+      <a class="nav-link"
+         (click)="setActive('accueil')">
+
+        <i class="nav-icon fa-solid fa-house"></i>
+
+        <span class="nav-label">Accueil</span>
+
+      </a>
+    </li>
+  </ul>
+  <ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem === 'historique'">
+
+      <a class="nav-link"
+         (click)="setActive('historique')">
+
+        <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
+
+        <span class="nav-label">Historique salarié</span>
+
+      </a>
+    </li>
+  </ul>
+<ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem === 'calcul'">
+
+      <a class="nav-link"
+         (click)="setActive('calcul')">
+
+        <i class="nav-icon fa-solid fa-chart-column"></i>
+
+        <span class="nav-label">Calcul rentabilité</span>
+
+      </a>
+    </li>
+  </ul>
+  </nav>
+
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" (click)="logout()">
+       <i class="fa-solid fa-right-from-bracket"></i>
+      <span class="logout-label">Déconnexion</span>
+    </button>
+  </div>
+</aside>

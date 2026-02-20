@@ -1,0 +1,113 @@
+<div class="import-container">
+  <h2 class="import-title"> Import des documents</h2>
+
+  <div class="documents-grid">
+    <!-- Fiche de paie -->
+    <div class="document-card">
+      <div class="card-header">
+        <div class="header-icon">
+           <i class="fa-solid fa-file-invoice"></i>
+        </div>
+        <h3 class="card-title">Fiche de paie</h3>
+        <span class="badge">Requis</span>
+      </div>
+
+      <p class="card-description">Importez votre bulletin de salaire (PDF, JPG, PNG, DOC)</p>
+
+      <div class="file-input-wrapper">
+        <input type="file"
+               id="fichePaie"
+               (change)="onFichePaieSelected($event)"
+               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+               [class.file-selected]="fichePaieFile">
+        <label for="fichePaie" class="file-label">
+          <span class="upload-icon">
+             <i class="fa-solid fa-paperclip"></i>
+          </span>
+          <span class="upload-text">{{ fichePaieFile ? fichePaieFile.name : 'Choisir un fichier' }}</span>
+          <span class="upload-hint" *ngIf="!fichePaieFile">Cliquez ou glissez-déposez</span>
+        </label>
+      </div>
+
+      <div *ngIf="fichePaieError" class="error-message">
+        <span class="error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
+        {{ fichePaieError }}
+      </div>
+
+
+    </div>
+
+    <!-- Note de frais -->
+    <div class="document-card">
+      <div class="card-header">
+        <div class="header-icon">
+           <i class="fa-solid fa-receipt"></i>
+        </div>
+        <h3 class="card-title">Note de frais</h3>
+        <span class="badge">Requis</span>
+      </div>
+
+      <p class="card-description">Importez vos justificatifs de dépenses (PDF, JPG, PNG, DOC)</p>
+
+      <div class="file-input-wrapper">
+        <input type="file"
+               id="noteFrais"
+               (change)="onNoteFraisSelected($event)"
+               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+               [class.file-selected]="noteFraisFile">
+        <label for="noteFrais" class="file-label">
+          <span class="upload-icon">
+             <i class="fa-solid fa-paperclip"></i>
+          </span>
+          <span class="upload-text">{{ noteFraisFile ? noteFraisFile.name : 'Choisir un fichier' }}</span>
+          <span class="upload-hint" *ngIf="!noteFraisFile">Cliquez ou glissez-déposez</span>
+        </label>
+      </div>
+
+      <div *ngIf="noteFraisError" class="error-message">
+        <span class="error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
+        {{ noteFraisError }}
+      </div>
+
+
+    </div>
+  </div>
+
+  <!-- Barre d'actions -->
+  <div class="actions-bar">
+    <button class="btn-primary"
+            (click)="onSubmit()"
+            [disabled]="!fichePaieFile || !noteFraisFile">
+      <span class="btn-icon">
+        <i class="fa-solid fa-check"></i>
+      </span>
+      Valider les documents
+    </button>
+
+    <button class="btn-secondary" (click)="resetForm()">
+      <span class="btn-icon">
+         <i class="fa-solid fa-rotate"></i>
+      </span>
+      Réinitialiser
+    </button>
+  </div>
+
+  <!-- Résumé des imports -->
+  <div class="summary-section" *ngIf="fichePaieFile || noteFraisFile">
+    <h4 class="summary-title"> Récapitulatif</h4>
+    <div class="summary-list">
+      <div class="summary-item" *ngIf="fichePaieFile">
+        <span class="item-label">Fiche de paie :</span>
+        <span class="item-value">{{ fichePaieFile.name }}</span>
+      </div>
+      <div class="summary-item" *ngIf="noteFraisFile">
+        <span class="item-label">Note de frais :</span>
+        <span class="item-value">{{ noteFraisFile.name }}</span>
+      </div>
+    </div>
+  </div>
+</div>
