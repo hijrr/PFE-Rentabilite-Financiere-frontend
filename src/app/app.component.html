@@ -1,7 +1,20 @@
-<!--<app-auth></app-auth>-->
-<app-dasboard></app-dasboard>
-<app-finance-import-component></app-finance-import-component>
-<app-financial-data-form-component></app-financial-data-form-component>
+<ng-container *ngIf="!isLoginPage(); else loginLayout">
+
+  <app-dasboard
+    (toggleChange)="onSidebarToggle($event)">
+  </app-dasboard>
+
+  <main class="main-content"
+        [class.sidebar-collapsed]="isSidebarCollapsed">
+    <router-outlet></router-outlet>
+  </main>
+
+</ng-container>
+
+<ng-template #loginLayout>
+  <router-outlet></router-outlet>
+</ng-template>
+
 <!--<div style="padding:40px">
   <form [formGroup]="loginForm" (ngSubmit)="loginUser()">
     <input type="text" placeholder="Username" formControlName="username">
@@ -11,4 +24,6 @@
 
     <button type="submit" [disabled]="loginForm.invalid">Login</button>
   </form>
+  <app-dasboard></app-dasboard>
+
 </div>-->

@@ -26,8 +26,8 @@
 
 /* Conteneur principal */
 .import-container {
-  max-width: 1000px;
-  margin: 2rem auto;
+  max-width: 100%;
+  margin: 0;
   padding: 2.5rem;
   background: var(--elzei-white);
   border-radius: var(--border-radius);
@@ -58,23 +58,27 @@
   border-radius: 4px;
 }
 
-/* Grille des documents */
 .documents-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr); /* 3 colonnes égales */
+  gap: 1.5rem;
   margin-bottom: 2.5rem;
+  width: 100%;
 }
 
-/* Carte de document */
+/* Carte de document - CORRIGÉ */
 .document-card {
   background: var(--elzei-bg);
   border-radius: var(--border-radius);
-  padding: 1.8rem;
+  padding: 1.5rem;
   border: 1px solid var(--elzei-green-light);
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  width: 100%; /* Prend toute la largeur de sa colonne */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .document-card:hover {
@@ -83,29 +87,31 @@
   transform: translateY(-2px);
 }
 
-/* En-tête de carte */
+/* En-tête de carte - ajusté */
 .card-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .header-icon {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   background: linear-gradient(135deg, var(--elzei-green-light) 0%, var(--elzei-white) 100%);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--elzei-green-dark);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--elzei-green-light);
+  flex-shrink: 0;
 }
 
 .card-title {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 500;
   color: var(--elzei-gray-dark);
   margin: 0;
@@ -117,27 +123,30 @@
 .badge {
   background: var(--elzei-green-light);
   color: var(--elzei-green-dark);
-  padding: 0.25rem 1rem;
+  padding: 0.2rem 0.8rem;
   border-radius: 30px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   border: 1px solid var(--elzei-green);
+  white-space: nowrap;
 }
 
 /* Description */
 .card-description {
   color: var(--elzei-gray);
-  font-size: 0.9rem;
-  margin-bottom: 1.8rem;
-  line-height: 1.5;
+  font-size: 0.85rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.4;
+  flex-grow: 1;
 }
 
-/* Wrapper du fichier */
+
 .file-input-wrapper {
-  position: relative;
-  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centre verticalement */
 }
 
 .file-input-wrapper input[type="file"] {
@@ -149,17 +158,22 @@
   z-index: 2;
 }
 
-/* Label du fichier */
 .file-label {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.2rem;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
   background: var(--elzei-white);
   border: 1.5px dashed var(--elzei-green-light);
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: var(--transition);
+  width: 100%;
+  box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .file-input-wrapper input[type="file"]:hover + .file-label {
@@ -186,7 +200,7 @@
 
 .upload-text {
   flex: 1;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--elzei-gray-dark);
   white-space: nowrap;
   overflow: hidden;
@@ -195,11 +209,11 @@
 }
 
 .upload-hint {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--elzei-gray-light);
   font-weight: 400;
+  white-space: nowrap;
 }
-
 /* Message d'erreur */
 .error-message {
   display: flex;
@@ -423,8 +437,8 @@
   }
 
   .documents-grid {
-    grid-template-columns: 1fr;
-    gap: 1.2rem;
+    grid-template-columns: 1fr; /* 1 colonne sur mobile */
+    gap: 1rem;
   }
 
   .actions-bar {
@@ -468,6 +482,11 @@
   .import-container {
     box-shadow: none;
     border: 1px solid var(--elzei-border);
+  }
+}
+@media (max-width: 1100px) {
+  .documents-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur tablette */
   }
 }
 

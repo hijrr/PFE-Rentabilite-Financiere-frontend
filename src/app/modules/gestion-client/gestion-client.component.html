@@ -1,0 +1,149 @@
+<div class="client-container">
+  <!-- En-tête avec KPI -->
+  <div class="kpi-section">
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Total Clients</span>
+        <span class="kpi-value">{{ totalClients }}</span>
+        <span class="kpi-trend" [class.positive]="clientTrend > 0" [class.negative]="clientTrend < 0">
+          <i class="fa-solid" [ngClass]="clientTrend > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ clientTrend > 0 ? '+' : '' }}{{ clientTrend }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-user-plus"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Clients Actifs</span>
+        <span class="kpi-value">{{ clientsActifs }}</span>
+        <span class="kpi-trend" [class.positive]="actifsTrend > 0" [class.negative]="actifsTrend < 0">
+          <i class="fa-solid" [ngClass]="actifsTrend > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ actifsTrend > 0 ? '+' : '' }}{{ actifsTrend }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-user-clock"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Prospects</span>
+        <span class="kpi-value">{{ totalProspects }}</span>
+        <span class="kpi-trend" [class.positive]="prospectsTrend > 0" [class.negative]="prospectsTrend < 0">
+          <i class="fa-solid" [ngClass]="prospectsTrend > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ prospectsTrend > 0 ? '+' : '' }}{{ prospectsTrend }}%
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre de recherche et titre -->
+  <div class="client-header">
+    <div class="header-title">
+      <div class="header-icon">
+        <i class="fa-solid fa-building"></i>
+      </div>
+      <h1>Liste des Clients</h1>
+      <span class="client-count">{{ filteredClients.length }} client(s) affiché(s)</span>
+    </div>
+
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Rechercher un client..."
+        (input)="filterClients($event)">
+    </div>
+  </div>
+
+  <!-- Tableau des clients -->
+  <div class="table-wrapper">
+    <table class="client-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Ville</th>
+          <th>Pays</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of paginatedClients">
+          <td class="client-cell">
+            <div class="client-info">
+              <div class="client-avatar">
+                <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client-logo">
+                <div *ngIf="!client.logoData" class="avatar-placeholder">
+                  {{ client.name?.charAt(0) || '?' }}
+                </div>
+              </div>
+              <div class="client-details">
+                <span class="client-name">{{ client.name || '—' }}</span>
+                <span class="client-code">{{ client.code_client || '—' }}</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ client.email || '—' }}</td>
+          <td>{{ formatPhone(client.phone) }}</td>
+          <td>{{ client.town || '—' }}</td>
+          <td>{{ getCountryName(client.country_code) }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getClientStatus(client.client).class">
+              {{ getClientStatus(client.client).label }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view" (click)="openClientDetails(client)" title="Voir détails">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="action-btn edit" title="Modifier">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn contact" title="Contacter">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="paginatedClients.length === 0">
+          <td colspan="7" class="no-data">
+            <i class="fa-solid fa-folder-open"></i>
+            <p>Aucun client trouvé</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-section">
+    <span class="pagination-info">
+      Affichage de {{ getPaginationStart() }} à {{ getPaginationEnd() }} sur {{ filteredClients.length }} clients
+    </span>
+    <div class="pagination-controls" *ngIf="totalPages > 1">
+      <button
+        class="page-btn"
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button
+        class="page-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="changePage(currentPage + 1)">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

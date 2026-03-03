@@ -12,13 +12,13 @@
         <span class="badge">Requis</span>
       </div>
 
-      <p class="card-description">Importez votre bulletin de salaire (PDF, JPG, PNG, DOC)</p>
+      <p class="card-description">Importez votre bulletin de salaire (PDF)</p>
 
       <div class="file-input-wrapper">
         <input type="file"
                id="fichePaie"
                (change)="onFichePaieSelected($event)"
-               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+               accept=".pdf"
                [class.file-selected]="fichePaieFile">
         <label for="fichePaie" class="file-label">
           <span class="upload-icon">
@@ -49,13 +49,13 @@
         <span class="badge">Requis</span>
       </div>
 
-      <p class="card-description">Importez vos justificatifs de dépenses (PDF, JPG, PNG, DOC)</p>
+      <p class="card-description">Importez vos justificatifs de dépenses (Excel)</p>
 
       <div class="file-input-wrapper">
         <input type="file"
                id="noteFrais"
                (change)="onNoteFraisSelected($event)"
-               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+               accept=".xlsx,.xls"
                [class.file-selected]="noteFraisFile">
         <label for="noteFrais" class="file-label">
           <span class="upload-icon">
@@ -75,7 +75,43 @@
 
 
     </div>
-  </div>
+    <!-- Note de frais kilométrique -->
+    <div class="document-card">
+      <div class="card-header">
+        <div class="header-icon">
+           <i class="fa-solid fa-receipt"></i>
+        </div>
+        <h3 class="card-title">Note de frais kilométrique</h3>
+        <span class="badge">Requis</span>
+      </div>
+
+      <p class="card-description">Importez vos justificatifs de dépenses (Excel)</p>
+
+      <div class="file-input-wrapper">
+        <input type="file"
+               id="noteFraisKilometrique"
+               (change)="onNoteFraisKiloSelected($event)"
+               accept=".xlsx,.xls"
+               [class.file-selected]="noteFraisKilometriqueFile">
+        <label for="noteFraisKilometrique" class="file-label">
+          <span class="upload-icon">
+             <i class="fa-solid fa-paperclip"></i>
+          </span>
+          <span class="upload-text">{{ noteFraisKilometriqueFile ? noteFraisKilometriqueFile.name : 'Choisir un fichier' }}</span>
+          <span class="upload-hint" *ngIf="!noteFraisKilometriqueFile">Cliquez ou glissez-déposez</span>
+        </label>
+      </div>
+
+      <div *ngIf="noteFraisError" class="error-message">
+        <span class="error-icon">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
+        {{ noteFraisKilometriqueError }}
+      </div>
+
+
+    </div>
+   </div>
 
   <!-- Barre d'actions -->
   <div class="actions-bar">
@@ -94,20 +130,5 @@
       </span>
       Réinitialiser
     </button>
-  </div>
-
-  <!-- Résumé des imports -->
-  <div class="summary-section" *ngIf="fichePaieFile || noteFraisFile">
-    <h4 class="summary-title"> Récapitulatif</h4>
-    <div class="summary-list">
-      <div class="summary-item" *ngIf="fichePaieFile">
-        <span class="item-label">Fiche de paie :</span>
-        <span class="item-value">{{ fichePaieFile.name }}</span>
-      </div>
-      <div class="summary-item" *ngIf="noteFraisFile">
-        <span class="item-label">Note de frais :</span>
-        <span class="item-value">{{ noteFraisFile.name }}</span>
-      </div>
-    </div>
   </div>
 </div>

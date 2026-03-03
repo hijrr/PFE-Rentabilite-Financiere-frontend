@@ -1,0 +1,31 @@
+<div class="app-layout">
+  <!-- Contenu principal -->
+  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+    <!-- En-tête -->
+    <header class="page-header">
+      <h1 class="page-title">
+        <span class="title-highlight">elzei</span> consulting
+      </h1>
+      <div class="user-menu">
+        <span class="user-name">{{ user?.username }}</span>
+        <div class="user-avatar">{{ getInitial(user?.username ?? '') }}</div>
+      </div>
+    </header>
+
+    <!-- Les deux composants côte à côte -->
+    <div class="components-row">
+      <!-- Composant Dolibarr -->
+      <div class="component-card">
+        <app-dolibarr-sync-component></app-dolibarr-sync-component>
+      </div>
+
+      <!-- Composant Import -->
+      <div class="component-card">
+        <app-finance-import-component></app-finance-import-component>
+      </div>
+    </div>
+
+    <!-- Troisième composant -->
+    <app-financial-data-form-component></app-financial-data-form-component>
+  </main>
+</div>

@@ -1,0 +1,146 @@
+/* Layout principal */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #F8FAFC;
+  font-family: 'Inter', sans-serif;
+}
+:host {
+  display: block;
+  width: 100%;
+}
+/* Contenu principal */
+.main-content {
+  max-width: 1500px;
+  margin:  auto;
+  width: 100%;
+}
+
+/* Quand la sidebar est réduite - UNIQUEMENT le margin-left change */
+.main-content.sidebar-collapsed {
+  margin-left: 130px; /* Largeur réduite de la sidebar */
+  width: calc(100% - 130px);
+}
+
+/* CENTRAGE - Quand la sidebar est réduite, les composants sont centrés */
+.main-content.sidebar-collapsed .components-row {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 2000px; /* Ajustez cette valeur selon vos besoins */
+}
+
+/* En-tête */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #E8F8F0;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 500;
+  color: #1F2937;
+  margin: 0;
+}
+
+.title-highlight {
+  color: #27AE60;
+  font-weight: 700;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1F2937;
+}
+
+.user-avatar {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #6FCF97 0%, #27AE60 100%);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+}
+
+/* Ligne des deux composants - PAS DE CHANGEMENT ICI */
+.components-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* Cartes des composants */
+.component-card {
+  background: transparent;
+  width: 100%;
+}
+
+/* Styles pour que les composants enfants prennent toute la largeur */
+.component-card ::ng-deep .synchronisation-container,
+.component-card ::ng-deep .import-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Troisième composant */
+app-financial-data-form-component {
+  display: block;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+/* Quand la sidebar est réduite - le troisième composant aussi centré */
+.main-content.sidebar-collapsed app-financial-data-form-component {
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+  .components-row {
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 1rem;
+  }
+  .components-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}

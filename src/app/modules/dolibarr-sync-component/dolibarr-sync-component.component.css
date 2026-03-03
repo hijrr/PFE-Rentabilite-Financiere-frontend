@@ -1,0 +1,455 @@
+/* Variables - Thème vert clair */
+:host {
+  --elzei-green: #6FCF97;
+  --elzei-green-light: #E8F8F0;
+  --elzei-green-dark: #27AE60;
+  --elzei-green-soft: #D5F0E0;
+  --elzei-white: #FFFFFF;
+  --elzei-gray-dark: #1F2937;
+  --elzei-gray: #4B5563;
+  --elzei-gray-light: #9CA3AF;
+  --elzei-gray-soft: #F3F4F6;
+  --elzei-border: #E5E7EB;
+  --elzei-bg: #F9FAFB;
+
+  --shadow-sm: 0 2px 8px rgba(111, 207, 151, 0.08);
+  --shadow-md: 0 4px 12px rgba(111, 207, 151, 0.12);
+  --shadow-lg: 0 8px 24px rgba(111, 207, 151, 0.15);
+
+  --border-radius: 16px;
+  --transition: all 0.2s ease;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Import police */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Container principal - CORRIGÉ pour même largeur que import */
+.synchronisation-container {
+  background: var(--elzei-white);
+  border-radius: var(--border-radius);
+  padding: 1.8rem;
+  /*Mêmepaddingqueimport*/margin: 0;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--elzei-border);
+  font-family: var(--font-family);
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease;
+  height: fit-content;
+  -webkit-animation: fadeIn 0.3s ease;
+  max-width: 600px;   /* 🔥 plus petit */
+  width: 100%;
+  margin: 0;
+}
+
+/* Header */
+.synchronisation-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--elzei-green-light);
+}
+
+.header-icon {
+  width: 44px; /* Réduit pour correspondre à import */
+  height: 44px;
+  background: linear-gradient(135deg, var(--elzei-green-light) 0%, var(--elzei-white) 100%);
+  border-radius: 12px; /* Changé de 50% à 12px comme import */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--elzei-green-light);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.header-icon i {
+  font-size: 1.5rem; /* Réduit */
+  color: var(--elzei-green-dark);
+}
+
+.header-title {
+  flex: 1;
+}
+
+.header-title h1 {
+  font-size: 1.4rem; /* Réduit pour correspondre */
+  font-weight: 600;
+  color: var(--elzei-gray-dark);
+  margin: 0 0 0.2rem 0;
+  letter-spacing: -0.02em;
+}
+
+.header-title p {
+  font-size: 0.85rem; /* Réduit */
+  color: var(--elzei-gray);
+  margin: 0;
+}
+
+.header-badge .badge-dolibarr {
+  background: linear-gradient(135deg, var(--elzei-green) 0%, var(--elzei-green-dark) 100%);
+  color: white;
+  padding: 0.3rem 1rem; /* Réduit */
+  border-radius: 30px;
+  font-size: 0.8rem; /* Réduit */
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+}
+
+.badge-dolibarr i {
+  font-size: 0.9rem;
+}
+
+/* Formulaire - CHAMPS VERTICAUX */
+.sync-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Disposition verticale des champs */
+.form-row {
+  display: flex;
+  flex-direction: column; /* Changé de grid à column */
+  gap: 1.2rem;
+  margin-bottom: 0;
+}
+
+.form-group {
+  position: relative;
+  width: 100%;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem; /* Réduit */
+  font-weight: 600;
+  color: var(--elzei-gray-dark);
+  margin-bottom: 0.4rem;
+}
+
+.form-label i {
+  color: var(--elzei-green);
+  margin-right: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.required-star {
+  color: #DC2626;
+  margin-left: 0.2rem;
+}
+
+/* Select personnalisé */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.8rem 1rem; /* Réduit */
+  padding-right: 2.5rem;
+  border: 1.5px solid var(--elzei-border);
+  border-radius: 10px; /* Réduit */
+  font-size: 0.9rem; /* Réduit */
+  color: var(--elzei-gray-dark);
+  background: var(--elzei-white);
+  appearance: none;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-family);
+}
+
+.form-select:hover {
+  border-color: var(--elzei-green);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--elzei-green-dark);
+  box-shadow: 0 0 0 3px rgba(111, 207, 151, 0.15);
+}
+
+.form-select.select-filled {
+  border-color: var(--elzei-green);
+  background: var(--elzei-green-light);
+}
+
+.select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--elzei-gray-light);
+  pointer-events: none;
+  transition: var(--transition);
+}
+
+/* Date input */
+.date-input-wrapper {
+  position: relative;
+  width: 90%;
+}
+
+.form-date {
+  width: 100%;
+  padding: 0.8rem 1rem; /* Réduit */
+  padding-left: 2.8rem;
+  border: 1.5px solid var(--elzei-border);
+  border-radius: 10px; /* Réduit */
+  font-size: 0.9rem; /* Réduit */
+  color: var(--elzei-gray-dark);
+  background: var(--elzei-white);
+  transition: var(--transition);
+  font-family: var(--font-family);
+}
+
+.form-date:hover {
+  border-color: var(--elzei-green);
+}
+
+.form-date:focus {
+  outline: none;
+  border-color: var(--elzei-green-dark);
+  box-shadow: 0 0 0 3px rgba(111, 207, 151, 0.15);
+}
+
+.form-date.date-filled {
+  border-color: var(--elzei-green);
+  background: var(--elzei-green-light);
+}
+
+/* Style pour le calendrier natif */
+.form-date::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-right: 0.3rem;
+}
+
+.form-date::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.date-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--elzei-green);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Field hint */
+.field-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem; /* Réduit */
+  color: var(--elzei-gray-light);
+  margin-top: 0.3rem;
+  margin-left: 0.5rem;
+}
+
+.field-hint i {
+  color: var(--elzei-green);
+  font-size: 0.65rem;
+}
+
+/* Messages d'erreur et succès */
+.error-message {
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  padding: 0.8rem 1rem; /* Réduit */
+  border-radius: 8px; /* Réduit */
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: slideIn 0.3s ease;
+  font-size: 0.85rem; /* Réduit */
+}
+
+.error-message i {
+  font-size: 1rem;
+}
+
+.success-message {
+  background: var(--elzei-green-light);
+  border: 1px solid var(--elzei-green);
+  color: var(--elzei-green-dark);
+  padding: 0.8rem 1rem; /* Réduit */
+  border-radius: 8px; /* Réduit */
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: slideIn 0.3s ease;
+  font-size: 0.85rem; /* Réduit */
+  font-weight: 500;
+}
+
+.success-message i {
+  font-size: 1rem;
+}
+
+/* Barre d'actions - VERTICALE */
+.actions-bar {
+  display: flex;
+  flex-direction: column; /* Changé de row à column */
+  gap: 0.8rem;
+  margin-top: 80px;
+
+  padding-top: 1rem;
+  border-top: 1px solid var(--elzei-green-light);
+}
+
+.btn-sync, .btn-reset {
+  width: 100%; /* Pleine largeur */
+  padding: 0.8rem 1.5rem; /* Réduit */
+  border: none;
+  border-radius: 40px;
+  font-size: 0.9rem; /* Réduit */
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: var(--font-family);
+}
+
+.btn-sync {
+  background: linear-gradient(135deg, var(--elzei-green) 0%, var(--elzei-green-dark) 100%);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-sync:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-sync:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--elzei-gray-light);
+}
+
+.btn-reset {
+  background: white;
+  color: var(--elzei-gray);
+  border: 1px solid var(--elzei-border);
+}
+
+.btn-reset:hover {
+  background: var(--elzei-green-light);
+  border-color: var(--elzei-green);
+  color: var(--elzei-green-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(111, 207, 151, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(111, 207, 151, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(111, 207, 151, 0);
+  }
+}
+
+/* Animation pour le bouton sync */
+.btn-sync:not(:disabled) {
+  animation: pulse 2s infinite;
+}
+
+/* États focus pour l'accessibilité */
+.form-select:focus-visible,
+.form-date:focus-visible,
+.btn-sync:focus-visible,
+.btn-reset:focus-visible {
+  outline: 2px solid var(--elzei-green-dark);
+  outline-offset: 2px;
+}
+
+/* Style pour le hover des champs */
+.form-group:hover .form-label i {
+  transform: scale(1.1);
+  transition: var(--transition);
+}
+
+/* Style pour la valeur sélectionnée */
+.select-filled, .date-filled {
+  font-weight: 500;
+}
+
+/* Tooltip pour les icônes (optionnel) */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--elzei-gray-dark);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  margin-bottom: 0.3rem;
+  z-index: 10;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Impression */
+@media print {
+  .synchronisation-container {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .btn-sync, .btn-reset {
+    display: none;
+  }
+}

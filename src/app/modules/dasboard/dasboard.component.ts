@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { AuthService, UserOut } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-dasboard',
@@ -6,23 +7,28 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./dasboard.component.css']
 })
 export class DasboardComponent implements OnInit {
-
-  constructor() { }
+ user?: UserOut;
+  constructor(public  authService: AuthService) { }
 
   ngOnInit(): void {
+     this.authService.getCurrentUser().subscribe({
+      next: (u) => this.user = u,
+      error: (err) => console.log('Erreur fetching user', err)
+    });
   }
+  getInitial(username: string): string {
+  if (!username) return '';  // si username vide ou null
+  return username.charAt(0).toUpperCase(); // première lettre en majuscule
+}
   // État du menu (ouvert/réduit)
   isCollapsed = false;
 
   // Élément actif
   activeItem: string = 'accueil';
 
-  // Données utilisateur
-  user = {
-    name: 'Thomas Martin',
-    email: 'thomas.martin@elzei.fr',
-    initials: 'TM'
-  };
+
+
+    @Output() toggleChange = new EventEmitter<boolean>();
 
   setActive(itemId: string) {
     this.activeItem = itemId;
@@ -30,6 +36,7 @@ export class DasboardComponent implements OnInit {
 
   toggleMenu() {
     this.isCollapsed = !this.isCollapsed;
+     this.toggleChange.emit(this.isCollapsed);
   }
 
   logout() {

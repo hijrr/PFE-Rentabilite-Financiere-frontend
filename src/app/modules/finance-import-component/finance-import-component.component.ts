@@ -9,10 +9,11 @@ export class FinanceImportComponentComponent implements OnInit {
 
  fichePaieFile: File | null = null;
   noteFraisFile: File | null = null;
+  noteFraisKilometriqueFile: File | null = null;
 
   fichePaieError = '';
   noteFraisError = '';
-
+  noteFraisKilometriqueError = '';
   maxSize = 5 * 1024 * 1024; // 5MB
 
   validExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
@@ -36,6 +37,16 @@ export class FinanceImportComponentComponent implements OnInit {
     } else {
       this.noteFraisError = 'Fichier invalide (max 5MB)';
       this.noteFraisFile = null;
+    }
+  }
+  onNoteFraisKiloSelected(event: any) {
+    const file = event.target.files[0];//tab de fichiers dima
+
+    if (file && this.validateFile(file)) {
+      this.noteFraisKilometriqueFile = file;
+    } else {
+      this.noteFraisKilometriqueError = 'Fichier invalide (max 5MB)';
+      this.noteFraisKilometriqueFile = null;
     }
   }
 

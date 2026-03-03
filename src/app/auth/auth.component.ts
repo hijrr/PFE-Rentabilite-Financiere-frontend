@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Form, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 
 interface LoginResponse {
@@ -21,13 +22,15 @@ export class AuthComponent implements OnInit {
     username : new FormControl('',[Validators.required]),
     password : new FormControl('',[Validators.required,Validators.minLength(4)])
   });
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,private router: Router) { }
 
 
   ngOnInit(): void {
     setInterval(() => {
       this.rotateWord();
     }, 3000);
+
+
   }
 rotateWord() {
     const words = document.querySelectorAll('.word');
@@ -48,7 +51,8 @@ rotateWord() {
     .subscribe({
       next: (response) => {
         console.log("Connexion réussie", response);
-         localStorage.setItem('token', response.access_token);
+         localStorage.setItem('token', response.access_token);//5thet ken acess token khw men json
+         this.router.navigate(['/']);
       },      error: (err) => {
         console.log("Erreur de connexion", err);
       }

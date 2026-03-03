@@ -1,1 +1,108 @@
-<p>dolibarr-sync-component works!</p>
+<div class="synchronisation-container">
+  <!-- Header avec titre -->
+  <div class="synchronisation-header">
+    <div class="header-icon">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+    </div>
+    <div class="header-title">
+      <h1>Synchronisation Dolibarr</h1>
+      <p>Exportez les données vers votre ERP</p>
+    </div>
+    <div class="header-badge">
+      <span class="badge-dolibarr">
+        <i class="fa-brands fa-dolibarr"></i>
+        Dolibarr
+      </span>
+    </div>
+  </div>
+
+  <!-- Formulaire de synchronisation -->
+  <div class="sync-form">
+    <!-- Sélection du salarié -->
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fa-solid fa-user"></i>
+          Salarié
+          <span class="required-star">*</span>
+        </label>
+        <div class="select-wrapper">
+          <select
+            [(ngModel)]="selectedSalarie"
+            name="salarie"
+            class="form-select"
+            [class.select-filled]="selectedSalarie">
+            <option value="" disabled selected>Choisir un salarié</option>
+            <option *ngFor="let salarie of salaries" [value]="salarie.id">
+              {{ salarie.nom }} - {{ salarie.poste }}
+            </option>
+          </select>
+          <i class="fa-solid fa-chevron-down select-arrow"></i>
+        </div>
+        <span class="field-hint" *ngIf="!selectedSalarie">
+          Sélectionnez le salarié à synchroniser
+        </span>
+      </div>
+
+      <!-- Sélection de la date avec jour -->
+      <div class="form-group">
+        <label class="form-label">
+          <i class="fa-solid fa-calendar"></i>
+          Date
+          <span class="required-star">*</span>
+        </label>
+        <div class="date-input-wrapper">
+          <input
+            type="date"
+            [(ngModel)]="selectedDate"
+            name="date"
+            class="form-date"
+            [max]="todayDate"
+            [class.date-filled]="selectedDate">
+          <i class="fa-solid fa-calendar-days date-icon"></i>
+        </div>
+        <span class="field-hint" *ngIf="!selectedDate">
+          Sélectionnez la date à synchroniser
+        </span>
+        <span class="field-hint" *ngIf="selectedDate">
+          <i class="fa-regular fa-clock"></i>
+          {{ formatDateWithDay(selectedDate) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div class="error-message" *ngIf="syncError">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      {{ syncError }}
+    </div>
+
+    <!-- Message de succès -->
+    <div class="success-message" *ngIf="syncSuccess">
+      <i class="fa-solid fa-circle-check"></i>
+      Synchronisation réussie avec Dolibarr !
+    </div>
+
+    <!-- Barre d'actions -->
+    <div class="actions-bar">
+      <button
+        class="btn-sync"
+        (click)="synchroniserDolibarr()"
+        [disabled]="!selectedSalarie || !selectedDate || isSyncing">
+
+        <i class="fa-solid" [ngClass]="{
+          'fa-cloud-arrow-up': !isSyncing,
+          'fa-circle-notch fa-spin': isSyncing
+        }"></i>
+
+        <span *ngIf="!isSyncing">Synchroniser avec Dolibarr</span>
+        <span *ngIf="isSyncing">Synchronisation en cours...</span>
+      </button>
+
+      <button class="btn-reset" (click)="resetForm()">
+        <i class="fa-solid fa-rotate"></i>
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+</div>
