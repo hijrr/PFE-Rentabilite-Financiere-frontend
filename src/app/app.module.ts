@@ -14,6 +14,7 @@ import { DasboardComponent } from './modules/dasboard/dasboard.component';
 import { CalculRenMainComponent } from './modules/calcul-ren-main/calcul-ren-main.component';
 import { GestionSalariesComponent } from './modules/gestion-salaries/gestion-salaries.component';
 import { GestionClientComponent } from './modules/gestion-client/gestion-client.component';
+import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -25,6 +26,7 @@ import { GestionClientComponent } from './modules/gestion-client/gestion-client.
     CalculRenMainComponent,
     GestionSalariesComponent,
     GestionClientComponent,
+    GestionFacturationComponent,
   ],
   imports: [
     BrowserModule,

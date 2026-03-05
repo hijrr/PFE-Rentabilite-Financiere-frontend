@@ -1,1 +1,394 @@
-<p>gestion-salaries works!</p>
+<div class="salarie-container">
+  <!-- En-tête avec titre et bouton d'ajout -->
+  <div class="salarie-header">
+    <div class="header-title">
+      <div class="header-icon">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <h1>Gestion des Salariés</h1>
+      <span class="salarie-count">24 salarié(s)</span>
+    </div>
+
+    <div class="header-actions">
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher un salarié...">
+      </div>
+
+      <button class="btn-add">
+        <i class="fa-solid fa-plus"></i>
+        Ajouter un salarié
+      </button>
+    </div>
+  </div>
+
+  <!-- Tableau des salariés -->
+  <div class="table-wrapper">
+    <table class="salarie-table">
+      <thead>
+        <tr>
+          <th>Salarié</th>
+          <th>Rôle</th>
+          <th>Projet</th>
+          <th>TJM</th>
+          <th>Statut rentabilité</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="salarie-cell">
+            <div class="salarie-info">
+              <div class="salarie-avatar">
+                <div class="avatar-placeholder">TM</div>
+              </div>
+              <div class="salarie-details">
+                <span class="salarie-name">Thomas Martin</span>
+                <span class="salarie-email">thomas.martin@elzei.fr</span>
+              </div>
+            </div>
+          </td>
+          <td>Développeur</td>
+          <td>ERP Client</td>
+          <td class="montant-cell">550 €</td>
+          <td>
+            <span class="status-badge status-rentable">Rentable</span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view" title="Voir détails">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="action-btn edit" title="Modifier">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn contact" title="Contacter">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td class="salarie-cell">
+            <div class="salarie-info">
+              <div class="salarie-avatar">
+                <div class="avatar-placeholder">SB</div>
+              </div>
+              <div class="salarie-details">
+                <span class="salarie-name">Sophie Bernard</span>
+                <span class="salarie-email">sophie.bernard@elzei.fr</span>
+              </div>
+            </div>
+          </td>
+          <td>Chef de projet</td>
+          <td>Site E-commerce</td>
+          <td class="montant-cell">650 €</td>
+          <td>
+            <span class="status-badge status-tres-rentable">Très rentable</span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view" title="Voir détails">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="action-btn edit" title="Modifier">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn contact" title="Contacter">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td class="salarie-cell">
+            <div class="salarie-info">
+              <div class="salarie-avatar">
+                <div class="avatar-placeholder">LP</div>
+              </div>
+              <div class="salarie-details">
+                <span class="salarie-name">Lucas Petit</span>
+                <span class="salarie-email">lucas.petit@elzei.fr</span>
+              </div>
+            </div>
+          </td>
+          <td>Développeur</td>
+          <td>API REST</td>
+          <td class="montant-cell">500 €</td>
+          <td>
+            <span class="status-badge status-low">Peu rentable</span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view" title="Voir détails">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="action-btn edit" title="Modifier">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn contact" title="Contacter">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td class="salarie-cell">
+            <div class="salarie-info">
+              <div class="salarie-avatar">
+                <div class="avatar-placeholder">ED</div>
+              </div>
+              <div class="salarie-details">
+                <span class="salarie-name">Emma Dubois</span>
+                <span class="salarie-email">emma.dubois@elzei.fr</span>
+              </div>
+            </div>
+          </td>
+          <td>Designer</td>
+          <td>Application Mobile</td>
+          <td class="montant-cell">480 €</td>
+          <td>
+            <span class="status-badge status-rentable">Rentable</span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view" title="Voir détails">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="action-btn edit" title="Modifier">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn contact" title="Contacter">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td class="salarie-cell">
+            <div class="salarie-info">
+              <div class="salarie-avatar">
+                <div class="avatar-placeholder">AR</div>
+              </div>
+              <div class="salarie-details">
+                <span class="salarie-name">Alexandre Roux</span>
+                <span class="salarie-email">alexandre.roux@elzei.fr</span>
+              </div>
+            </div>
+          </td>
+          <td>Commercial</td>
+          <td>Prospection</td>
+          <td class="montant-cell">400 €</td>
+          <td>
+            <span class="status-badge status-pending">En attente</span>
+          </td>
+          <td class="actions-cell">
+            <button class="action-btn view" title="Voir détails">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+            <button class="action-btn edit" title="Modifier">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="action-btn contact" title="Contacter">
+              <i class="fa-solid fa-envelope"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-section">
+    <span class="pagination-info">
+      Affichage de 1 à 5 sur 24 salariés
+    </span>
+    <div class="pagination-controls">
+      <button class="page-btn" disabled>
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span class="page-info">1 / 5</span>
+      <button class="page-btn">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>
+<!--
+
+<div class="modal-overlay">
+  <div class="modal-container">
+
+    <div class="modal-header">
+      <h2>
+        <i class="fa-solid fa-user-plus"></i>
+        Ajouter un salarié
+      </h2>
+      <button class="close-btn">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <form>
+      <div class="modal-body">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Nom <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="Ex: Martin">
+          </div>
+
+          <div class="form-group">
+            <label>Prénom <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="Ex: Thomas">
+          </div>
+
+
+          <div class="form-group">
+            <label>Email <span class="required">*</span></label>
+            <input type="email" class="form-control" placeholder="exemple@elzei.fr">
+          </div>
+
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="tel" class="form-control" placeholder="06 12 34 56 78">
+          </div>
+
+
+          <div class="form-group">
+            <label>Poste <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="Ex: Développeur Full Stack">
+          </div>
+
+          <div class="form-group">
+            <label>Rôle <span class="required">*</span></label>
+            <select class="form-control">
+              <option value="">Sélectionner un rôle</option>
+              <option value="Développeur">Développeur</option>
+              <option value="Chef de projet">Chef de projet</option>
+              <option value="Designer">Designer</option>
+              <option value="Commercial">Commercial</option>
+              <option value="Data">Data</option>
+              <option value="PO">Product Owner</option>
+              <option value="DevOps">DevOps</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Projet</label>
+            <input type="text" class="form-control" placeholder="Ex: ERP Client">
+          </div>
+
+          <div class="form-group">
+            <label>TJM (€) <span class="required">*</span></label>
+            <input type="number" class="form-control" placeholder="550" min="0">
+          </div>
+
+          <div class="form-group">
+            <label>Date d'embauche <span class="required">*</span></label>
+            <input type="date" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Statut rentabilité</label>
+            <select class="form-control">
+              <option value="tres_rentable">Très rentable</option>
+              <option value="rentable">Rentable</option>
+              <option value="en_attente">En attente</option>
+              <option value="peu_rentable">Peu rentable</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary">Annuler</button>
+        <button type="submit" class="btn-primary">
+          <i class="fa-solid fa-check"></i>
+          Ajouter
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay">
+  <div class="modal-container">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="salarie-avatar large">
+          <div class="avatar-placeholder large">TM</div>
+        </div>
+        <div>
+          <h2>Thomas Martin</h2>
+          <p class="salarie-subtitle">Développeur Full Stack</p>
+        </div>
+      </div>
+      <button class="close-btn">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="details-section">
+        <h3>
+          <i class="fa-solid fa-address-card"></i>
+          Informations personnelles
+        </h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">thomas.martin@elzei.fr</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">06 12 34 56 78</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date d'embauche</span>
+            <span class="detail-value">15/01/2023</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="details-section">
+        <h3>
+          <i class="fa-solid fa-briefcase"></i>
+          Informations professionnelles
+        </h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Rôle</span>
+            <span class="detail-value">Développeur</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Projet</span>
+            <span class="detail-value">ERP Client</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">TJM</span>
+            <span class="detail-value">550 €</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Statut rentabilité</span>
+            <span class="detail-value">
+              <span class="status-badge status-rentable">Rentable</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary">Fermer</button>
+      <button class="btn-primary">
+        <i class="fa-solid fa-pen"></i>
+        Modifier
+      </button>
+      <button class="btn-danger">
+        <i class="fa-solid fa-trash"></i>
+        Supprimer
+      </button>
+    </div>
+
+  </div>-->

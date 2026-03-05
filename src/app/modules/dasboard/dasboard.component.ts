@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { AuthService, UserOut } from 'src/app/services/auth.service';
 
 @Component({
@@ -8,13 +9,28 @@ import { AuthService, UserOut } from 'src/app/services/auth.service';
 })
 export class DasboardComponent implements OnInit {
  user?: UserOut;
-  constructor(public  authService: AuthService) { }
+  constructor(public  authService: AuthService,private router: Router) { }
 
   ngOnInit(): void {
      this.authService.getCurrentUser().subscribe({
       next: (u) => this.user = u,
       error: (err) => console.log('Erreur fetching user', err)
     });
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        const routeSegment = event.urlAfterRedirects.split('/')[1];
+        this.activeItem = this.mapRouteToActive(routeSegment);
+      }
+    });
+  }
+   mapRouteToActive(segment: string): string {
+    switch(segment.toLowerCase()) {
+      case 'facturation': return 'Facturation';
+      case 'clients': return 'Clients';
+      case 'salaries': return 'historique';
+      case 'calcul': return 'calcul';
+      default: return 'accueil';
+    }
   }
   getInitial(username: string): string {
   if (!username) return '';  // si username vide ou null

@@ -6,10 +6,12 @@ import { CalculRenMainComponent } from './modules/calcul-ren-main/calcul-ren-mai
 import { GestionClientComponent } from './modules/gestion-client/gestion-client.component';
 import { AuthComponent } from './auth/auth.component';
 import { AuthGuard } from './auth.guard';
+import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
   {path:'',component:CalculRenMainComponent,canActivate: [AuthGuard]},
+  {path:'Facturation',component:GestionFacturationComponent,canActivate: [AuthGuard]},
   {path:'Salaries',component:GestionSalariesComponent,canActivate: [AuthGuard]},
   {path:'Clients',component:GestionClientComponent,canActivate: [AuthGuard]},
   { path: '**', redirectTo: 'login' }

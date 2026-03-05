@@ -1,5 +1,5 @@
 <aside class="elzei-sidebar" [class.collapsed]="isCollapsed">
- 
+
   <div class="sidebar-logo">
     <div class="logo">
      <img src="assets/logo.webp" alt="Elzei Consulting" class="logo-img" />
@@ -77,6 +77,20 @@
         <i class="nav-icon fa-solid fa-chart-column"></i>
 
         <span class="nav-label">Calcul rentabilité</span>
+
+      </a>
+    </li>
+  </ul>
+  <ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem === 'Facturation'">
+
+      <a class="nav-link"
+         (click)="setActive('Facturation')" routerLink="Facturation">
+
+        <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
+
+        <span class="nav-label">Facturation</span>
 
       </a>
     </li>

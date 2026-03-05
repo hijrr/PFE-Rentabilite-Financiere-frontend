@@ -1,6 +1,7 @@
 <div class="client-container">
-  <!-- En-tête avec KPI -->
-  <div class="kpi-section">
+  <!-- En-tête avec KPI - 6 cartes maintenant -->
+  <div class="kpi-section six-cards">
+    <!-- KPI Clients existants -->
     <div class="kpi-card">
       <div class="kpi-icon">
         <i class="fa-solid fa-users"></i>
@@ -42,6 +43,75 @@
         </span>
       </div>
     </div>
+
+    <!-- Nouveaux KPI Factures -->
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-file-invoice"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Total Factures</span>
+        <span class="kpi-value">{{ getTotalInvoices() }}</span>
+        <span class="kpi-trend positive">
+          <i class="fa-solid fa-arrow-up"></i>
+          +{{ getTotalInvoices() > 0 ? '8' : '0' }}%
+        </span>
+      </div>
+    </div>
+<!-- Nouveaux KPI Factures -->
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Chiffre d'Affaires Total</span>
+        <span class="kpi-value">{{ getTotalCA() | number:'1.0-0' }} €</span>
+        <span class="kpi-trend" [class.positive]="getTotalCA() > 10000" [class.negative]="getTotalCA() <= 10000">
+          <i class="fa-solid" [ngClass]="getTotalCA() > 10000 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ getTotalCA() > 10000 ? '+' : '' }}{{ getTotalCA() > 10000 ? '12' : '5' }}%
+        </span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Facture Impayées</span>
+        <span class="kpi-value">{{ nbFacturesImpayees }}</span>
+        <span class="kpi-trend" [class.positive]="nbFacturesImpayees > 0" [class.negative]="nbFacturesImpayees <= 0">
+          <i class="fa-solid" [ngClass]="nbFacturesImpayees > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ nbFacturesImpayees > 0 ? '+' : '' }}{{ nbFacturesImpayees > 0 ? '12' : '5' }}%
+        </span>
+      </div>
+    </div>
+     <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Facture payées</span>
+        <span class="kpi-value">{{ nbFacturesPayees }}</span>
+        <span class="kpi-trend" [class.positive]="nbFacturesPayees > 0" [class.negative]="nbFacturesPayees <= 0">
+          <i class="fa-solid" [ngClass]="nbFacturesPayees > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ nbFacturesPayees > 0 ? '+' : '' }}{{ nbFacturesPayees > 0 ? '12' : '5' }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-calculator"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Moyenne par Facture</span>
+        <span class="kpi-value">{{ getAverageInvoice() | number:'1.0-0' }} €</span>
+        <span class="kpi-trend" [class.positive]="getAverageInvoice() > 500" [class.negative]="getAverageInvoice() <= 500">
+          <i class="fa-solid" [ngClass]="getAverageInvoice() > 500 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
+          {{ getAverageInvoice() > 500 ? '+' : '' }}{{ getAverageInvoice() > 500 ? '7' : '3' }}%
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- Barre de recherche et titre -->
@@ -64,16 +134,13 @@
     </div>
   </div>
 
-  <!-- Tableau des clients -->
+ <!-- Tableau simplifié des clients -->
   <div class="table-wrapper">
     <table class="client-table">
       <thead>
         <tr>
           <th>Client</th>
-          <th>Email</th>
-          <th>Téléphone</th>
-          <th>Ville</th>
-          <th>Pays</th>
+          <th>CA Total</th>
           <th>Statut</th>
           <th>Actions</th>
         </tr>
@@ -94,10 +161,10 @@
               </div>
             </div>
           </td>
-          <td>{{ client.email || '—' }}</td>
-          <td>{{ formatPhone(client.phone) }}</td>
-          <td>{{ client.town || '—' }}</td>
-          <td>{{ getCountryName(client.country_code) }}</td>
+          <td class="montant-cell">
+            <span *ngIf="getClientCA(client.id) > 0" class="ca-value">{{ getClientCA(client.id) | number:'1.0-0' }} €</span>
+            <span *ngIf="getClientCA(client.id) === 0" class="ca-value zero">—</span>
+          </td>
           <td>
             <span class="status-badge" [ngClass]="getClientStatus(client.client).class">
               {{ getClientStatus(client.client).label }}
@@ -107,16 +174,10 @@
             <button class="action-btn view" (click)="openClientDetails(client)" title="Voir détails">
               <i class="fa-solid fa-eye"></i>
             </button>
-            <button class="action-btn edit" title="Modifier">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button class="action-btn contact" title="Contacter">
-              <i class="fa-solid fa-envelope"></i>
-            </button>
           </td>
         </tr>
         <tr *ngIf="paginatedClients.length === 0">
-          <td colspan="7" class="no-data">
+          <td colspan="4" class="no-data">
             <i class="fa-solid fa-folder-open"></i>
             <p>Aucun client trouvé</p>
           </td>
@@ -124,7 +185,6 @@
       </tbody>
     </table>
   </div>
-
   <!-- Pagination -->
   <div class="pagination-section">
     <span class="pagination-info">
@@ -145,5 +205,211 @@
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
+  </div>
+</div>
+<!-- Modal Détails Client (TOUS LES DÉTAILS ICI) -->
+<div class="modal-overlay" *ngIf="showDetailsModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- En-tête du modal -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="client-avatar large">
+          <img *ngIf="selectedClient?.logoData" [src]="selectedClient?.logoData" alt="logo" class="client-logo">
+          <div *ngIf="!selectedClient?.logoData" class="avatar-placeholder large">
+            {{ selectedClient?.name?.charAt(0) || '?' }}
+          </div>
+        </div>
+        <div class="client-info-header">
+          <h2>{{ selectedClient?.name || '—' }}</h2>
+          <div class="client-meta">
+            <span class="client-code-badge">{{ selectedClient?.code_client || 'Sans code' }}</span>
+            <span class="status-badge" [ngClass]="getClientStatus(selectedClient?.client).class">
+              {{ getClientStatus(selectedClient?.client).label }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="closeModal()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Corps du modal (TOUS LES DÉTAILS) -->
+    <div class="modal-body">
+
+      <!-- Section Coordonnées -->
+      <div class="details-section">
+        <h3>
+          <i class="fa-solid fa-address-card"></i>
+          Coordonnées
+        </h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">
+              <a *ngIf="selectedClient?.email" [href]="'mailto:' + selectedClient.email">
+                {{ selectedClient.email }}
+              </a>
+              <span *ngIf="!selectedClient?.email">—</span>
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">
+              <a *ngIf="selectedClient?.phone" [href]="'tel:' + selectedClient.phone">
+                {{ selectedClient.phone }}
+              </a>
+              <span *ngIf="!selectedClient?.phone">—</span>
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Fax</span>
+            <span class="detail-value">{{ selectedClient?.fax || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Site Web</span>
+            <span class="detail-value">
+              <a *ngIf="selectedClient?.url" [href]="'https://' + selectedClient.url" target="_blank">
+                {{ selectedClient.url }}
+              </a>
+              <span *ngIf="!selectedClient?.url">—</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Adresse -->
+      <div class="details-section">
+        <h3>
+          <i class="fa-solid fa-location-dot"></i>
+          Adresse
+        </h3>
+        <div class="details-grid">
+          <div class="detail-item full-width">
+            <span class="detail-label">Adresse</span>
+            <span class="detail-value">{{ selectedClient?.address || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Code postal</span>
+            <span class="detail-value">{{ selectedClient?.zip || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Ville</span>
+            <span class="detail-value">{{ selectedClient?.town || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Pays</span>
+            <span class="detail-value">{{ getCountryName(selectedClient?.country_code) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Informations légales -->
+      <div class="details-section">
+        <h3>
+          <i class="fa-solid fa-scale-balanced"></i>
+          Informations légales
+        </h3>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="detail-label">SIRET</span>
+            <span class="detail-value">{{ selectedClient?.idprof1 || '—' }} {{ selectedClient?.idprof2 || '' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">TVA Intracommunautaire</span>
+            <span class="detail-value">{{ selectedClient?.tva_intra || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Forme juridique</span>
+            <span class="detail-value">{{ selectedClient?.forme_juridique || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Capital</span>
+            <span class="detail-value">{{ selectedClient?.capital ? (selectedClient.capital | number:'1.0-0') + ' €' : '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Effectif</span>
+            <span class="detail-value">{{ selectedClient?.effectif || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Code NAF</span>
+            <span class="detail-value">{{ selectedClient?.idprof3 || '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Statistiques financières -->
+      <div class="details-section">
+        <h3>
+          <i class="fa-solid fa-chart-pie"></i>
+          Statistiques financières
+        </h3>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-label">Chiffre d'Affaires Total</span>
+            <span class="stat-value">{{ getClientCA(selectedClient?.id) | number:'1.0-0' }} €</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Nombre de factures</span>
+            <span class="stat-value">{{ getClientInvoiceCount(selectedClient?.id) }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Date création</span>
+            <span class="stat-value">{{ formatDate(selectedClient?.date_creation) }}</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Dernière modification</span>
+            <span class="stat-value">{{ formatDate(selectedClient?.date_modification) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Dernières factures -->
+      <div class="details-section" *ngIf="getClientInvoices(selectedClient?.id).length > 0">
+        <h3>
+          <i class="fa-solid fa-file-invoice"></i>
+          Dernières factures
+        </h3>
+        <div class="invoices-list">
+          <table class="invoices-table">
+            <thead>
+              <tr>
+                <th>Référence</th>
+                <th>Date</th>
+                <th>Montant HT</th>
+                <th>Totale TVA</th>
+                <th>Montant TTC</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let inv of getClientInvoices(selectedClient?.id) | slice:0:5">
+                <td>{{ inv.ref || '—' }}</td>
+                <td>{{ formatDate(inv.date) }}</td>
+                <td class="montant-cell">{{ inv.total_ht | number:'1.0-0' }} €</td>
+                <td class="montant-cell">{{ inv.total_tva | number:'1.0-0' }} €</td>
+                <td class="montant-cell">{{ inv.total_ttc | number:'1.0-0' }} €</td>
+                <td>
+                  <span class="status-badge small" [ngClass]="getInvoiceStatusClass(inv)">
+                    {{ getInvoiceStatusLabel(inv) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Pied du modal -->
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeModal()">
+        <i class="fa-solid fa-times"></i>
+        Fermer
+      </button>
+    </div>
+
   </div>
 </div>
