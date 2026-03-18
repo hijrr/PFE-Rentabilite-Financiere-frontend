@@ -30,7 +30,7 @@
       [class.active]="activeItem === 'accueil'">
 
       <a class="nav-link"
-         (click)="setActive('accueil')"  routerLink="">
+         (click)="setActive('accueil')"routerLink="" >
 
         <i class="nav-icon fa-solid fa-house"></i>
 
@@ -48,7 +48,7 @@
 
         <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
 
-        <span class="nav-label">Historique salarié</span>
+        <span class="nav-label">Gestion salarié</span>
 
       </a>
     </li>
@@ -67,16 +67,30 @@
       </a>
     </li>
   </ul>
+   <ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem === 'projets'">
+
+      <a class="nav-link"
+         (click)="setActive('projets')" routerLink="Projets">
+
+        <i class="fa-solid fa-folder"></i>
+
+        <span class="nav-label"> Projets</span>
+
+      </a>
+    </li>
+  </ul>
 <ul class="nav-list">
     <li class="nav-item"
         [class.active]="activeItem === 'calcul'">
 
       <a class="nav-link"
-         (click)="setActive('calcul')">
+         (click)="setActive('calcul')" >
 
         <i class="nav-icon fa-solid fa-chart-column"></i>
 
-        <span class="nav-label">Calcul rentabilité</span>
+        <span class="nav-label">Calcul rentabilité mensuelle</span>
 
       </a>
     </li>

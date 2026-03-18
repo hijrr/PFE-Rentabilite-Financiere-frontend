@@ -20,7 +20,7 @@ export class GestionFacturationComponent implements OnInit {
 
   // Pagination
   currentPage: number = 1;
-  itemsPerPage: number = 10;
+  itemsPerPage: number = 5;
   totalPages: number = 1;
 
   // Modal
@@ -32,6 +32,8 @@ export class GestionFacturationComponent implements OnInit {
   totalPaid: number = 0;
   totalUnpaid: number = 0;
   totalAmount: number = 0;
+  totalPaidTTC: number = 0;
+  isLoading: boolean = true;
 
   constructor(private clientService: ClientService) { }
 
@@ -41,6 +43,7 @@ export class GestionFacturationComponent implements OnInit {
   }
 
   loadInvoices(): void {
+    this.isLoading = true;
     this.clientService.getInvoices().subscribe({
       next: (data) => {
         this.invoices = data.invoices || [];
@@ -49,10 +52,12 @@ export class GestionFacturationComponent implements OnInit {
         this.filteredInvoices = [...this.invoices];
         this.calculerStatistiques();
         this.updatePagination();
+        this.isLoading = false;
         console.log('Factures chargées:', this.invoices);
       },
       error: (err) => {
         console.error('Erreur chargement factures:', err);
+        this.isLoading = false;
       }
     });
   }
@@ -81,10 +86,13 @@ export class GestionFacturationComponent implements OnInit {
   }
 
   calculerStatistiques(): void {
-    this.totalInvoices = this.invoices.length;
-    this.totalPaid = this.invoices.filter(inv => inv.paye === "1").length;
-    this.totalUnpaid = this.invoices.filter(inv => inv.paye === "0").length;
-    this.totalAmount = this.invoices.reduce((sum, inv) => sum + parseFloat(inv.total_ttc || 0), 0);
+    this.totalInvoices = this.invoices.filter(inv => inv.statut !== "0").length;
+    this.totalPaid = this.invoices.filter(inv => inv.paye === "1"&& inv.statut === "2").length;
+    this.totalUnpaid = this.invoices.filter(inv => inv.paye === "0" && inv.statut === "1").length;
+    this.totalAmount = this.invoices.filter(inv => inv.paye === "1" && inv.statut === "2")
+    .reduce((sum, inv) => sum + parseFloat(inv.total_ht || "0"), 0);
+    this.totalPaidTTC = this.invoices.filter(inv => inv.paye === "1" && inv.statut === "2")
+    .reduce((sum, inv) => sum + parseFloat(inv.total_ttc || "0"), 0);
   }
 
   // ========== AUTOCOMPLETE CLIENTS ==========
@@ -198,7 +206,11 @@ export class GestionFacturationComponent implements OnInit {
       maximumFractionDigits: 2
     }).format(num || 0);
   }
-
+getCATtcImpayee(): number {
+  return this.invoices
+    .filter(inv => inv.paye === "0" && inv.statut === "1")
+    .reduce((sum, inv) => sum + parseFloat(inv.total_ttc || "0"), 0);
+}
   // Statut facture
   getInvoiceStatusClass(invoice: any): string {
     if (invoice.paye === "1") {

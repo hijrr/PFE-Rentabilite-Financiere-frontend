@@ -2,7 +2,7 @@
 .app-layout {
   display: flex;
   min-height: 100vh;
-  background: #F8FAFC;
+  background: #ffffff;
   font-family: 'Inter', sans-serif;
 }
 :host {
@@ -11,7 +11,7 @@
 }
 /* Contenu principal */
 .main-content {
-  max-width: 1500px;
+
   margin:  auto;
   width: 100%;
 }
@@ -29,53 +29,7 @@
   max-width: 2000px; /* Ajustez cette valeur selon vos besoins */
 }
 
-/* En-tête */
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 20px;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #E8F8F0;
-}
 
-.page-title {
-  font-size: 2rem;
-  font-weight: 500;
-  color: #1F2937;
-  margin: 0;
-}
-
-.title-highlight {
-  color: #27AE60;
-  font-weight: 700;
-}
-
-.user-menu {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-name {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #1F2937;
-}
-
-.user-avatar {
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(135deg, #6FCF97 0%, #27AE60 100%);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
-}
 
 /* Ligne des deux composants - PAS DE CHANGEMENT ICI */
 .components-row {
@@ -113,7 +67,7 @@ app-financial-data-form-component {
 
 /* Quand la sidebar est réduite - le troisième composant aussi centré */
 .main-content.sidebar-collapsed app-financial-data-form-component {
-  max-width: 1000px;
+
   margin-left: auto;
   margin-right: auto;
 }

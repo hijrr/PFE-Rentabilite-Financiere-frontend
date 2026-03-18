@@ -11,8 +11,10 @@ export class GestionClientComponent implements OnInit {
   invoices: any[] = [];
   filteredClients: any[] = [];
   searchTerm: string = '';
-nbFacturesPayees: number = 0;
-nbFacturesImpayees: number = 0;
+  showClientList: boolean = false;
+selectedClientId: string | null = null;
+filteredClientsList: any[] = [];
+private hideTimeout: any;
   // KPI Clients
   totalClients: number = 0;
   clientsActifs: number = 0;
@@ -32,6 +34,7 @@ nbFacturesImpayees: number = 0;
   // Modal
   showDetailsModal: boolean = false;
   selectedClient: any = null;
+ isLoading: boolean = false; // Indicateur de chargement
 
   constructor(private clientService: ClientService) { }
 
@@ -39,13 +42,66 @@ nbFacturesImpayees: number = 0;
     this.loadClients();
     this.loadInvoices();
   }
+  onSearchInput(event: any): void {
+  const term = event.target.value.toLowerCase();
+  this.searchTerm = term;
+
+  if (term) {
+    this.filteredClientsList = this.clients.filter(client =>
+      client.name?.toLowerCase().includes(term) ||
+      client.email?.toLowerCase().includes(term) ||
+      client.code_client?.toLowerCase().includes(term) ||
+      client.phone?.includes(term) ||
+      client.town?.toLowerCase().includes(term)
+    );
+  } else {
+    this.filteredClientsList = this.clients.slice(0, 5);
+  }
+
+  this.showClientList = true;
+}
+
+selectClient(client: any): void {
+  this.selectedClientId = client.id;
+  this.searchTerm = client.name;
+  this.filteredClients = [client];
+  this.currentPage = 1;
+  this.updatePagination();
+  this.showClientList = false;
+}
+
+resetClientFilter(): void {
+  this.selectedClientId = null;
+  this.searchTerm = '';
+  this.filteredClients = [...this.clients];
+  this.currentPage = 1;
+  this.updatePagination();
+}
+
+getSelectedClientName(): string {
+  if (!this.selectedClientId) return '';
+  const client = this.clients.find(c => c.id == this.selectedClientId);
+  return client ? client.name : '';
+}
+
+hideClientListWithDelay(): void {
+  this.hideTimeout = setTimeout(() => {
+    this.showClientList = false;
+  }, 200);
+}
+
+getClientInitials(client: any): string {
+  if (!client.name) return '?';
+  return client.name.charAt(0).toUpperCase();
+}
 
   // Chargement des clients
   loadClients(): void {
+
     this.clientService.getClients().subscribe({
       next: (data) => {
         this.clients = data.clients || [];
-
+  this.filteredClientsList = [...this.clients];
         // Calcul des KPI clients
         this.totalClients = this.clients.length;
         this.clientsActifs = this.clients.filter(c => c.client === '1').length;
@@ -67,6 +123,7 @@ nbFacturesImpayees: number = 0;
 
         this.filteredClients = [...this.clients];
         this.updatePagination();
+
       },
       error: (err) => console.error('Erreur récupération clients', err)
     });
@@ -74,41 +131,20 @@ nbFacturesImpayees: number = 0;
 
   // Chargement des factures
   loadInvoices(): void {
+    this.isLoading = true;
     this.clientService.getInvoices().subscribe({
       next: (data) => {
        this.invoices = data.invoices || [];
-        console.log('Factures chargées:', this.invoices);
-        this.nbFacturesPayees =
-        this.invoices.filter(inv => inv.paye === "1").length;
-
-      this.nbFacturesImpayees =
-        this.invoices.filter(inv => inv.paye === "0").length;
 
         // Calculer le CA par client après chargement des factures
         this.caByClient = this.getCAByClient();
-
+this.isLoading = false;
       },
       error: (err) => {
         console.error(err);
       }
     });
   }
-
-getTotalCA(): number {
-  return this.invoices
-    .filter(inv => inv.paye === "1")
-    .reduce((sum, inv) => sum + Number(inv.total_ttc || 0), 0);
-}
-
-  getTotalInvoices(): number {
-    return this.invoices.length;
-  }
-
-  getAverageInvoice(): number {
-    if (this.invoices.length === 0) return 0;
-    return this.getTotalCA() / this.invoices.length;
-  }
-
   getCAByClient(): any {
   const result: any = {};
 
@@ -135,12 +171,6 @@ getTotalCA(): number {
     return this.invoices.filter(inv => inv.socid == clientId).length;
   }
 
-  getClientAverageInvoice(clientId: string): number {
-    const clientInvoices = this.invoices.filter(inv => inv.socid == clientId);
-    if (clientInvoices.length === 0) return 0;
-    const total = clientInvoices.reduce((sum, inv) => sum + parseFloat(inv.total_ttc || 0), 0);
-    return total / clientInvoices.length;
-  }
 
   getClientInvoices(clientId: string): any[] {
     return this.invoices.filter(inv => inv.socid == clientId);
@@ -197,6 +227,7 @@ getTotalCA(): number {
         client.code_client?.toLowerCase().includes(term) ||
         client.phone?.includes(term) ||
         client.town?.toLowerCase().includes(term)
+
       );
     }
     this.currentPage = 1;
@@ -279,24 +310,6 @@ getTotalCA(): number {
   this.selectedClient = null;
   console.log('Modal fermé');
 }
-
-  editClient(client: any): void {
-    console.log('Modifier client:', client);
-    // Ici vous pouvez ouvrir un formulaire d'édition
-    alert(`Modification du client: ${client.name}`);
-    this.closeModal();
-  }
-
-  contactClient(client: any): void {
-    console.log('Contacter client:', client);
-    if (client.email) {
-      window.location.href = `mailto:${client.email}`;
-    } else {
-      alert('Ce client n\'a pas d\'email renseigné');
-    }
-  }
- 
-
   isSidebarCollapsed = false;
 
   onSidebarToggle(collapsed: boolean) {

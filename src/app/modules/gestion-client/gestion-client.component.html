@@ -44,76 +44,6 @@
       </div>
     </div>
 
-    <!-- Nouveaux KPI Factures -->
-    <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-file-invoice"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Total Factures</span>
-        <span class="kpi-value">{{ getTotalInvoices() }}</span>
-        <span class="kpi-trend positive">
-          <i class="fa-solid fa-arrow-up"></i>
-          +{{ getTotalInvoices() > 0 ? '8' : '0' }}%
-        </span>
-      </div>
-    </div>
-<!-- Nouveaux KPI Factures -->
-    <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-chart-line"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Chiffre d'Affaires Total</span>
-        <span class="kpi-value">{{ getTotalCA() | number:'1.0-0' }} €</span>
-        <span class="kpi-trend" [class.positive]="getTotalCA() > 10000" [class.negative]="getTotalCA() <= 10000">
-          <i class="fa-solid" [ngClass]="getTotalCA() > 10000 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ getTotalCA() > 10000 ? '+' : '' }}{{ getTotalCA() > 10000 ? '12' : '5' }}%
-        </span>
-      </div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-chart-line"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Facture Impayées</span>
-        <span class="kpi-value">{{ nbFacturesImpayees }}</span>
-        <span class="kpi-trend" [class.positive]="nbFacturesImpayees > 0" [class.negative]="nbFacturesImpayees <= 0">
-          <i class="fa-solid" [ngClass]="nbFacturesImpayees > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ nbFacturesImpayees > 0 ? '+' : '' }}{{ nbFacturesImpayees > 0 ? '12' : '5' }}%
-        </span>
-      </div>
-    </div>
-     <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-chart-line"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Facture payées</span>
-        <span class="kpi-value">{{ nbFacturesPayees }}</span>
-        <span class="kpi-trend" [class.positive]="nbFacturesPayees > 0" [class.negative]="nbFacturesPayees <= 0">
-          <i class="fa-solid" [ngClass]="nbFacturesPayees > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ nbFacturesPayees > 0 ? '+' : '' }}{{ nbFacturesPayees > 0 ? '12' : '5' }}%
-        </span>
-      </div>
-    </div>
-
-    <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-calculator"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Moyenne par Facture</span>
-        <span class="kpi-value">{{ getAverageInvoice() | number:'1.0-0' }} €</span>
-        <span class="kpi-trend" [class.positive]="getAverageInvoice() > 500" [class.negative]="getAverageInvoice() <= 500">
-          <i class="fa-solid" [ngClass]="getAverageInvoice() > 500 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ getAverageInvoice() > 500 ? '+' : '' }}{{ getAverageInvoice() > 500 ? '7' : '3' }}%
-        </span>
-      </div>
-    </div>
-  </div>
-
   <!-- Barre de recherche et titre -->
   <div class="client-header">
     <div class="header-title">
@@ -124,18 +54,56 @@
       <span class="client-count">{{ filteredClients.length }} client(s) affiché(s)</span>
     </div>
 
-    <div class="search-wrapper">
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input
-        type="text"
-        class="search-input"
-        placeholder="Rechercher un client..."
-        (input)="filterClients($event)">
+    <!-- RECHERCHE AMÉLIORÉE AVEC AUTOCOMPLETE ET LOGOS -->
+    <div class="search-container">
+      <div class="search-wrapper">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text"
+               class="search-input"
+               placeholder="Rechercher un client..."
+               [(ngModel)]="searchTerm"
+               (input)="onSearchInput($event)"
+               (focus)="showClientList = true"
+               (blur)="hideClientListWithDelay()">
+
+        <!-- Liste des clients (autocomplete) -->
+        <div class="client-autocomplete-list" *ngIf="showClientList && filteredClientsList.length > 0">
+          <ul>
+            <li *ngFor="let client of filteredClientsList" (mousedown)="selectClient(client)">
+              <div class="client-item">
+                <div class="client1-avatar-small">
+                  <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client1-logo">
+                  <div *ngIf="!client.logoData" class="avatar-placeholder-small">
+                    {{ getClientInitials(client) }}
+                  </div>
+                </div>
+                <div class="client1-info">
+                  <span class="client1-name">{{ client.name }}</span>
+                  <span class="client1-email">{{ client.email || '—' }}</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bouton reset filtre -->
+      <button class="btn-reset-filter" *ngIf="selectedClientId" (click)="resetClientFilter()">
+        <i class="fa-solid fa-times"></i>
+        {{ getSelectedClientName() }}
+      </button>
     </div>
   </div>
+  </div>
 
- <!-- Tableau simplifié des clients -->
-  <div class="table-wrapper">
+
+
+  <div class="loading-container" *ngIf="isLoading">
+  <div class="spinner"></div>
+  <p>Chargement des clients...</p>
+</div>
+  <!-- Tableau simplifié des clients -->
+  <div class="table-wrapper"*ngIf="!isLoading">
     <table class="client-table">
       <thead>
         <tr>
@@ -162,7 +130,8 @@
             </div>
           </td>
           <td class="montant-cell">
-            <span *ngIf="getClientCA(client.id) > 0" class="ca-value">{{ getClientCA(client.id) | number:'1.0-0' }} €</span>
+            <span *ngIf="getClientCA(client.id) > 0" class="ca-value">{{ getClientCA(client.id) | number:'1.0-0' }}
+              €</span>
             <span *ngIf="getClientCA(client.id) === 0" class="ca-value zero">—</span>
           </td>
           <td>
@@ -191,17 +160,11 @@
       Affichage de {{ getPaginationStart() }} à {{ getPaginationEnd() }} sur {{ filteredClients.length }} clients
     </span>
     <div class="pagination-controls" *ngIf="totalPages > 1">
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
       <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="changePage(currentPage + 1)">
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
@@ -326,7 +289,8 @@
           </div>
           <div class="detail-item">
             <span class="detail-label">Capital</span>
-            <span class="detail-value">{{ selectedClient?.capital ? (selectedClient.capital | number:'1.0-0') + ' €' : '—' }}</span>
+            <span class="detail-value">{{ selectedClient?.capital ? (selectedClient.capital | number:'1.0-0') + ' €' :
+              '—' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Effectif</span>

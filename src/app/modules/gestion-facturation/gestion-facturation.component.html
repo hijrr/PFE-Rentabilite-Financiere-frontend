@@ -30,14 +30,36 @@
         <span class="kpi-value">{{ totalUnpaid }}</span>
       </div>
     </div>
+      <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-clock"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Totales Montant Impayées (TTC)</span>
+        <span class="kpi-value">{{ getCATtcImpayee() | number:'1.0-2' }} €</span>
+
+      </div>
+    </div>
+
+
+
 
     <div class="kpi-card">
       <div class="kpi-icon">
         <i class="fa-solid fa-chart-line"></i>
       </div>
       <div class="kpi-content">
-        <span class="kpi-label">Montant Total</span>
+        <span class="kpi-label">Montant Total (HT)</span>
         <span class="kpi-value">{{ totalAmount | number:'1.0-0' }} €</span>
+      </div>
+    </div>
+     <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Montant Total (TTC)</span>
+        <span class="kpi-value">{{ totalPaidTTC | number:'1.0-0' }} €</span>
       </div>
     </div>
   </div>
@@ -55,14 +77,8 @@
     <div class="search-container">
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Rechercher un client..."
-          [(ngModel)]="searchTerm"
-          (input)="onSearchInput($event)"
-          (focus)="showClientList = true"
-          (blur)="hideClientListWithDelay()">
+        <input type="text" class="search-input" placeholder="Rechercher un client..." [(ngModel)]="searchTerm"
+          (input)="onSearchInput($event)" (focus)="showClientList = true" (blur)="hideClientListWithDelay()">
 
         <!-- Liste des clients (autocomplete) -->
         <div class="client-autocomplete-list" *ngIf="showClientList && filteredClients.length > 0">
@@ -97,7 +113,7 @@
   <div class="table-wrapper">
     <table class="factures-table">
       <thead>
-        <tr>
+        <tr >
           <th>Référence</th>
           <th>Client</th>
           <th>Date d'émission</th>
@@ -110,14 +126,23 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let invoice of paginatedInvoices">
+        <tr *ngIf="isLoading">
+    <td colspan="9" class="loading-row">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Chargement des factures...
+    </td>
+  </tr>
+        <ng-container *ngIf="!isLoading && paginatedInvoices.length > 0">
+    <tr *ngFor="let invoice of paginatedInvoices">
+
           <td class="ref-cell">
             <span class="ref-badge">{{ invoice.ref || '—' }}</span>
           </td>
           <td class="client-cell">
             <div class="client-info-with-logo">
               <div class="client-avatar-small">
-                <img *ngIf="getClientLogo(invoice.socid)" [src]="getClientLogo(invoice.socid)" alt="logo" class="client-logo">
+                <img *ngIf="getClientLogo(invoice.socid)" [src]="getClientLogo(invoice.socid)" alt="logo"
+                  class="client-logo">
                 <div *ngIf="!getClientLogo(invoice.socid)" class="avatar-placeholder-small">
                   {{ getClientInitialsById(invoice.socid) }}
                 </div>
@@ -144,12 +169,13 @@
             </button>
           </td>
         </tr>
-        <tr *ngIf="paginatedInvoices.length === 0">
+        <tr *ngIf="!isLoading && paginatedInvoices.length === 0">
           <td colspan="9" class="no-data">
             <i class="fa-solid fa-file-invoice"></i>
             <p>Aucune facture trouvée</p>
           </td>
         </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>
@@ -160,17 +186,11 @@
       Affichage de {{ getPaginationStart() }} à {{ getPaginationEnd() }} sur {{ filteredInvoices.length }} factures
     </span>
     <div class="pagination-controls" *ngIf="totalPages > 1">
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
       <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="changePage(currentPage + 1)">
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>

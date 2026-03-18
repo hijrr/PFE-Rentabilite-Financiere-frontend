@@ -7,6 +7,7 @@ import { GestionClientComponent } from './modules/gestion-client/gestion-client.
 import { AuthComponent } from './auth/auth.component';
 import { AuthGuard } from './auth.guard';
 import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
+import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path:'Facturation',component:GestionFacturationComponent,canActivate: [AuthGuard]},
   {path:'Salaries',component:GestionSalariesComponent,canActivate: [AuthGuard]},
   {path:'Clients',component:GestionClientComponent,canActivate: [AuthGuard]},
+  {path:'Projets',component: GestionProjetComponent,canActivate: [AuthGuard]},
   { path: '**', redirectTo: 'login' }
 ];
 

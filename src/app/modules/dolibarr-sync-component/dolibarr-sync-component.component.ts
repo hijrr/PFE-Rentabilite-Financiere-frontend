@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Salarie, SalarieServiceService } from 'src/app/services/salarie-service.service';
 
 @Component({
   selector: 'app-dolibarr-sync-component',
@@ -7,27 +8,33 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DolibarrSyncComponentComponent implements OnInit {
 
-  constructor() { }
+  constructor(private salarieService: SalarieServiceService) { }
 
   ngOnInit(): void {
+    this.loadSalaries();
   }
    // Données sélectionnées
   selectedSalarie: string = '';
   selectedDate: string = '';
-
+  salaries:Salarie[] = [];
   // État de la synchronisation
   isSyncing: boolean = false;
   syncSuccess: boolean = false;
   syncError: string = '';
 
-  // Liste des salariés (simulée)
-  salaries = [
-    { id: '1', nom: 'Thomas Martin', poste: 'Développeur' },
-    { id: '2', nom: 'Sophie Bernard', poste: 'Comptable' },
-    { id: '3', nom: 'Lucas Petit', poste: 'Commercial' },
-    { id: '4', nom: 'Emma Dubois', poste: 'RH' },
-    { id: '5', nom: 'Alexandre Roux', poste: 'Manager' }
-  ];
+
+
+   loadSalaries(): void {
+    this.salarieService.getSalaries().subscribe({
+      next: (data) => {
+        this.salaries = data || [];
+        console.log('Salariés chargés:', this.salaries);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
 
   // Méthode de synchronisation
   synchroniserDolibarr() {
@@ -101,8 +108,8 @@ export class DolibarrSyncComponentComponent implements OnInit {
 
   // Récupérer le nom du salarié
   getSalarieName(salarieId: string): string {
-    const salarie = this.salaries.find(s => s.id === salarieId);
-    return salarie ? salarie.nom : '';
+    const salarie = this.salaries.find(s => String(s.id) === salarieId);
+    return salarie ? salarie.username : '';
   }
 
 }

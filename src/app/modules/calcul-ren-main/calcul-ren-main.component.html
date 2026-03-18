@@ -1,16 +1,7 @@
 <div class="app-layout">
   <!-- Contenu principal -->
   <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
-    <!-- En-tête -->
-    <header class="page-header">
-      <h1 class="page-title">
-        <span class="title-highlight">elzei</span> consulting
-      </h1>
-      <div class="user-menu">
-        <span class="user-name">{{ user?.username }}</span>
-        <div class="user-avatar">{{ getInitial(user?.username ?? '') }}</div>
-      </div>
-    </header>
+   
 
     <!-- Les deux composants côte à côte -->
     <div class="components-row">

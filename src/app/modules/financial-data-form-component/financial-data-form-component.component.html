@@ -13,135 +13,189 @@
   <div class="form-container">
     <form [formGroup]="financeForm" class="financial-form">
 
-      <div class="form-section">
-        <div class="section-header">
-          <h2>Revenus bruts</h2>
+      <!-- GRID DES SECTIONS -->
+      <div class="sections-grid">
+
+        <!-- SECTION 1 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h2>Revenus bruts</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="field-label">
+                Salaire brut
+                <span class="required-star">*</span>
+              </label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="salaireBrut"
+                       class="form-input"
+                       placeholder="0,00">
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="form-grid">
-          <div class="form-field">
-            <label class="field-label">
-              Salaire brut
-              <span class="required-star">*</span>
-            </label>
-            <div class="input-wrapper">
-              <span class="input-currency">€</span>
-              <input type="number"
-                     formControlName="salaireBrut"
-                     class="form-input"
-                     placeholder="0,00"
-                     step="0.01"
-                     min="0"
-                     required>
+        <!-- SECTION 2 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h2>Cotisations</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="field-label">Total cotisations salariales</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="totalCotisationsSalariales"
+                       class="form-input">
+              </div>
             </div>
-            <span class="field-hint">Montant brut mensuel</span>
+
+            <div class="form-field">
+              <label class="field-label">Charges patronales</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="chargesPatronales"
+                       class="form-input">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h2>Avantages & Primes</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="field-label">Repas restaurant</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="repasRestaurant"
+                       class="form-input">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h2>Résultat du salaire</h2>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label class="field-label">Net avant impôt</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="netAvantImpot"
+                       class="form-input">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">Net à payer</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="netPayer"
+                       class="form-input">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h2>Note de Frais & Kilométrique</h2>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label class="field-label">Total Note de Frais</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="totalNoteFrais"
+                       class="form-input">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">Total Note Kilométrique</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       formControlName="totalNoteKilometrique"
+                       class="form-input">
+              </div>
+            </div>
+
+          </div>
+        </div>
+<!-- SECTION 6 -->
+        <div class="form-section">
+          <div class="section-header">
+            <h2>Facturation</h2>
+          </div>
+
+          <div class="form-grid">
+
+            <div class="form-field">
+              <label class="field-label">TJM(€)</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+                       class="form-input">
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="field-label">Jours Travaillés</label>
+              <div class="input-wrapper">
+                <span class="input-currency">  <i class="fa-regular fa-calendar"></i></span>
+                <input type="number"
+
+                       class="form-input">
+              </div>
+            </div>
+ <div class="form-field">
+              <label class="field-label">Facture</label>
+              <div class="input-wrapper">
+                <span class="input-currency">€</span>
+                <input type="number"
+
+                       class="form-input">
+              </div>
+            </div>
+            <div class="form-field">
+               <label class="field-label">Payé?</label>
+          <div class="payment-switch" (click)="togglePayment()" [class.paye]="isPaid">
+  <span class="option non" [class.active]="!isPaid">NON</span>
+  <span class="option oui" [class.active]="isPaid">OUI</span>
+  <div class="slider" [class.slider-right]="isPaid"></div>
+</div>
+</div>
           </div>
         </div>
       </div>
 
-      <!-- ===================== -->
-      <!-- 2️⃣ Cotisations -->
-      <!-- ===================== -->
-      <div class="form-section">
-        <div class="section-header">
-          <h2>Cotisations</h2>
-        </div>
-
-        <div class="form-grid">
-
-          <div class="form-field">
-            <label class="field-label">Total cotisations salariales</label>
-            <div class="input-wrapper">
-              <span class="input-currency">€</span>
-              <input type="number"
-                     formControlName="totalCotisationsSalariales"
-                     class="form-input"
-                     placeholder="0,00"
-                     step="0.01"
-                     min="0">
-            </div>
-            <span class="field-hint">Part salarié</span>
-          </div>
-
-          <div class="form-field">
-            <label class="field-label">Charges patronales</label>
-            <div class="input-wrapper">
-              <span class="input-currency">€</span>
-              <input type="number"
-                     formControlName="chargesPatronales"
-                     class="form-input"
-                     placeholder="0,00"
-                     step="0.01"
-                     min="0">
-            </div>
-            <span class="field-hint">Part employeur</span>
-          </div>
-
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="section-header">
-          <h2>Avantages & Primes</h2>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-field">
-            <label class="field-label">Repas restaurant</label>
-            <div class="input-wrapper">
-              <span class="input-currency">€</span>
-              <input type="number"
-                     formControlName="repasRestaurant"
-                     class="form-input"
-                     placeholder="0,00"
-                     step="0.01"
-                     min="0">
-            </div>
-            <span class="field-hint">Valeur des tickets restaurant</span>
-          </div>
-        </div>
-      </div>
-
-     
-      <div class="form-section">
-        <div class="section-header">
-          <h2>Résultat du salaire</h2>
-        </div>
-
-        <div class="form-grid">
-
-          <div class="form-field">
-            <label class="field-label">Net avant impôt</label>
-            <div class="input-wrapper">
-              <span class="input-currency">€</span>
-              <input type="number"
-                     formControlName="netAvantImpot"
-                     class="form-input"
-                     placeholder="0,00"
-                     step="0.01"
-                     min="0">
-            </div>
-            <span class="field-hint">Salaire net avant prélèvement</span>
-          </div>
-
-          <div class="form-field highlight-field">
-            <label class="field-label">Net à payer</label>
-            <div class="input-wrapper highlight">
-              <span class="input-currency">€</span>
-              <input type="number"
-                     formControlName="netPayer"
-                     class="form-input highlight-input"
-                     placeholder="0,00"
-                     step="0.01"
-                     min="0"
-                     required>
-            </div>
-            <span class="field-hint">Montant versé sur votre compte</span>
-          </div>
-
-        </div>
-      </div>
-
+      <!-- BOUTONS -->
       <div class="actions-bar">
         <button type="submit"
                 class="btn-primary"

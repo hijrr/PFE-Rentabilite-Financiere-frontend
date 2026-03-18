@@ -1,0 +1,81 @@
+<header class="main-header">
+  <!-- Logo et titre -->
+  <div class="logo-section">
+    <div class="logo-wrapper">
+      <img src="assets/logo.webp" alt="Elzei Consulting" class="logo-img" />
+      <span class="logo-text">elzei <span class="logo-highlight">consulting</span></span>
+    </div>
+  </div>
+
+  <!-- Actions droite -->
+  <div class="header-actions">
+
+    <!-- Mode nuit -->
+    <button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="isDarkMode ? 'Passer en mode clair' : 'Passer en mode nuit'">
+      <i class="fa-solid" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'"></i>
+    </button>
+
+    <!-- Notifications -->
+    <div class="notification-wrapper" (mouseenter)="showNotifications = true" (mouseleave)="showNotifications = false">
+      <button class="notification-btn">
+        <i class="fa-regular fa-bell"></i>
+        <span class="notification-badge" *ngIf="unreadNotifications > 0">{{ unreadNotifications }}</span>
+      </button>
+
+      <!-- Dropdown notifications -->
+      <div class="notification-dropdown" *ngIf="showNotifications">
+        <div class="dropdown-header">
+          <h3>Notifications</h3>
+          <span class="mark-read" (click)="markAllAsRead()" *ngIf="unreadNotifications > 0">Tout marquer comme lu</span>
+        </div>
+
+        <div class="notification-list">
+          <div class="notification-item" *ngFor="let notif of notifications" [class.unread]="!notif.read">
+            <div class="notification-icon" [ngClass]="notif.type">
+              <i class="fa-solid" [ngClass]="{
+                'fa-file-invoice': notif.type === 'invoice',
+                'fa-users': notif.type === 'client',
+                'fa-user': notif.type === 'salarie',
+                'fa-diagram-project': notif.type === 'projet',
+                'fa-circle-exclamation': notif.type === 'alert'
+              }"></i>
+            </div>
+            <div class="notification-content">
+              <p class="notification-text">{{ notif.message }}</p>
+              <span class="notification-time">{{ notif.time | date:'HH:mm' }}</span>
+            </div>
+          </div>
+
+          <div class="no-notifications" *ngIf="notifications.length === 0">
+            <i class="fa-regular fa-bell-slash"></i>
+            <p>Aucune notification</p>
+          </div>
+        </div>
+
+        <div class="dropdown-footer" *ngIf="notifications.length > 0">
+          <a href="#" class="view-all">Voir toutes les notifications</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profil utilisateur -->
+    <div class="user-menu" (mouseenter)="showUserMenu = true" (mouseleave)="showUserMenu = false">
+      <div class="user-info">
+        <span class="user-name">{{ user?.username }}</span>
+        <span class="user-role">{{ user?.role}}</span>
+      </div>
+      <div class="user-avatar">{{ getInitial(user?.username ?? '') }}</div>
+
+      <!-- Dropdown menu utilisateur -->
+      <div class="user-dropdown" *ngIf="showUserMenu">
+        <ul>
+          <li><a href="#"><i class="fa-regular fa-user"></i> Mon profil</a></li>
+          <li><a href="#"><i class="fa-regular fa-gear"></i> Paramètres</a></li>
+          <li><a href="#"><i class="fa-regular fa-circle-question"></i> Aide</a></li>
+          <li class="divider"></li>
+          <li><a href="#" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>

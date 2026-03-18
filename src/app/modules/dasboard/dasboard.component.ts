@@ -29,6 +29,7 @@ export class DasboardComponent implements OnInit {
       case 'clients': return 'Clients';
       case 'salaries': return 'historique';
       case 'calcul': return 'calcul';
+      case 'projets': return 'projets';
       default: return 'accueil';
     }
   }

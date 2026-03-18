@@ -15,6 +15,8 @@ import { CalculRenMainComponent } from './modules/calcul-ren-main/calcul-ren-mai
 import { GestionSalariesComponent } from './modules/gestion-salaries/gestion-salaries.component';
 import { GestionClientComponent } from './modules/gestion-client/gestion-client.component';
 import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
+import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
+import { HeaderComponent } from './modules/header/header.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,6 +29,8 @@ import { GestionFacturationComponent } from './modules/gestion-facturation/gesti
     GestionSalariesComponent,
     GestionClientComponent,
     GestionFacturationComponent,
+    GestionProjetComponent,
+    HeaderComponent,
   ],
   imports: [
     BrowserModule,

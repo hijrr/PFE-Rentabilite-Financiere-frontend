@@ -115,14 +115,17 @@
 
   <!-- Barre d'actions -->
   <div class="actions-bar">
-    <button class="btn-primary"
-            (click)="onSubmit()"
-            [disabled]="!fichePaieFile || !noteFraisFile">
-      <span class="btn-icon">
-        <i class="fa-solid fa-check"></i>
-      </span>
-      Valider les documents
-    </button>
+   <button class="btn-primary"
+        (click)="onSubmit()"
+        [disabled]="!fichePaieFile || !noteFraisFile || isProcessing">
+  <span class="btn-icon">
+    <i class="fa-solid fa-check"></i>
+  </span>
+  <span *ngIf="!isProcessing">Valider les documents</span>
+  <span *ngIf="isProcessing">
+    <i class="fa-solid fa-spinner fa-spin"></i> Traitement...
+  </span>
+</button>
 
     <button class="btn-secondary" (click)="resetForm()">
       <span class="btn-icon">
