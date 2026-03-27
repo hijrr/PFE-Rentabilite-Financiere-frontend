@@ -73,7 +73,7 @@
               <div class="client-item">
                 <div class="client1-avatar-small">
                   <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client1-logo">
-                  <div *ngIf="!client.logoData" class="avatar-placeholder-small">
+                  <div *ngIf="!client.logoData" class="avatar-placeholder-small" [ngClass]="getAvatarClass(client)">
                     {{ getClientInitials(client) }}
                   </div>
                 </div>
@@ -119,7 +119,7 @@
             <div class="client-info">
               <div class="client-avatar">
                 <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client-logo">
-                <div *ngIf="!client.logoData" class="avatar-placeholder">
+                <div *ngIf="!client.logoData" class="avatar-placeholder"[ngClass]="getAvatarClass(client)">
                   {{ client.name?.charAt(0) || '?' }}
                 </div>
               </div>
@@ -163,7 +163,14 @@
       <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button
+        *ngFor="let page of pageNumbers"
+        class="page-btn"
+        [ngClass]="{ active: page === currentPage, ellipsis: page === '...' }"
+        [disabled]="page === '...'"
+        (click)="onPageClick(page)">
+        {{ page }}
+      </button>
       <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
@@ -179,7 +186,7 @@
       <div class="modal-title">
         <div class="client-avatar large">
           <img *ngIf="selectedClient?.logoData" [src]="selectedClient?.logoData" alt="logo" class="client-logo">
-          <div *ngIf="!selectedClient?.logoData" class="avatar-placeholder large">
+          <div *ngIf="!selectedClient?.logoData" class="avatar-placeholder large" [ngClass]="getAvatarClass(selectedClient)">
             {{ selectedClient?.name?.charAt(0) || '?' }}
           </div>
         </div>

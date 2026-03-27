@@ -17,6 +17,7 @@ import { GestionClientComponent } from './modules/gestion-client/gestion-client.
 import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
 import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
 import { HeaderComponent } from './modules/header/header.component';
+import { PageMainComponent } from './modules/page-main/page-main.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -31,6 +32,7 @@ import { HeaderComponent } from './modules/header/header.component';
     GestionFacturationComponent,
     GestionProjetComponent,
     HeaderComponent,
+    PageMainComponent,
   ],
   imports: [
     BrowserModule,

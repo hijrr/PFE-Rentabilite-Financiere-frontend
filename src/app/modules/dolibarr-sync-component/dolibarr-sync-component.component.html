@@ -34,7 +34,7 @@
             [class.select-filled]="selectedSalarie">
             <option value="" disabled selected>Choisir un salarié</option>
             <option *ngFor="let salarie of salaries" [value]="salarie.id">
-              {{ salarie.username }} - {{ salarie.projet }}
+              {{ salarie.username }} 
             </option>
           </select>
           <i class="fa-solid fa-chevron-down select-arrow"></i>

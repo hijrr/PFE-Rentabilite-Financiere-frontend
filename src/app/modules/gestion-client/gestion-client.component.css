@@ -283,14 +283,46 @@
 .avatar-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--elzei-green) 0%, var(--elzei-green-dark) 100%);
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   font-weight: 600;
 }
+
+/* Classes d'avatar optimisées pour chaque lettre */
+.avatar-default {
+  background-color: #E5E7EB;
+  color: #4B5563;
+}
+
+.avatar-a { background-color: #D32F2F; color: #FFFFFF; }
+.avatar-b { background-color: #1976D2; color: #FFFFFF; }
+.avatar-c { background-color: #388E3C; color: #FFFFFF; }
+.avatar-d { background-color: #FBC02D; color: #000000; }
+.avatar-e { background-color: #7B1FA2; color: #FFFFFF; }
+.avatar-f { background-color: #FF5722; color: #FFFFFF; }
+.avatar-g { background-color: #0097A7; color: #FFFFFF; }
+.avatar-h { background-color: #689F38; color: #FFFFFF; }
+.avatar-i { background-color: #F57C00; color: #FFFFFF; }
+.avatar-j { background-color: #512DA8; color: #FFFFFF; }
+.avatar-k { background-color: #00796B; color: #FFFFFF; }
+.avatar-l { background-color: #E64A19; color: #FFFFFF; }
+.avatar-m { background-color: #303F9F; color: #FFFFFF; }
+.avatar-n { background-color: #689F38; color: #FFFFFF; }
+.avatar-o { background-color: #FF9800; color: #FFFFFF; }
+.avatar-p { background-color: #8BC34A; color: #FFFFFF; }
+.avatar-q { background-color: #795548; color: #FFFFFF; }
+.avatar-r { background-color: #2196F3; color: #FFFFFF; }
+.avatar-s { background-color: #FFEB3B; color: #000000; }
+.avatar-t { background-color: #9C27B0; color: #FFFFFF; }
+.avatar-u { background-color: #4CAF50; color: #FFFFFF; }
+.avatar-v { background-color: #FF6F00; color: #FFFFFF; }
+.avatar-w { background-color: #3F51B5; color: #FFFFFF; }
+.avatar-x { background-color: #E91E63; color: #FFFFFF; }
+.avatar-y { background-color: #00BCD4; color: #FFFFFF; }
+.avatar-z { background-color: #8D6E63; color: #FFFFFF; }
+
 
 .client-details {
   display: flex;
@@ -449,9 +481,27 @@
   border-color: var(--elzei-green-dark);
 }
 
+.page-btn.active {
+  background: var(--elzei-green);
+  color: white;
+  border-color: var(--elzei-green-dark);
+}
+
 .page-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.page-btn.ellipsis {
+  cursor: default;
+  background: transparent;
+  border: none;
+  color: var(--elzei-gray-light);
+}
+
+.page-btn.ellipsis:hover {
+  background: transparent;
+  color: var(--elzei-gray-light);
 }
 
 .page-info {
@@ -997,8 +1047,6 @@
 .avatar-placeholder-small {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #c2edce 0%, #30cd22 100%);
-  color: white;
   display: flex;
   align-items: center;
   justify-content: center;

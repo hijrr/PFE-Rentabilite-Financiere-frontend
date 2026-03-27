@@ -28,4 +28,10 @@ export class ExtractionService {
 
     return this.http.post(`http://localhost:8000/extract-noteDeFraisKilometrique/`, formData);
   }
+  extractionDonneesPersonnelles(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post(`http://localhost:8000/extract-infosPersonnel/`, formData);
+  }
 }

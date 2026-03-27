@@ -1,6 +1,6 @@
 <div class="salarie-container">
 
-
+<input type="file" #fileInput hidden (change)="onFileSelected($event)">
 
   <!-- HEADER -->
   <div class="salarie-header">
@@ -37,7 +37,10 @@
         <i class="fa-solid fa-plus"></i>
         Ajouter un salarié
       </button>
-
+<button class="btn-add" (click)="openExtractModal()">
+  <i class="fa-solid fa-file-import"></i>
+  Extraire fiche de paie
+</button>
     </div>
   </div>
 <!-- KPI SECTION -->
@@ -70,10 +73,13 @@
 
       <thead>
         <tr>
+          <th>Numéro de Sécurité Sociale</th>
           <th>Salarié</th>
           <th>Rôle</th>
-          <th>Projet</th>
-          <th>TJM</th>
+          <th>Email</th>
+          <th>TJM Réference (€)</th>
+          <th>Adresse</th>
+          <th>Date d'Entrée</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -81,13 +87,13 @@
       <tbody>
 
         <tr *ngFor="let s of paginatedSalaries">
-
+          <td class="ref-cell"><span class="ref-badge">{{ s.num_securite_sociale }}</span></td>
           <td class="salarie-cell">
             <div class="salarie-info">
 
               <div class="salarie-avatar">
-                <div class="avatar-placeholder">
-                  {{ s.username.substring(0,2) | uppercase }}
+                <div class="avatar-placeholder" [ngClass]="getAvatarClass(s)">
+                  {{ s.username.substring(0,1) | uppercase }}
                 </div>
               </div>
 
@@ -100,12 +106,13 @@
 
           <td>{{ s.role }}</td>
 
-          <td>{{ s.projet || '-' }}</td>
+          <td>{{ s.email || '-' }}</td>
 
           <td class="montant-cell">
             {{ s.tjm || 0 }} €
           </td>
-
+          <td>{{ s.adresse }}</td>
+          <td>{{ s.date_entree | date:'dd/MM/yyyy' }}</td>
           <td class="actions-cell">
 
             <button
@@ -122,6 +129,14 @@
               title="Modifier"
             >
               <i class="fa-solid fa-pen"></i>
+            </button>
+
+            <button
+              class="action-btn delete"
+              (click)="deleteSalarie(s.id)"
+              title="Supprimer"
+            >
+              <i class="fa-solid fa-trash"></i>
             </button>
 
           </td>
@@ -145,7 +160,14 @@
         (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button
+        *ngFor="let page of pageNumbers"
+        class="page-btn"
+        [ngClass]="{ active: page === currentPage, ellipsis: page === '...' }"
+        [disabled]="page === '...'"
+        (click)="onPageClick(page)">
+        {{ page }}
+      </button>
       <button
         class="page-btn"
         [disabled]="currentPage === totalPages"
@@ -162,7 +184,6 @@
 
 <!-- MODAL AJOUT/MODIFICATION -->
 <div class="modal-overlay" *ngIf="showModal && (modalMode === 'add' || modalMode === 'edit')">
-
   <div class="modal-container">
 
     <div class="modal-header">
@@ -177,6 +198,7 @@
 
     <form [formGroup]="salarieForm" (ngSubmit)="onSubmit()">
       <div class="modal-body">
+
 
         <div class="form-grid">
 
@@ -195,32 +217,56 @@
             </div>
           </div>
 
+          <!-- Numéro de Sécurité Sociale -->
+          <div class="form-group">
+            <label>Numéro de sécurité sociale <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="num_securite_sociale"
+              min="0"
+              step="1"
+              [class.is-invalid]="isFieldInvalid('num_securite_sociale')"
+              placeholder="0"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('num_securite_sociale')">
+              Le numéro de sécurité sociale est requis et doit être un entier
+            </div>
+          </div>
+
           <!-- Rôle -->
           <div class="form-group">
             <label>Rôle <span class="required">*</span></label>
-           <select class="form-control" formControlName="role" [class.is-invalid]="isFieldInvalid('role')">
-  <option value="">Sélectionner un rôle</option>
-  <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
-</select>
+            <select
+              class="form-control"
+              formControlName="role"
+              [class.is-invalid]="isFieldInvalid('role')"
+            >
+              <option value="">Sélectionner un rôle</option>
+              <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+            </select>
             <div class="error-message" *ngIf="isFieldInvalid('role')">
               Le rôle est requis
             </div>
           </div>
 
-          <!-- Projet -->
+          <!-- email -->
           <div class="form-group">
-            <label>Projet</label>
+            <label>Email<span class="required">*</span></label>
             <input
-              type="text"
+              type="email"
               class="form-control"
-              formControlName="projet"
-              placeholder="Ex: ERP Client"
+              formControlName="email"
+              [class.is-invalid]="isFieldInvalid('email')"
+              placeholder="Ex: jean.dupont@example.com"
             >
+            <div class="error-message" *ngIf="isFieldInvalid('email')">
+              L'email est requis et doit être valide
+            </div>
           </div>
-
           <!-- TJM -->
           <div class="form-group">
-            <label>TJM (€) </label>
+            <label>TJM Réference (€)</label>
             <input
               type="number"
               class="form-control"
@@ -235,14 +281,35 @@
             </div>
           </div>
 
-        </div>
+          <!-- Adresse -->
+          <div class="form-group">
+            <label>Adresse</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="adresse"
+              placeholder="Ex: 123 Rue de la Paix"
+            >
+          </div>
 
+          <!-- Date d'entrée -->
+          <div class="form-group">
+            <label>Date d'entrée<span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="date_entree"
+              [class.is-invalid]="isFieldInvalid('date_entree')"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('date_entree')">
+              La date d'entrée est requise
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="closeModal()">
-          Annuler
-        </button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">Annuler</button>
         <button type="submit" class="btn-primary" [disabled]="salarieForm.invalid">
           <i class="fa-solid fa-check"></i>
           {{ modalMode === 'add' ? 'Ajouter' : 'Modifier' }}
@@ -251,10 +318,7 @@
     </form>
 
   </div>
-
 </div>
-
-
 <!-- MODAL DETAILS -->
 <div class="modal-overlay" *ngIf="showModal && modalMode === 'details'">
 
@@ -263,7 +327,7 @@
     <div class="modal-header">
       <div class="modal-title">
         <div class="salarie-avatar large">
-          <div class="avatar-placeholder large">
+          <div class="avatar-placeholder large" [ngClass]="getAvatarClass(selectedSalarie)">
             {{ selectedSalarie?.username?.substring(0,2) | uppercase }}
           </div>
         </div>
@@ -289,13 +353,25 @@
             <span class="detail-label">Rôle</span>
             <span class="detail-value">{{ selectedSalarie?.role }}</span>
           </div>
-          <div class="detail-item">
-            <span class="detail-label">Projet</span>
-            <span class="detail-value">{{ selectedSalarie?.projet || '-' }}</span>
+           <div class="detail-item">
+            <span class="detail-label">Numéro de Sécurité Sociale</span>
+            <span class="detail-value">{{ selectedSalarie.num_securite_sociale }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">TJM</span>
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ selectedSalarie.email  }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">TJM Réference</span>
             <span class="detail-value">{{ selectedSalarie?.tjm || 0 }} €</span>
+          </div>
+            <div class="detail-item">
+            <span class="detail-label">Adresse</span>
+            <span class="detail-value">{{ selectedSalarie?.adresse || '-' }}</span>
+          </div>
+           <div class="detail-item">
+            <span class="detail-label">Date d'Entrée</span>
+            <span class="detail-value">{{ selectedSalarie.date_entree | date:'dd/MM/yyyy' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">ID</span>

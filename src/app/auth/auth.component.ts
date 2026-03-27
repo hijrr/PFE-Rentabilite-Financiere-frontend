@@ -52,7 +52,7 @@ rotateWord() {
       next: (response) => {
         console.log("Connexion réussie", response);
          localStorage.setItem('token', response.access_token);//5thet ken acess token khw men json
-         this.router.navigate(['/']);
+         this.router.navigate(['/Accueil']);
       },      error: (err) => {
         console.log("Erreur de connexion", err);
       }

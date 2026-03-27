@@ -87,7 +87,7 @@
               <div class="client-item">
                 <div class="client-avatar-small">
                   <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client-logo">
-                  <div *ngIf="!client.logoData" class="avatar-placeholder-small">
+                  <div *ngIf="!client.logoData" class="avatar-placeholder-small" [ngClass]="getAvatarClass(client)">
                     {{ getClientInitials(client) }}
                   </div>
                 </div>
@@ -143,7 +143,7 @@
               <div class="client-avatar-small">
                 <img *ngIf="getClientLogo(invoice.socid)" [src]="getClientLogo(invoice.socid)" alt="logo"
                   class="client-logo">
-                <div *ngIf="!getClientLogo(invoice.socid)" class="avatar-placeholder-small">
+                <div *ngIf="!getClientLogo(invoice.socid)" class="avatar-placeholder-small" [ngClass]="getAvatarClass(getClientById(invoice.socid))">
                   {{ getClientInitialsById(invoice.socid) }}
                 </div>
               </div>
@@ -189,7 +189,14 @@
       <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button
+        *ngFor="let page of pageNumbers"
+        class="page-btn"
+        [ngClass]="{ active: page === currentPage, ellipsis: page === '...' }"
+        [disabled]="page === '...'"
+        (click)="onPageClick(page)">
+        {{ page }}
+      </button>
       <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
         <i class="fa-solid fa-chevron-right"></i>
       </button>

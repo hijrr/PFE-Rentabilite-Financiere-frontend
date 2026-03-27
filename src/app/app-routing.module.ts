@@ -8,12 +8,14 @@ import { AuthComponent } from './auth/auth.component';
 import { AuthGuard } from './auth.guard';
 import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
 import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
+import { PageMainComponent } from './modules/page-main/page-main.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
-  {path:'',component:CalculRenMainComponent,canActivate: [AuthGuard]},
+  {path:'Calcul',component:CalculRenMainComponent,canActivate: [AuthGuard]},
   {path:'Facturation',component:GestionFacturationComponent,canActivate: [AuthGuard]},
   {path:'Salaries',component:GestionSalariesComponent,canActivate: [AuthGuard]},
+  {path:'Accueil',component:PageMainComponent,canActivate: [AuthGuard]},
   {path:'Clients',component:GestionClientComponent,canActivate: [AuthGuard]},
   {path:'Projets',component: GestionProjetComponent,canActivate: [AuthGuard]},
   { path: '**', redirectTo: 'login' }

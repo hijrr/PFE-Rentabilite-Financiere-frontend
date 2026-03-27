@@ -125,9 +125,58 @@ export class GestionProjetComponent implements OnInit {
     return Math.min(this.currentPage * this.itemsPerPage, this.filteredProjets.length);
   }
 
+  get pageNumbers(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const delta = 2; // Nombre de pages autour de la page courante
+
+    if (total <= 7) {
+      // Si moins de 7 pages, afficher toutes
+      for (let i = 1; i <= total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Toujours afficher la première page
+      pages.push(1);
+
+      // Calculer la plage autour de la page courante
+      let start = Math.max(2, current - delta);
+      let end = Math.min(total - 1, current + delta);
+
+      // Ajouter ellipse si nécessaire avant la plage
+      if (start > 2) {
+        pages.push('...');
+      }
+
+      // Ajouter les pages de la plage
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      // Ajouter ellipse si nécessaire après la plage
+      if (end < total - 1) {
+        pages.push('...');
+      }
+
+      // Toujours afficher la dernière page
+      if (total > 1) {
+        pages.push(total);
+      }
+    }
+
+    return pages;
+  }
+
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+    }
+  }
+
+  onPageClick(page: number | string): void {
+    if (typeof page === 'number') {
+      this.changePage(page);
     }
   }
 
@@ -284,4 +333,16 @@ export class GestionProjetComponent implements OnInit {
     }).format(montant || 0) + ' €';
   }
 
+
+     // Générer la classe CSS d'avatar optimisée
+  getAvatarClass(client: any): string {
+    if (!client || !client.name) {
+      return 'avatar-default';
+    }
+
+    const firstLetter = client.name.charAt(0).toUpperCase();
+    return `avatar-${firstLetter.toLowerCase()}`;
+
+
+}
 }

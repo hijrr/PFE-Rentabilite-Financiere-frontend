@@ -90,7 +90,8 @@
             </div>
           </td>
 
-          <td>{{ p.client || '-' }}</td>
+          <td>
+            {{ p.client || '-' }}</td>
 
           <td class="montant-cell">
             {{ p.jours_travailles || 0 }}
@@ -157,7 +158,14 @@
         (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button
+        *ngFor="let page of pageNumbers"
+        class="page-btn"
+        [ngClass]="{ active: page === currentPage, ellipsis: page === '...' }"
+        [disabled]="page === '...'"
+        (click)="onPageClick(page)">
+        {{ page }}
+      </button>
       <button
         class="page-btn"
         [disabled]="currentPage === totalPages"
@@ -227,7 +235,7 @@
                     <div class="client-item">
                       <div class="client-avatar-small">
                          <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client-logo">
-                        <div  *ngIf="!client.logoData" class="avatar-placeholder-small">
+                        <div  *ngIf="!client.logoData" class="avatar-placeholder-small"[ngClass]="getAvatarClass(client)">
                           {{ client.name?.charAt(0) || '?' }}
                         </div>
                       </div>
