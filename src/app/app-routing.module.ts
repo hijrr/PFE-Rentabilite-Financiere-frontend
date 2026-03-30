@@ -9,6 +9,7 @@ import { AuthGuard } from './auth.guard';
 import { GestionFacturationComponent } from './modules/gestion-facturation/gestion-facturation.component';
 import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
 import { PageMainComponent } from './modules/page-main/page-main.component';
+import { HistoriqueSalarieComponent } from './modules/historique-salarie/historique-salarie.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
@@ -18,7 +19,8 @@ const routes: Routes = [
   {path:'Accueil',component:PageMainComponent,canActivate: [AuthGuard]},
   {path:'Clients',component:GestionClientComponent,canActivate: [AuthGuard]},
   {path:'Projets',component: GestionProjetComponent,canActivate: [AuthGuard]},
-  { path: '**', redirectTo: 'login' }
+  {path:'Historique',component: HistoriqueSalarieComponent,canActivate: [AuthGuard]},
+  { path: '**', redirectTo: localStorage.getItem('token') ? 'Accueil' : 'login'  }
 ];
 
 @NgModule({

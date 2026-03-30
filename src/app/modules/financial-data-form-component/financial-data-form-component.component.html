@@ -11,7 +11,7 @@
   </div>
 
   <div class="form-container">
-    <form [formGroup]="financeForm" class="financial-form">
+    <form [formGroup]="financeForm" class="financial-form" (ngSubmit)="onSubmit()">
 
       <!-- GRID DES SECTIONS -->
       <div class="sections-grid">
@@ -148,53 +148,56 @@
 
           </div>
         </div>
-<!-- SECTION 6 -->
-        <div class="form-section">
-          <div class="section-header">
-            <h2>Facturation</h2>
-          </div>
+<!-- SECTION 6 : Facturation -->
+<div class="form-section">
+  <div class="section-header">
+    <h2>Facturation</h2>
+  </div>
 
-          <div class="form-grid">
+  <div class="form-grid">
 
-            <div class="form-field">
-              <label class="field-label">TJM(€)</label>
-              <div class="input-wrapper">
-                <span class="input-currency">€</span>
-                <input type="number"
-                       class="form-input">
-              </div>
-            </div>
-
-            <div class="form-field">
-              <label class="field-label">Jours Travaillés</label>
-              <div class="input-wrapper">
-                <span class="input-currency">  <i class="fa-regular fa-calendar"></i></span>
-                <input type="number"
-
-                       class="form-input">
-              </div>
-            </div>
- <div class="form-field">
-              <label class="field-label">Facture</label>
-              <div class="input-wrapper">
-                <span class="input-currency">€</span>
-                <input type="number"
-
-                       class="form-input">
-              </div>
-            </div>
-            <div class="form-field">
-               <label class="field-label">Payé?</label>
-          <div class="payment-switch" (click)="togglePayment()" [class.paye]="isPaid">
-  <span class="option non" [class.active]="!isPaid">NON</span>
-  <span class="option oui" [class.active]="isPaid">OUI</span>
-  <div class="slider" [class.slider-right]="isPaid"></div>
-</div>
-</div>
-          </div>
-        </div>
+    <!-- TJM -->
+    <div class="form-field">
+      <label class="field-label">TJM(€)</label>
+      <div class="input-wrapper">
+        <span class="input-currency">€</span>
+        <input type="number" formControlName="tjm" class="form-input">
       </div>
+    </div>
 
+    <!-- Jours Travaillés -->
+    <div class="form-field">
+      <label class="field-label">Jours Travaillés</label>
+      <div class="input-wrapper">
+        <span class="input-currency"><i class="fa-regular fa-calendar"></i></span>
+        <input type="number" formControlName="joursTravailles" class="form-input">
+      </div>
+    </div>
+
+    <!-- Facture -->
+    <div class="form-field">
+      <label class="field-label">Facture</label>
+      <div class="input-wrapper">
+        <span class="input-currency">€</span>
+        <input type="number" formControlName="facture" class="form-input" [readonly]="true">
+      </div>
+    </div>
+
+    <!-- Switch payé -->
+    <div class="form-field">
+      <label class="field-label">Payé ?</label>
+      <div class="payment-switch"
+           (click)="togglePaye()"
+           [class.paye]="financeForm.get('paye')?.value">
+        <span class="option non" [class.active]="!financeForm.get('paye')?.value">NON</span>
+        <span class="option oui" [class.active]="financeForm.get('paye')?.value">OUI</span>
+        <div class="slider" [class.slider-right]="financeForm.get('paye')?.value"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+      </div>
       <!-- BOUTONS -->
       <div class="actions-bar">
         <button type="submit"
@@ -212,5 +215,46 @@
 
     </form>
   </div>
+<!-- SECTION KPI (cartes) -->
+<div class="kpi-section">
+  <div class="kpi-card">
+    <div class="kpi-icon">
+      <i class="fa-solid fa-utensils"></i>
+    </div>
+    <div class="kpi-content">
+      <span class="kpi-label">Salaire net hors repas</span>
+      <span class="kpi-value">{{ kpiForm.get('salaireNetHorsRepas')?.value | number:'1.0-2' }} €</span>
+    </div>
+  </div>
 
+  <div class="kpi-card">
+    <div class="kpi-icon">
+      <i class="fa-solid fa-hand-holding-usd"></i>
+    </div>
+    <div class="kpi-content">
+      <span class="kpi-label">Total perçu</span>
+      <span class="kpi-value">{{ kpiForm.get('totalePercu')?.value | number:'1.0-2' }} €</span>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon">
+      <i class="fa-solid fa-file-invoice-dollar"></i>
+    </div>
+    <div class="kpi-content">
+      <span class="kpi-label">Facture totale</span>
+      <span class="kpi-value">{{ kpiForm.get('totaleFacture')?.value | number:'1.0-2' }} €</span>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-icon">
+      <i class="fa-solid fa-chart-line"></i>
+    </div>
+    <div class="kpi-content">
+      <span class="kpi-label">Rentabilité</span>
+      <span class="kpi-value">{{ kpiForm.get('rentabilite')?.value | number:'1.0-2' }} €</span>
+    </div>
+  </div>
+</div>
 </div>

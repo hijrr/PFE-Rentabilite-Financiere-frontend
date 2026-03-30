@@ -1,3 +1,4 @@
+import { SalarieServiceService } from 'src/app/services/salarie-service.service';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ClientService } from 'src/app/services/client.service';
@@ -13,7 +14,7 @@ export class GestionProjetComponent implements OnInit {
   filteredProjets: Projet[] = [];
   clients: any[] = [];
   searchTerm: string = '';
-
+salariesList: any[] = [];
   // Pagination
   currentPage: number = 1;
   itemsPerPage: number = 5;
@@ -35,16 +36,28 @@ export class GestionProjetComponent implements OnInit {
      nom: new FormControl('', Validators.required),
       client: new FormControl('', Validators.required),
       clientId: new FormControl(''),
-      jours_travailles: new FormControl(0, [Validators.min(0)]),
+      marge_cible: new FormControl(0, [Validators.min(0)]),
+      salarie_id: new FormControl(null, Validators.required),
       tjm: new FormControl(0, [Validators.min(0)]),
-      status_paiement: new FormControl('en_attente')
+      status_paiement: new FormControl('en_attente'),
+       champ_remarque: new FormControl('')
     });
-  constructor(private projetservice: ProjetService,private clientService: ClientService) { }
+  constructor(private projetservice: ProjetService,private clientService: ClientService,private SalarieServiceService: SalarieServiceService) { }
 
   ngOnInit(): void {
     this.loadProjets();
     this.loadClients();
+    this.loadSalaries();
   }
+  loadSalaries(): void {
+  this.SalarieServiceService.getSalaries().subscribe({
+    next: (data) => {
+      this.salariesList = data || [];
+      console.log('Salariés chargés:', this.salariesList);
+    },
+    error: (err) => console.error('Erreur chargement salariés:', err)
+  });
+}
    loadProjets(): void {
     this.projetservice.getProjets().subscribe({
       next: (data) => {
@@ -86,7 +99,6 @@ export class GestionProjetComponent implements OnInit {
 // Calcul des KPI
   calculerKPIs(): void {
     this.totalProjets = this.projets.length;
-    this.joursFacturables = this.projets.reduce((sum, p) => sum + (p.jours_travailles || 0), 0);
   }
 
   // Filtrage
@@ -218,6 +230,9 @@ export class GestionProjetComponent implements OnInit {
       nom: '',
       client: '',
       clientId: '',
+      marge_cible: 0,
+      salarie_id: null,
+      champ_remarque: '',
       jours_travailles: 0,
       tjm: 0,
       status_paiement: 'en_attente'
@@ -230,13 +245,14 @@ export class GestionProjetComponent implements OnInit {
     this.modalMode = 'edit';
     this.selectedProjet = p;
     this.projetForm.patchValue({
-      id: p.id,
-      nom: p.nom,
-      client: p.client,
-      clientId: p.clientId || '',
-      jours_travailles: p.jours_travailles || 0,
-      tjm: p.tjm || 0,
-      status_paiement: p.status_paiement || 'en_attente'
+       nom: p.nom,
+    client: p.client,
+    clientId: p.clientId || '',
+    tjm: p.tjm || 0,
+    marge_cible: p.marge_cible || 0,
+    status_paiement: p.status_paiement || 'en_attente',
+    champ_remarque: p.champ_remarque || '',
+    salarie_id: p.salarie_id || null  // <-- ici
     });
     this.showModal = true;
     document.body.style.overflow = 'hidden';

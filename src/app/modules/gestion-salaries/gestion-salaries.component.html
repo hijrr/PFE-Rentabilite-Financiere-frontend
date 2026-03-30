@@ -1,4 +1,8 @@
 <div class="salarie-container">
+  <div *ngIf="isLoading" class="loader-overlay">
+    <div class="spinner"></div>
+     <p class="loading-text">Extraction en cours...</p>
+  </div>
 
 <input type="file" #fileInput hidden (change)="onFileSelected($event)">
 
@@ -65,13 +69,15 @@
       </div>
     </div>
   </div>
-
+<div class="loading-container" *ngIf="isLoadingSalaries">
+  <div class="spinnerr"></div>
+  <p>Chargement des salarie...</p>
+</div>
   <!-- TABLE -->
-  <div class="table-wrapper">
-
+  <div class="table-wrapper"*ngIf="!isLoadingSalaries">
     <table class="salarie-table">
 
-      <thead>
+      <thead >
         <tr>
           <th>Numéro de Sécurité Sociale</th>
           <th>Salarié</th>

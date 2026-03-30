@@ -35,6 +35,8 @@ selectedRole: string = '';
   // KPI
   totalSalaries: number = 0;
   tjmMoyen: number = 0;
+  isLoading = false;
+  isLoadingSalaries = false;
 
   salarieForm: FormGroup= new FormGroup({
      username:new FormControl( ['', Validators.required]),
@@ -53,9 +55,11 @@ selectedRole: string = '';
   }
 
   loadSalaries(): void {
+     this.isLoadingSalaries = true;
     this.salarieService.getSalaries().subscribe({
       next: (data) => {
         this.salaries = data || [];
+        this.isLoadingSalaries = false;
         this.filterSalaries();
         this.calculerKPIs();
         console.log('Salariés chargés:', this.salaries);
@@ -330,11 +334,11 @@ openExtractModal() {
 onFileSelected(event: any) {
   const file = event.target.files[0];
   if (!file) return;
-
+ this.isLoading = true; // 🔥 afficher loader
   this.ExtractionService.extractionDonneesPersonnelles(file).subscribe({
     next: (data) => {
       console.log('DATA EXTRAITE:', data);
-
+  this.isLoading = false; // ✅ cacher loader
       // ouvrir modal en mode add
       this.modalMode = 'add';
       this.showModal = true;
@@ -348,6 +352,7 @@ onFileSelected(event: any) {
     },
     error: (err) => {
       console.error(err);
+      this.isLoading = false;
       alert("Erreur lors de l'extraction");
     }
   });

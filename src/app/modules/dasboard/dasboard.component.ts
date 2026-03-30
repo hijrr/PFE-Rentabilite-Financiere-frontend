@@ -27,9 +27,10 @@ export class DasboardComponent implements OnInit {
     switch(segment.toLowerCase()) {
       case 'facturation': return 'Facturation';
       case 'clients': return 'Clients';
-      case 'salaries': return 'historique';
+      case 'salaries': return 'salaries';
       case 'calcul': return 'calcul';
       case 'projets': return 'projets';
+      case 'historique': return 'historique';
       default: return 'accueil';
     }
   }

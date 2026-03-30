@@ -41,14 +41,14 @@
   </ul>
   <ul class="nav-list">
     <li class="nav-item"
-        [class.active]="activeItem === 'historique'">
+        [class.active]="activeItem === 'salaries'">
 
       <a class="nav-link"
-         (click)="setActive('historique')" routerLink="Salaries">
+         (click)="setActive('salaries')" routerLink="Salaries">
 
-        <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
+    <i class="fa-solid fa-people-group"></i>
 
-        <span class="nav-label">Gestion salarié</span>
+        <span class="nav-label">salariés</span>
 
       </a>
     </li>
@@ -91,6 +91,20 @@
         <i class="nav-icon fa-solid fa-chart-column"></i>
 
         <span class="nav-label">Calcul rentabilité mensuelle</span>
+
+      </a>
+    </li>
+  </ul>
+  <ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem === 'historique'">
+
+      <a class="nav-link"
+         (click)="setActive('historique')" routerLink="Historique">
+
+      <i class="fa fa-history"></i>
+
+        <span class="nav-label">Historique Salarié</span>
 
       </a>
     </li>

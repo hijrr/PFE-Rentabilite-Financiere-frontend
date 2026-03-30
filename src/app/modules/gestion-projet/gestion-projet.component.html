@@ -16,10 +16,6 @@
       <div class="kpi-icon">
         <i class="fa-solid fa-calendar-check"></i>
       </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Jours Facturables</span>
-        <span class="kpi-value">{{ joursFacturables }}</span>
-      </div>
     </div>
   </div>
 
@@ -67,9 +63,9 @@
         <tr>
           <th>Projet</th>
           <th>Client</th>
-          <th>Jours travaillés</th>
+          <th>Salarie</th>
           <th>TJM</th>
-          <th>Total HT</th>
+          <th>Marge Cible</th>
           <th>Statut paiement</th>
           <th>Actions</th>
         </tr>
@@ -90,21 +86,14 @@
             </div>
           </td>
 
-          <td>
-            {{ p.client || '-' }}</td>
+          <td>{{ p.client || '-' }}</td>
 
-          <td class="montant-cell">
-            {{ p.jours_travailles || 0 }}
-          </td>
+          <td>{{ p.salarie?.username || '-' }}</td>
 
           <td class="montant-cell">
             {{ p.tjm || 0 }} €
           </td>
-
-          <td class="montant-cell total">
-            {{ (p.jours_travailles || 0) * (p.tjm || 0) | number:'1.0-0' }} €
-          </td>
-
+<td>{{ p.marge_cible || '-' }} %</td>
           <td>
             <span class="status-badge" [ngClass]="getStatusClass(p.status_paiement || '')">
               {{ getStatusLabel(p.status_paiement || '') }}
@@ -253,19 +242,15 @@
             </div>
           </div>
 
-          <!-- Jours travaillés -->
-          <div class="form-group">
-            <label>Jours travaillés</label>
-            <input
-              type="number"
-              class="form-control"
-              formControlName="jours_travailles"
-              min="0"
-              step="0.5"
-              placeholder="0"
-            >
-          </div>
-
+         <div class="form-group">
+  <label>Salarie</label>
+  <select class="form-control" formControlName="salarie_id">
+    <option [value]="null" disabled>-- Choisir un salarié --</option>
+    <option *ngFor="let s of salariesList" [value]="s.id">
+      {{ s.username }}
+    </option>
+  </select>
+</div>
           <!-- TJM -->
           <div class="form-group">
             <label>TJM (€)</label>
@@ -278,7 +263,10 @@
               placeholder="0"
             >
           </div>
-
+ <div class="form-group">
+    <label>Marge cible</label>
+    <input type="number" class="form-control" formControlName="marge_cible">
+  </div>
           <!-- Statut paiement -->
           <div class="form-group">
             <label>Statut paiement</label>
@@ -288,7 +276,10 @@
               <option value="retard">En retard</option>
             </select>
           </div>
-
+ <div class="form-group">
+    <label>Champ remarque</label>
+    <textarea class="form-control" formControlName="champ_remarque"></textarea>
+  </div>
         </div>
 
       </div>
@@ -341,19 +332,21 @@
             <span class="detail-label">Client</span>
             <span class="detail-value">{{ selectedProjet?.client }}</span>
           </div>
-          <div class="detail-item">
-            <span class="detail-label">Jours travaillés</span>
-            <span class="detail-value">{{ selectedProjet.jours_travailles || 0 }}</span>
+            <div class="detail-item">
+              <span class="detail-label">Salarie</span>
+              <span class="detail-value">{{ selectedProjet?.salarie.username || '-' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">TJM</span>
+              <span class="detail-value">{{ selectedProjet?.tjm || 0 }} €</span>
+            </div>
+            <div class="detail-item">
+            <span class="detail-label">Marge cible</span>
+            <span class="detail-value">{{ selectedProjet?.marge_cible || '-' }} %</span>
           </div>
-          <div class="detail-item">
-            <span class="detail-label">TJM</span>
-            <span class="detail-value">{{ selectedProjet?.tjm || 0 }} €</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Total HT</span>
-            <span class="detail-value highlight">
-              {{ (selectedProjet?.jours_travailles || 0) * (selectedProjet?.tjm || 0) | number:'1.0-0' }} €
-            </span>
+           <div class="detail-item">
+            <span class="detail-label">champ remarque</span>
+            <span class="detail-value">{{ selectedProjet?.champ_remarque || '-' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">Statut paiement</span>

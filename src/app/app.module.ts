@@ -18,6 +18,7 @@ import { GestionFacturationComponent } from './modules/gestion-facturation/gesti
 import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
 import { HeaderComponent } from './modules/header/header.component';
 import { PageMainComponent } from './modules/page-main/page-main.component';
+import { HistoriqueSalarieComponent } from './modules/historique-salarie/historique-salarie.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,6 +34,7 @@ import { PageMainComponent } from './modules/page-main/page-main.component';
     GestionProjetComponent,
     HeaderComponent,
     PageMainComponent,
+    HistoriqueSalarieComponent,
   ],
   imports: [
     BrowserModule,

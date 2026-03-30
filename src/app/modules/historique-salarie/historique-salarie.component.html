@@ -1,0 +1,162 @@
+<div class="historique-container">
+  <!-- Barre de recherche -->
+  <div class="search-wrapper">
+    <i class="fas fa-search search-icon"></i>
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      placeholder="Rechercher un salarié (nom, email, fonction)..."
+      class="search-input"
+    />
+  </div>
+
+  <div class="content-split">
+    <!-- Colonne gauche : liste des salariés (inchangée) -->
+    <div class="employees-panel">
+      <div class="panel-header">
+        <h2><i class="fas fa-users"></i> Salariés</h2>
+        <span class="badge">{{ filteredSalaries.length }}</span>
+      </div>
+      <div class="employees-list">
+        <div *ngIf="isLoading" class="loading-spinner">
+          <i class="fas fa-spinner fa-pulse"></i> Chargement...
+        </div>
+        <div *ngIf="!isLoading && filteredSalaries.length === 0" class="no-data">
+          Aucun salarié trouvé.
+        </div>
+        <div
+          *ngFor="let s of filteredSalaries"
+          class="employee-card"
+          [class.selected]="selectedSalarie?.id === s.id"
+          (click)="selectSalarie(s)"
+        >
+          <div class="avatar" [class]="'avatar-' + (s.username?.charAt(0)?.toLowerCase() || 'default')">
+            {{ (s.username | slice:0:1) + (s.username.split(' ')[1]?.[0] || '') }}
+          </div>
+          <div class="employee-info">
+            <div class="employee-name">{{ s.username }}</div>
+            <div class="employee-role">{{ s.role }}</div>
+            <div class="employee-email">{{ s.email }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne droite : historique amélioré -->
+    <div class="history-panel" *ngIf="selectedSalarie; else noSelection">
+      <!-- En-tête avec résumé -->
+      <div class="panel-header">
+        <div class="header-left">
+          <h2>{{ selectedSalarie.username }}</h2>
+          <div class="stats-row">
+            <div class="stat-item">
+              <i class="fas fa-calendar-alt"></i>
+              <span>{{ totalRecords }} enregistrement(s)</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-euro-sign"></i>
+              <span>Salaire total : {{ totalSalary | currency:'EUR' }}</span>
+            </div>
+            <div class="stat-item">
+              <i class="fas fa-chart-line"></i>
+              <span>Facture totale : {{ totalFacture | currency:'EUR' }}</span>
+            </div>
+            <div class="stat-item" [class.positive]="totalRentabilite >= 0" [class.negative]="totalRentabilite < 0">
+              <i class="fas fa-chart-simple"></i>
+              <span>Rentabilité : {{ totalRentabilite | currency:'EUR' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div *ngIf="filteredHistoriques.length === 0" class="no-data">
+        Aucun historique pour ce salarié.
+      </div>
+<div class="timeline">
+  <div *ngFor="let yearData of timelineData" class="timeline-year">
+    <div class="year-badge">
+      <i class="fas fa-calendar-alt"></i> {{ yearData.year }}
+    </div>
+    <div *ngFor="let monthData of yearData.months" class="timeline-month">
+      <div class="month-title">{{ monthData.name }}</div>
+      <div class="timeline-cards">
+        <div *ngFor="let record of monthData.records" class="history-card">
+                <div class="card-date">
+                  <i class="fas fa-calendar-week"></i> {{ record.date }}
+                </div>
+                <div class="card-content">
+                  <div class="section finance">
+                    <h4><i class="fas fa-chart-line"></i> Finance</h4>
+                    <div class="data-row">
+                      <span>Salaire brut</span>
+                      <strong>{{ record.salaireBrut | currency:'EUR' }}</strong>
+                    </div>
+                    <div class="data-row">
+                      <span>Net payer</span>
+                      <strong>{{ record.netPayer | currency:'EUR' }}</strong>
+                    </div>
+                    <div class="data-row">
+                      <span>Charges patronales</span>
+                      <strong>{{ record.chargesPatronales | currency:'EUR' }}</strong>
+                    </div>
+                    <div class="data-row">
+                      <span>Notes de frais</span>
+                      <strong>{{ record.totalNoteFrais | currency:'EUR' }}</strong>
+                    </div>
+                  </div>
+                  <div class="section dolibar">
+                    <h4><i class="fas fa-chart-simple"></i> Dolibar</h4>
+                    <div class="data-row">
+                      <span>TJM</span>
+                      <strong>{{ record.tjm | currency:'EUR' }}</strong>
+                    </div>
+                    <div class="data-row">
+                      <span>Jours travaillés</span>
+                      <strong>{{ record.joursTravailles }}</strong>
+                    </div>
+                    <div class="data-row">
+                      <span>Facture</span>
+                      <strong>{{ record.facture | currency:'EUR' }}</strong>
+                    </div>
+                    <div class="data-row">
+                      <span>Payé</span>
+                      <strong>{{ record.paye | currency:'EUR' }}</strong>
+                    </div>
+                  </div>
+                  <div class="section rentability">
+                    <h4><i class="fas fa-chart-simple"></i> Rentabilité</h4>
+                    <div class="data-row">
+                      <span>Total perçu</span>
+                      <strong>{{ record.totalePercu | currency:'EUR' }}</strong>
+                    </div>
+                    <div class="data-row highlight">
+                      <span>Rentabilité</span>
+                      <strong [class.positive]="record.rentabilite >= 0" [class.negative]="record.rentabilite < 0">
+                        {{ record.rentabilite | currency:'EUR' }}
+                      </strong>
+                    </div>
+                    <!-- Micro graphique barre -->
+                    <div class="profit-bar">
+                      <div class="bar-fill" [style.width.%]="profitPercent(record)"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noSelection>
+      <div class="history-panel empty">
+        <div class="empty-state">
+          <i class="fas fa-users"></i>
+          <h3>Sélectionnez un salarié</h3>
+          <p>Choisissez un salarié dans la liste pour voir son historique financier.</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

@@ -18,90 +18,105 @@
 
   <!-- Formulaire de synchronisation -->
   <div class="sync-form">
-    <!-- Sélection du salarié -->
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fa-solid fa-user"></i>
-          Salarié
-          <span class="required-star">*</span>
-        </label>
-        <div class="select-wrapper">
-          <select
-            [(ngModel)]="selectedSalarie"
-            name="salarie"
-            class="form-select"
-            [class.select-filled]="selectedSalarie">
-            <option value="" disabled selected>Choisir un salarié</option>
-            <option *ngFor="let salarie of salaries" [value]="salarie.id">
-              {{ salarie.username }} 
-            </option>
-          </select>
-          <i class="fa-solid fa-chevron-down select-arrow"></i>
-        </div>
-        <span class="field-hint" *ngIf="!selectedSalarie">
-          Sélectionnez le salarié à synchroniser
-        </span>
-      </div>
-
-      <!-- Sélection de la date avec jour -->
-      <div class="form-group">
-        <label class="form-label">
-          <i class="fa-solid fa-calendar"></i>
-          Date
-          <span class="required-star">*</span>
-        </label>
-        <div class="date-input-wrapper">
-          <input
-            type="date"
-            [(ngModel)]="selectedDate"
-            name="date"
-            class="form-date"
-            [class.date-filled]="selectedDate">
-          <i class="fa-solid fa-calendar-days date-icon"></i>
-        </div>
-        <span class="field-hint" *ngIf="!selectedDate">
-          Sélectionnez la date à synchroniser
-        </span>
-        <span class="field-hint" *ngIf="selectedDate">
-          <i class="fa-regular fa-clock"></i>
-          {{ formatDateWithDay(selectedDate) }}
-        </span>
+    <!-- Sélection du projet -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="fa-solid fa-folder"></i>
+        Projet
+        <span class="required-star">*</span>
+      </label>
+      <div class="select-wrapper">
+        <select
+          [(ngModel)]="selectedProjet"
+          name="projet"
+          class="form-select"
+          [class.select-filled]="selectedProjet"
+          (change)="onProjetChange()">
+         <option [ngValue]="null" disabled>Choisir un projet</option>
+          <option *ngFor="let projet of projets" [value]="projet.id">
+            {{ projet.nom }}
+          </option>
+        </select>
+        <i class="fa-solid fa-chevron-down select-arrow"></i>
       </div>
     </div>
 
-    <!-- Message d'erreur -->
-    <div class="error-message" *ngIf="syncError">
-      <i class="fa-solid fa-circle-exclamation"></i>
-      {{ syncError }}
+    <!-- Sélection de la facture -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="fa-solid fa-file-invoice"></i>
+        Facture
+        <span class="required-star">*</span>
+      </label>
+      <div class="select-wrapper">
+        <select
+          [(ngModel)]="selectedFacture"
+          name="facture"
+          class="form-select"
+          [class.select-filled]="selectedFacture"
+          [disabled]="!filteredFactures.length">
+          <option [ngValue]="null" disabled>Choisir une facture</option>
+          <option *ngFor="let facture of filteredFactures" [value]="facture.id">
+            {{ facture.ref }} - {{ getClientNameById(facture.socid) }} - {{ formatDateForDisplay(facture.date_creation) }}
+          </option>
+          <option disabled *ngIf="filteredFactures.length === 0">Aucune facture correspondante</option>
+        </select>
+        <i class="fa-solid fa-chevron-down select-arrow"></i>
+      </div>
     </div>
 
-    <!-- Message de succès -->
-    <div class="success-message" *ngIf="syncSuccess">
-      <i class="fa-solid fa-circle-check"></i>
-      Synchronisation réussie avec Dolibarr !
+    <!-- Sélection de la date -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="fa-solid fa-calendar"></i>
+        Date
+        <span class="required-star">*</span>
+      </label>
+      <div class="date-input-wrapper">
+        <input
+          type="month"
+          [(ngModel)]="selectedDate"
+          name="date"
+          class="form-date"
+          [class.date-filled]="selectedDate">
+        <i class="fa-solid fa-calendar-days date-icon"></i>
+      </div>
+      <span class="field-hint" *ngIf="!selectedDate">
+        Sélectionnez la date à synchroniser
+      </span>
+      <span class="field-hint" *ngIf="selectedDate">
+        <i class="fa-regular fa-clock"></i>
+        {{ formatDateWithDay(selectedDate) }}
+      </span>
     </div>
+  </div>
 
-    <!-- Barre d'actions -->
-    <div class="actions-bar">
-      <button
-        class="btn-sync"
-        (click)="synchroniserDolibarr()"
-        [disabled]="!selectedSalarie || !selectedDate || isSyncing">
+  <!-- Messages -->
+  <div class="error-message" *ngIf="syncError">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ syncError }}
+  </div>
+  <div class="success-message" *ngIf="syncSuccess">
+    <i class="fa-solid fa-circle-check"></i>
+    Synchronisation réussie avec Dolibarr !
+  </div>
 
-        <i class="fa-solid" [ngClass]="{
-          'fa-cloud-arrow-up': !isSyncing,
-          'fa-circle-notch fa-spin': isSyncing
-        }"></i>
-
-        <span *ngIf="!isSyncing">Synchroniser avec Dolibarr</span>
-        <span *ngIf="isSyncing">Synchronisation en cours...</span>
-      </button>
-
-      <button class="btn-reset" (click)="resetForm()">
-        <i class="fa-solid fa-rotate"></i>
-        Réinitialiser
-      </button>
-    </div>
+  <!-- Actions -->
+  <div class="actions-bar">
+    <button
+      class="btn-sync"
+      (click)="synchroniserDolibarr()"
+      [disabled]="!selectedProjet || !selectedDate || !selectedFacture || isSyncing">
+      <i class="fa-solid" [ngClass]="{
+        'fa-cloud-arrow-up': !isSyncing,
+        'fa-circle-notch fa-spin': isSyncing
+      }"></i>
+      <span *ngIf="!isSyncing">Synchroniser avec Dolibarr</span>
+      <span *ngIf="isSyncing">Synchronisation en cours...</span>
+    </button>
+    <button class="btn-reset" (click)="resetForm()">
+      <i class="fa-solid fa-rotate"></i>
+      Réinitialiser
+    </button>
   </div>
 </div>

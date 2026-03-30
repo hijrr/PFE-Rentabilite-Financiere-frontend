@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Form, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 
 interface LoginResponse {
@@ -22,7 +24,9 @@ export class AuthComponent implements OnInit {
     username : new FormControl('',[Validators.required]),
     password : new FormControl('',[Validators.required,Validators.minLength(4)])
   });
-  constructor(private http: HttpClient,private router: Router) { }
+  constructor(private http: HttpClient,private router: Router,private authService: AuthService) { }
+ private loggedIn = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
+  isLoggedIn$ = this.loggedIn.asObservable();
 
 
   ngOnInit(): void {
@@ -51,7 +55,7 @@ rotateWord() {
     .subscribe({
       next: (response) => {
         console.log("Connexion réussie", response);
-         localStorage.setItem('token', response.access_token);//5thet ken acess token khw men json
+         this.authService.login(response.access_token);
          this.router.navigate(['/Accueil']);
       },      error: (err) => {
         console.log("Erreur de connexion", err);
@@ -65,5 +69,9 @@ rotateWord() {
   get password(){
     return this.loginForm.get('password');
   }
-
+ logout() {
+  localStorage.removeItem('token'); // supprime le token
+  this.loggedIn.next(false);
+   this.router.navigate(['/login']);
+}
 }

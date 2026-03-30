@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 export interface UserOut {
   id: number;
   username: string;
@@ -15,12 +15,19 @@ export interface UserOut {
 export class AuthService {
 
   constructor(private http: HttpClient,private router:Router) { }
+   private loggedIn = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
+   isLoggedIn$ = this.loggedIn.asObservable();
+
    getCurrentUser(): Observable<UserOut> {
     return this.http.get<UserOut>(`http://localhost:8000/me`);
   }
-
+  login(token: string) {
+    localStorage.setItem('token', token); // stocke le token
+    this.loggedIn.next(true);              // notifie tous les abonnés
+  }
   logout() {
   localStorage.removeItem('token'); // supprime le token
+  this.loggedIn.next(false);              // notifie tous les abonnés
 
    this.router.navigate(['/login']);
 }

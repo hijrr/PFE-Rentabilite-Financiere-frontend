@@ -1,15 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Salarie } from './salarie-service.service';
 export interface Projet {
   id:number;
   nom: string;
   client: string;
-  jours_travailles?: number | null;
   tjm?: number | null;
   status_paiement?: string | null;
-
-
+  marge_cible?: number | null;
+  champ_remarque?: string | null;
+  salarie_id?: number | null;
+  salarie:Salarie|null;
 }
 @Injectable({
   providedIn: 'root'

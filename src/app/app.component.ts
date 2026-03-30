@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +8,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private router: Router) {}
+  isLoggedIn = false;
+  constructor(private router: Router,private authService: AuthService) {
+     this.authService.isLoggedIn$.subscribe(status => this.isLoggedIn = status);
+  }
   title = 'rentabilite-dashboard';
   // Variable pour suivre l'état de la sidebar
   isSidebarCollapsed = false;
@@ -18,6 +22,6 @@ export class AppComponent {
     console.log('Sidebar état:', collapsed ? 'réduite' : 'ouverte');
   }
   isLoginPage(): boolean {
-  return this.router.url === '/login';
+    return !this.isLoggedIn;
 }
 }
