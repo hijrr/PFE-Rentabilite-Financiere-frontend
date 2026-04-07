@@ -1,5 +1,15 @@
+
 <div class="historique-container">
-  <!-- Barre de recherche -->
+  <div class="histo-header">
+    <div class="header-title">
+      <div class="header-icon">
+        <i class="fa fa-history"></i>
+      </div>
+      <h1>Historique Salarié</h1>
+    </div>
+    <!-- Optionnel : header-actions -->
+  </div>
+  <!-- Barre de recherche salarié -->
   <div class="search-wrapper">
     <i class="fas fa-search search-icon"></i>
     <input
@@ -7,29 +17,21 @@
       [(ngModel)]="searchTerm"
       placeholder="Rechercher un salarié (nom, email, fonction)..."
       class="search-input"
+      (input)="currentPage = 1"
     />
   </div>
 
   <div class="content-split">
-    <!-- Colonne gauche : liste des salariés (inchangée) -->
+    <!-- Colonne gauche : liste des salariés -->
     <div class="employees-panel">
       <div class="panel-header">
         <h2><i class="fas fa-users"></i> Salariés</h2>
         <span class="badge">{{ filteredSalaries.length }}</span>
       </div>
       <div class="employees-list">
-        <div *ngIf="isLoading" class="loading-spinner">
-          <i class="fas fa-spinner fa-pulse"></i> Chargement...
-        </div>
-        <div *ngIf="!isLoading && filteredSalaries.length === 0" class="no-data">
-          Aucun salarié trouvé.
-        </div>
-        <div
-          *ngFor="let s of filteredSalaries"
-          class="employee-card"
-          [class.selected]="selectedSalarie?.id === s.id"
-          (click)="selectSalarie(s)"
-        >
+        <div *ngIf="isLoading" class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Chargement...</div>
+        <div *ngIf="!isLoading && filteredSalaries.length === 0" class="no-data">Aucun salarié trouvé.</div>
+        <div *ngFor="let s of paginatedSalaries" class="employee-card" [class.selected]="selectedSalarie?.id === s.id" (click)="selectSalarie(s)">
           <div class="avatar" [class]="'avatar-' + (s.username?.charAt(0)?.toLowerCase() || 'default')">
             {{ (s.username | slice:0:1) + (s.username.split(' ')[1]?.[0] || '') }}
           </div>
@@ -40,123 +42,137 @@
           </div>
         </div>
       </div>
+      <div class="pagination-bar" *ngIf="filteredSalaries.length > pageSize">
+        <button class="pagination-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1"><i class="fas fa-chevron-left"></i></button>
+        <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+        <button class="pagination-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages"><i class="fas fa-chevron-right"></i></button>
+      </div>
     </div>
 
-    <!-- Colonne droite : historique amélioré -->
+    <!-- Colonne droite -->
     <div class="history-panel" *ngIf="selectedSalarie; else noSelection">
-      <!-- En-tête avec résumé -->
+      <!-- En-tête statistiques -->
       <div class="panel-header">
         <div class="header-left">
           <h2>{{ selectedSalarie.username }}</h2>
           <div class="stats-row">
-            <div class="stat-item">
-              <i class="fas fa-calendar-alt"></i>
-              <span>{{ totalRecords }} enregistrement(s)</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-euro-sign"></i>
-              <span>Salaire total : {{ totalSalary | currency:'EUR' }}</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-chart-line"></i>
-              <span>Facture totale : {{ totalFacture | currency:'EUR' }}</span>
-            </div>
-            <div class="stat-item" [class.positive]="totalRentabilite >= 0" [class.negative]="totalRentabilite < 0">
-              <i class="fas fa-chart-simple"></i>
-              <span>Rentabilité : {{ totalRentabilite | currency:'EUR' }}</span>
+            <div class="stat-item"><i class="fas fa-calendar-alt"></i> {{ totalRecords }} enregistrement(s)</div>
+            <div class="stat-item"><i class="fas fa-euro-sign"></i> Salaire total : {{ totalSalary | currency:'EUR' }}</div>
+            <div class="stat-item"><i class="fas fa-chart-line"></i> Facture totale : {{ totalFacture | currency:'EUR' }}</div>
+            <div class="stat-item" [class.positive]="totalRentabilite>=0" [class.negative]="totalRentabilite<0">
+              <i class="fas fa-chart-simple"></i> Rentabilité : {{ totalRentabilite | currency:'EUR' }}
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Timeline -->
-      <div *ngIf="filteredHistoriques.length === 0" class="no-data">
-        Aucun historique pour ce salarié.
+      <!-- Recherche projet -->
+      <div class="projet-search-section">
+        <label>Rechercher un projet :</label>
+        <div class="search-wrapper small">
+          <input type="text" [(ngModel)]="projetSearchTerm" (input)="onProjetSearch()" placeholder="Nom, client ou TJM..." class="search-input" autocomplete="off"/>
+          <div *ngIf="filteredProjets.length>0 && projetSearchTerm" class="autocomplete-list">
+            <div *ngFor="let p of filteredProjets" class="autocomplete-item" (click)="selectProjet(p)">
+              <div class="projet-name">{{ p.nom }}</div>
+              <div class="projet-details"><span>{{ p.client }}</span> <span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
+            </div>
+          </div>
+        </div>
       </div>
-<div class="timeline">
-  <div *ngFor="let yearData of timelineData" class="timeline-year">
-    <div class="year-badge">
-      <i class="fas fa-calendar-alt"></i> {{ yearData.year }}
-    </div>
-    <div *ngFor="let monthData of yearData.months" class="timeline-month">
-      <div class="month-title">{{ monthData.name }}</div>
-      <div class="timeline-cards">
-        <div *ngFor="let record of monthData.records" class="history-card">
-                <div class="card-date">
-                  <i class="fas fa-calendar-week"></i> {{ record.date }}
+      <div *ngIf="selectedProjetObj" class="selected-projet-info">
+        <i class="fas fa-check-circle"></i> Projet : {{ selectedProjetObj.nom }} (TJM: {{ selectedProjetObj.tjm }} € - Client: {{ selectedProjetObj.client }})
+        <button class="clear-projet" (click)="clearProjetSelection()">✖</button>
+         <button class="export-csv-btn" (click)="exportToCSV()" title="Exporter les enregistrements du projet en CSV">
+    <i class="fas fa-file-csv"></i> Exporter CSV
+  </button>
+      </div>
+
+      <!-- Filtres année + mois -->
+      <div *ngIf="selectedProjetObj && allYearsForProject.length" class="filters-section">
+        <div class="filter-group">
+          <label>Année :</label>
+          <select [(ngModel)]="selectedYearFilter" (change)="onYearFilterChange()" class="filter-select">
+            <option value="">Toutes les années</option>
+            <option *ngFor="let y of allYearsForProject" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+        <div class="filter-group" *ngIf="availableMonthsForYear.length">
+          <label>Mois :</label>
+          <select [(ngModel)]="selectedMonthFilter" (change)="applyPreciseFilter()" class="filter-select">
+            <option value="">Tous les mois</option>
+            <option *ngFor="let m of availableMonthsForYear" [value]="m.value">{{ m.name }}</option>
+          </select>
+        </div>
+        <button *ngIf="selectedYearFilter || selectedMonthFilter" class="clear-filters" (click)="clearFilters()">Réinitialiser filtres</button>
+      </div>
+
+      <!-- Affichage hiérarchique -->
+      <div *ngIf="selectedProjetObj && filteredHierarchy.length" class="hierarchy-view">
+        <div *ngFor="let yearData of filteredHierarchy" class="year-block">
+          <div class="year-title" (click)="toggleYear(yearData.year)">
+            <i class="fas" [class.fa-chevron-down]="yearData.expanded" [class.fa-chevron-right]="!yearData.expanded"></i> {{ yearData.year }}
+          </div>
+          <div *ngIf="yearData.expanded" class="months-container">
+            <div *ngFor="let monthData of yearData.months" class="month-block">
+              <div class="month-title" (click)="toggleMonth(yearData.year, monthData.month)">
+                <i class="fas" [class.fa-chevron-down]="monthData.expanded" [class.fa-chevron-right]="!monthData.expanded"></i> {{ monthData.monthName }} ({{ monthData.records.length }})
+              </div>
+              <div *ngIf="monthData.expanded" class="records-list">
+                <div *ngFor="let record of monthData.paginatedRecords" class="record-card" (click)="openRecordModal(record)">
+                  <div class="record-date">{{ record.date }}</div>
+                  <div class="record-summary">Salaire brut: {{ record.salaireBrut | currency:'EUR' }} | Net: {{ record.netPayer | currency:'EUR' }} | Rentabilité: {{ record.rentabilite | currency:'EUR' }}</div>
                 </div>
-                <div class="card-content">
-                  <div class="section finance">
-                    <h4><i class="fas fa-chart-line"></i> Finance</h4>
-                    <div class="data-row">
-                      <span>Salaire brut</span>
-                      <strong>{{ record.salaireBrut | currency:'EUR' }}</strong>
-                    </div>
-                    <div class="data-row">
-                      <span>Net payer</span>
-                      <strong>{{ record.netPayer | currency:'EUR' }}</strong>
-                    </div>
-                    <div class="data-row">
-                      <span>Charges patronales</span>
-                      <strong>{{ record.chargesPatronales | currency:'EUR' }}</strong>
-                    </div>
-                    <div class="data-row">
-                      <span>Notes de frais</span>
-                      <strong>{{ record.totalNoteFrais | currency:'EUR' }}</strong>
-                    </div>
-                  </div>
-                  <div class="section dolibar">
-                    <h4><i class="fas fa-chart-simple"></i> Dolibar</h4>
-                    <div class="data-row">
-                      <span>TJM</span>
-                      <strong>{{ record.tjm | currency:'EUR' }}</strong>
-                    </div>
-                    <div class="data-row">
-                      <span>Jours travaillés</span>
-                      <strong>{{ record.joursTravailles }}</strong>
-                    </div>
-                    <div class="data-row">
-                      <span>Facture</span>
-                      <strong>{{ record.facture | currency:'EUR' }}</strong>
-                    </div>
-                    <div class="data-row">
-                      <span>Payé</span>
-                      <strong>{{ record.paye | currency:'EUR' }}</strong>
-                    </div>
-                  </div>
-                  <div class="section rentability">
-                    <h4><i class="fas fa-chart-simple"></i> Rentabilité</h4>
-                    <div class="data-row">
-                      <span>Total perçu</span>
-                      <strong>{{ record.totalePercu | currency:'EUR' }}</strong>
-                    </div>
-                    <div class="data-row highlight">
-                      <span>Rentabilité</span>
-                      <strong [class.positive]="record.rentabilite >= 0" [class.negative]="record.rentabilite < 0">
-                        {{ record.rentabilite | currency:'EUR' }}
-                      </strong>
-                    </div>
-                    <!-- Micro graphique barre -->
-                    <div class="profit-bar">
-                      <div class="bar-fill" [style.width.%]="profitPercent(record)"></div>
-                    </div>
-                  </div>
+                <div *ngIf="monthData.records.length > recordsPerPage" class="pagination-records">
+                  <button (click)="changeMonthPage(yearData.year, monthData.month, monthData.currentPage-1)" [disabled]="monthData.currentPage===1">Précédent</button>
+                  <span>Page {{ monthData.currentPage }} / {{ monthData.totalPages }}</span>
+                  <button (click)="changeMonthPage(yearData.year, monthData.month, monthData.currentPage+1)" [disabled]="monthData.currentPage===monthData.totalPages">Suivant</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div *ngIf="selectedProjetObj && !filteredHierarchy.length" class="no-data">Aucun enregistrement pour ce projet avec les filtres sélectionnés.</div>
+      <div *ngIf="!selectedProjetObj && filteredHistoriques.length===0" class="no-data">Aucun historique pour ce salarié.</div>
     </div>
 
     <ng-template #noSelection>
-      <div class="history-panel empty">
-        <div class="empty-state">
-          <i class="fas fa-users"></i>
-          <h3>Sélectionnez un salarié</h3>
-          <p>Choisissez un salarié dans la liste pour voir son historique financier.</p>
-        </div>
-      </div>
+      <div class="history-panel empty"><div class="empty-state"><i class="fas fa-users"></i><h3>Sélectionnez un salarié</h3><p>Choisissez un salarié dans la liste pour voir son historique financier.</p></div></div>
     </ng-template>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showRecordModal" (click)="closeRecordModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2><i class="fas fa-info-circle"></i> Détail de l'enregistrement</h2>
+      <button class="close-btn" (click)="closeRecordModal()">✖</button>
+    </div>
+    <div class="modal-body" *ngIf="selectedRecord">
+      <div class="table-responsive">
+        <table class="detail-table">
+          <tbody>
+            <tr><td class="detail-label">Date</td><td>{{ selectedRecord.date }}</td></tr>
+            <tr><td class="detail-label">Salaire brut</td><td>{{ selectedRecord.salaireBrut | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Net payer</td><td>{{ selectedRecord.netPayer | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Charges patronales</td><td>{{ selectedRecord.chargesPatronales | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Repas restaurant</td><td>{{ selectedRecord.repasRestaurant | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Total cotisations salariales</td><td>{{ selectedRecord.totalCotisationsSalariales | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Total notes de frais</td><td>{{ selectedRecord.totalNoteFrais | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Total notes kilométriques</td><td>{{ selectedRecord.totalNoteKilometrique | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">TJM</td><td>{{ selectedRecord.tjm | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Jours travaillés</td><td>{{ selectedRecord.joursTravailles }}</td></tr>
+            <tr><td class="detail-label">Facture</td><td>{{ selectedRecord.facture | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Payé</td><td>{{ selectedRecord.paye }}</td></tr>
+            <tr><td class="detail-label">Total perçu</td><td>{{ selectedRecord.totalePercu | currency:'EUR' }}</td></tr>
+            <tr><td class="detail-label">Total facture</td><td>{{ selectedRecord.totaleFacture | currency:'EUR' }}</td></tr>
+            <tr class="highlight-row"><td class="detail-label">Rentabilité</td><td>{{ selectedRecord.rentabilite | currency:'EUR' }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeRecordModal()">Fermer</button>
+    </div>
   </div>
 </div>

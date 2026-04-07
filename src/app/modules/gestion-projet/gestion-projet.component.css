@@ -352,6 +352,7 @@
 .actions-cell {
   display: flex;
   gap: 0.5rem;
+  margin-top: 20px;
   flex-wrap: wrap;
 }
 
@@ -385,7 +386,11 @@
   color: #2563EB;
   border-color: #2563EB;
 }
-
+.action-btn.delete:hover {
+  background: #EFF6FF;
+  color: #dd4213;
+  border-color: #e01111;
+}
 /* Aucune donnée */
 .no-data {
   text-align: center;
@@ -916,4 +921,52 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* Slider personnalisé */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-range {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  background: var(--elzei-border);
+  border-radius: 3px;
+  outline: none;
+}
+
+.form-range:focus {
+  outline: none;
+}
+
+.form-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--elzei-green);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: var(--transition);
+}
+
+.form-range::-webkit-slider-thumb:hover {
+  background: var(--elzei-green-dark);
+  transform: scale(1.1);
+}
+
+.slider-value {
+  min-width: 50px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--elzei-green-dark);
+  background: var(--elzei-green-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
 }

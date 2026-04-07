@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
+import { ProjetService } from 'src/app/services/projet.service';
 import { SalarieServiceService } from 'src/app/services/salarie-service.service';
 
 @Component({
@@ -8,116 +9,331 @@ import { SalarieServiceService } from 'src/app/services/salarie-service.service'
   styleUrls: ['./historique-salarie.component.css']
 })
 export class HistoriqueSalarieComponent implements OnInit {
+  // Données
+  allHistoriques: any[] = [];
+  salaries: any[] = [];
+  selectedSalarie: any = null;
+  filteredHistoriques: any[] = [];
+  searchTerm = '';
+  isLoading = false;
 
-  constructor(private salarieService: SalarieServiceService,private financeDataService: FinanceDataService) { }
-   allHistoriques: any[] = [];
-salaries:any[]=[];
-historiqueData: any;
-dolibarData: any;
-selectedSalarie: any = null;
- filteredHistoriques: any[] = []; // Historique du salarié sélectionné
-  searchTerm: string = '';
-   isLoading = false;
-   timelineData: Array<{ year: string; months: Array<{ name: string; records: any[] }> }> = [];
-  // Filtre de recherche
+  // Projets
+  projetsSalarie: any[] = [];
+  selectedProjetId: number | null = null;
+  allHistoriquesBackup: any[] = [];
+
+  // Recherche projet
+  projetSearchTerm = '';
+  filteredProjets: any[] = [];
+  selectedProjetObj: any = null;
+
+  // Filtres année/mois
+  selectedYearFilter = '';
+  selectedMonthFilter = '';
+  allYearsForProject: string[] = [];
+  availableMonthsForYear: { name: string; value: string }[] = [];
+
+  // Structure hiérarchique brute et filtrée
+  rawHierarchy: Array<{
+    year: string;
+    months: Array<{
+      month: number;
+      monthName: string;
+      records: any[];
+    }>;
+  }> = [];
+  filteredHierarchy: Array<{
+    year: string;
+    expanded: boolean;
+    months: Array<{
+      month: number;
+      monthName: string;
+      expanded: boolean;
+      records: any[];
+      pageSize: number;
+      currentPage: number;
+      totalPages: number;
+      paginatedRecords: any[];
+    }>;
+  }> = [];
+
+  recordsPerPage = 3;
+
+  // Modals
+  showRecordModal = false;
+  selectedRecord: any = null;
+
+  // Pagination salariés
+  currentPage = 1;
+  pageSize = 4;
+
+  constructor(
+    private salarieService: SalarieServiceService,
+    private financeDataService: FinanceDataService,
+    private projetService: ProjetService
+  ) {}
+
   ngOnInit(): void {
     this.loadSalaries();
     this.loadHistoriques();
   }
- loadSalaries(): void {
-  this.isLoading = true;
+
+  loadSalaries(): void {
+    this.isLoading = true;
     this.salarieService.getSalaries().subscribe({
-      next: (data) => {
-        this.isLoading = false;
-        this.salaries = data || [];
-        console.log('Salariés chargés:', this.salaries);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error(err);
-      }
+      next: (data) => { this.salaries = data || []; this.isLoading = false; },
+      error: (err) => { this.isLoading = false; console.error(err); }
     });
   }
+
   loadHistoriques(): void {
     this.financeDataService.getHistoriques().subscribe({
       next: (data) => {
         this.allHistoriques = data || [];
-        // Si un salarié est déjà sélectionné, on met à jour son historique
-        if (this.selectedSalarie) {
-          this.filterHistoriquesBySalarie(this.selectedSalarie);
-        }
+        if (this.selectedSalarie) this.filterHistoriquesBySalarie(this.selectedSalarie);
       },
       error: (err) => console.error('Erreur chargement historiques', err)
     });
   }
+
   filterHistoriquesBySalarie(salarie: any): void {
     this.filteredHistoriques = this.allHistoriques.filter(h => h.salarie_id === salarie.id);
-      this.updateTimelineData();
   }
 
-  // Sélection d'un salarié
   selectSalarie(salarie: any): void {
     this.selectedSalarie = salarie;
     this.filterHistoriquesBySalarie(salarie);
+    this.loadProjetsForSalarie(salarie.id);
+    this.clearProjetSelection();
+    this.currentPage = 1;
   }
-   get filteredSalaries(): any[] {
-    if (!this.searchTerm) return this.salaries;
-    const term = this.searchTerm.toLowerCase();
-    return this.salaries.filter(s =>
-      s.username.toLowerCase().includes(term) ||
-      s.email.toLowerCase().includes(term) ||
-      s.role.toLowerCase().includes(term)
+
+  loadProjetsForSalarie(salarieId: number): void {
+    this.projetService.getProjetsById(salarieId).subscribe({
+      next: (projets) => { this.projetsSalarie = projets || []; },
+      error: (err) => console.error(err)
+    });
+  }
+
+  // Recherche projet
+  onProjetSearch(): void {
+    const term = this.projetSearchTerm.toLowerCase().trim();
+    if (!term) { this.filteredProjets = []; return; }
+    this.filteredProjets = this.projetsSalarie.filter(p =>
+      p.nom?.toLowerCase().includes(term) ||
+      p.client?.toLowerCase().includes(term) ||
+      p.tjm?.toString().includes(term)
     );
   }
-   get totalRecords(): number {
-    return this.filteredHistoriques.length;
+
+  selectProjet(projet: any): void {
+    this.selectedProjetObj = projet;
+    this.projetSearchTerm = projet.nom;
+    this.filteredProjets = [];
+    this.selectedProjetId = projet.id;
+    if (this.allHistoriquesBackup.length === 0) this.allHistoriquesBackup = [...this.filteredHistoriques];
+    this.filteredHistoriques = this.allHistoriquesBackup.filter(record => record.projet_id === projet.id);
+    this.buildRawHierarchy();
+    this.initFiltersFromData();
+    this.applyPreciseFilter();
   }
 
-  get totalSalary(): number {
-    return this.filteredHistoriques.reduce((sum, r) => sum + (r.salaireBrut || 0), 0);
+  clearProjetSelection(): void {
+    this.selectedProjetObj = null;
+    this.selectedProjetId = null;
+    this.projetSearchTerm = '';
+    this.filteredProjets = [];
+    this.selectedYearFilter = '';
+    this.selectedMonthFilter = '';
+    this.allYearsForProject = [];
+    this.availableMonthsForYear = [];
+    if (this.allHistoriquesBackup.length) {
+      this.filteredHistoriques = [...this.allHistoriquesBackup];
+      this.allHistoriquesBackup = [];
+    } else if (this.selectedSalarie) this.filterHistoriquesBySalarie(this.selectedSalarie);
+    this.rawHierarchy = [];
+    this.filteredHierarchy = [];
   }
 
-  get totalFacture(): number {
-    return this.filteredHistoriques.reduce((sum, r) => sum + (r.facture || 0), 0);
-  }
-
-  get totalRentabilite(): number {
-    return this.filteredHistoriques.reduce((sum, r) => sum + (r.rentabilite || 0), 0);
-  }
-
-  updateTimelineData() {
-    const groups: { [year: string]: { [month: string]: any[] } } = {};
+  // Construction de la hiérarchie brute (année -> mois -> enregistrements)
+  buildRawHierarchy(): void {
+    const map = new Map<string, Map<number, any[]>>();
     for (const record of this.filteredHistoriques) {
       const date = new Date(record.date);
       const year = date.getFullYear().toString();
-      const month = date.getMonth(); // 0-11
-      if (!groups[year]) groups[year] = {};
-      if (!groups[year][month]) groups[year][month] = [];
-      groups[year][month].push(record);
+      const month = date.getMonth() + 1;
+      if (!map.has(year)) map.set(year, new Map());
+      const monthMap = map.get(year)!;
+      if (!monthMap.has(month)) monthMap.set(month, []);
+      monthMap.get(month)!.push(record);
     }
-
-    const result: Array<{ year: string; months: Array<{ name: string; records: any[] }> }> = [];
-    const years = Object.keys(groups).sort().reverse(); // années décroissantes
+    const years = Array.from(map.keys()).sort().reverse();
+    this.rawHierarchy = [];
     for (const year of years) {
-      const monthsList: Array<{ name: string; records: any[] }> = [];
-      const monthNumbers = Object.keys(groups[year]).map(Number).sort((a, b) => b - a); // mois décroissants
-      for (const monthNum of monthNumbers) {
-        monthsList.push({
-          name: new Date(2000, monthNum, 1).toLocaleString('fr-FR', { month: 'long' }),
-          records: groups[year][monthNum]
-        });
-      }
-      result.push({ year, months: monthsList });
+      const monthMap = map.get(year)!;
+      const months = Array.from(monthMap.keys()).sort((a,b) => b - a);
+      const monthsData = months.map(month => ({
+        month,
+        monthName: new Date(2000, month-1, 1).toLocaleString('fr-FR', { month: 'long' }),
+        records: monthMap.get(month)!.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      }));
+      this.rawHierarchy.push({ year, months: monthsData });
     }
-    this.timelineData = result;
   }
 
-
-  profitPercent(record: any): number {
-    const facture = record.facture || 0;
-    if (facture === 0) return 0;
-    const profit = record.rentabilite || 0;
-    const ratio = (profit / facture) * 100;
-    return Math.min(Math.max(ratio, 0), 100); // entre 0 et 100%
+  // Remplir les listes déroulantes année/mois à partir des données
+  initFiltersFromData(): void {
+    const yearsSet = new Set<string>();
+    for (const yearData of this.rawHierarchy) yearsSet.add(yearData.year);
+    this.allYearsForProject = Array.from(yearsSet).sort().reverse();
+    this.selectedYearFilter = '';
+    this.selectedMonthFilter = '';
+    this.availableMonthsForYear = [];
   }
+
+  onYearFilterChange(): void {
+    this.selectedMonthFilter = '';
+    if (!this.selectedYearFilter) {
+      this.availableMonthsForYear = [];
+    } else {
+      const yearData = this.rawHierarchy.find(y => y.year === this.selectedYearFilter);
+      if (yearData) {
+        this.availableMonthsForYear = yearData.months.map(m => ({ name: m.monthName, value: m.month.toString() }));
+      } else {
+        this.availableMonthsForYear = [];
+      }
+    }
+    this.applyPreciseFilter();
+  }
+
+  applyPreciseFilter(): void {
+    let filtered = [...this.rawHierarchy];
+    if (this.selectedYearFilter) {
+      filtered = filtered.filter(yr => yr.year === this.selectedYearFilter);
+    }
+    if (this.selectedMonthFilter) {
+      const monthNum = parseInt(this.selectedMonthFilter);
+      filtered = filtered.map(yr => ({
+        ...yr,
+        months: yr.months.filter(m => m.month === monthNum)
+      })).filter(yr => yr.months.length > 0);
+    }
+    // Construire la hiérarchie avec état d'expansion et pagination
+    this.filteredHierarchy = filtered.map(yr => ({
+      year: yr.year,
+      expanded: false,
+      months: yr.months.map(m => {
+        const totalPages = Math.ceil(m.records.length / this.recordsPerPage);
+        return {
+          month: m.month,
+          monthName: m.monthName,
+          expanded: false,
+          records: m.records,
+          pageSize: this.recordsPerPage,
+          currentPage: 1,
+          totalPages,
+          paginatedRecords: m.records.slice(0, this.recordsPerPage)
+        };
+      })
+    }));
+  }
+
+  clearFilters(): void {
+    this.selectedYearFilter = '';
+    this.selectedMonthFilter = '';
+    this.availableMonthsForYear = [];
+    this.applyPreciseFilter();
+  }
+
+  toggleYear(year: string): void {
+    const yearData = this.filteredHierarchy.find(y => y.year === year);
+    if (yearData) yearData.expanded = !yearData.expanded;
+  }
+
+  toggleMonth(year: string, month: number): void {
+    const yearData = this.filteredHierarchy.find(y => y.year === year);
+    if (yearData) {
+      const monthData = yearData.months.find(m => m.month === month);
+      if (monthData) monthData.expanded = !monthData.expanded;
+    }
+  }
+
+  changeMonthPage(year: string, month: number, newPage: number): void {
+    const yearData = this.filteredHierarchy.find(y => y.year === year);
+    if (yearData) {
+      const monthData = yearData.months.find(m => m.month === month);
+      if (monthData && newPage >= 1 && newPage <= monthData.totalPages) {
+        monthData.currentPage = newPage;
+        const start = (newPage - 1) * monthData.pageSize;
+        monthData.paginatedRecords = monthData.records.slice(start, start + monthData.pageSize);
+      }
+    }
+  }
+
+  // Getters
+  get filteredSalaries(): any[] {
+    if (!this.searchTerm) return this.salaries;
+    const term = this.searchTerm.toLowerCase();
+    return this.salaries.filter(s => s.username.toLowerCase().includes(term) || s.email.toLowerCase().includes(term) || s.role.toLowerCase().includes(term));
+  }
+  get paginatedSalaries(): any[] {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredSalaries.slice(start, start + this.pageSize);
+  }
+  get totalPages(): number { return Math.ceil(this.filteredSalaries.length / this.pageSize); }
+  changePage(page: number): void { if (page>=1 && page<=this.totalPages) this.currentPage = page; }
+
+  get totalRecords(): number { return this.filteredHistoriques.length; }
+  get totalSalary(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.salaireBrut||0),0); }
+  get totalFacture(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.facture||0),0); }
+  get totalRentabilite(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.rentabilite||0),0); }
+
+  openRecordModal(record: any): void { this.selectedRecord = record; this.showRecordModal = true; }
+  closeRecordModal(): void { this.showRecordModal = false; this.selectedRecord = null; }
+  exportToCSV(): void {
+  if (!this.selectedProjetObj) return;
+
+  // Utiliser tous les enregistrements du projet (non filtrés par année/mois)
+  const recordsToExport = this.filteredHistoriques;
+
+  if (recordsToExport.length === 0) {
+    alert('Aucun enregistrement à exporter pour ce projet.');
+    return;
+  }
+
+  // Définir les colonnes du CSV
+  const columns = [
+    'date', 'salaireBrut', 'netPayer', 'chargesPatronales', 'repasRestaurant',
+    'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique',
+    'tjm', 'joursTravailles', 'facture', 'paye', 'totalePercu', 'totaleFacture', 'rentabilite'
+  ];
+
+  // En-têtes lisibles
+  const headers = [
+    'Date', 'Salaire brut', 'Net payer', 'Charges patronales', 'Repas restaurant',
+    'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques',
+    'TJM', 'Jours travaillés', 'Facture', 'Payé', 'Total perçu', 'Total facture', 'Rentabilité'
+  ];
+
+  // Générer les lignes CSV
+  const rows = recordsToExport.map(record =>
+    columns.map(col => record[col] !== undefined && record[col] !== null ? record[col] : '').join(',')
+  );
+
+  const csvContent = [headers.join(','), ...rows].join('\n');
+
+  // Téléchargement
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const fileName = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
+
+  link.setAttribute('href', url);
+  link.setAttribute('download', fileName);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 }

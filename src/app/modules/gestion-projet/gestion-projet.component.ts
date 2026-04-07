@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ClientService } from 'src/app/services/client.service';
 import { Projet, ProjetService } from 'src/app/services/projet.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-gestion-projet',
@@ -48,6 +49,8 @@ salariesList: any[] = [];
     this.loadProjets();
     this.loadClients();
     this.loadSalaries();
+     this.projetForm.get('client')?.valueChanges.subscribe(() => this.updateNomProjet());
+  this.projetForm.get('salarie_id')?.valueChanges.subscribe(() => this.updateNomProjet());
   }
   loadSalaries(): void {
   this.SalarieServiceService.getSalaries().subscribe({
@@ -73,7 +76,7 @@ salariesList: any[] = [];
     });
   }
  loadClients(): void {
-    this.clientService.getClients().subscribe({
+    this.clientService.getclientsBD().subscribe({
       next: (data) => {
         this.clients = data.clients || [];
         this.filteredClients = [...this.clients];
@@ -179,7 +182,44 @@ salariesList: any[] = [];
 
     return pages;
   }
+// Supprimer un salarié
+  deleteProjet(id: number): void {
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Cette action est irréversible !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Oui, supprimer !',
+    cancelButtonText: 'Annuler',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      // appel service suppression
+      this.projetservice.deleteProjet(id).subscribe({
+        next: () => {
+          this.projets = this.projets.filter(s => s.id !== id);
+          this.loadProjets();
+          Swal.fire(
+            'Supprimé !',
+            'Le projet a été supprimé.',
+            'success'
+          );
 
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire(
+            'Erreur !',
+            'Une erreur est survenue.',
+            'error'
+          );
+        }
+      });
+    }
+  });
+}
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
@@ -213,6 +253,20 @@ salariesList: any[] = [];
     }, 200);
   }
 
+updateNomProjet(): void {
+  const clientName = this.projetForm.get('client')?.value || '';
+  const salarieId = this.projetForm.get('salarie_id')?.value;
+
+  // conversion string -> number si besoin
+  const salarieName = this.salariesList.find(s => s.id == salarieId)?.username || '';
+
+  const currentNom = this.projetForm.get('nom')?.value || '';
+  const generatedNom = clientName && salarieName ? `${clientName} - ${salarieName}` : '';
+
+  if (!currentNom || currentNom === generatedNom) {
+    this.projetForm.get('nom')?.setValue(generatedNom);
+  }
+}
   selectClient(client: any): void {
     this.projetForm.patchValue({
       client: client.name,
@@ -220,6 +274,7 @@ salariesList: any[] = [];
     });
     this.showClientList = false;
     clearTimeout(this.hideTimeout);
+     this.updateNomProjet();
   }
 
   // Ouvrir le modal en mode ajout
@@ -255,6 +310,7 @@ salariesList: any[] = [];
     salarie_id: p.salarie_id || null  // <-- ici
     });
     this.showModal = true;
+    this.updateNomProjet();
     document.body.style.overflow = 'hidden';
   }
 

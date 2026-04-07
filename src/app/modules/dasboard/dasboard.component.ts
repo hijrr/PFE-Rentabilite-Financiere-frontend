@@ -31,6 +31,9 @@ export class DasboardComponent implements OnInit {
       case 'calcul': return 'calcul';
       case 'projets': return 'projets';
       case 'historique': return 'historique';
+      case 'parametres':return 'parametres'
+      case 'calculpargroupe': return 'calculParGroupe';
+      case'calculparsalaire': return 'calculparsalaire';
       default: return 'accueil';
     }
   }
@@ -57,7 +60,5 @@ export class DasboardComponent implements OnInit {
      this.toggleChange.emit(this.isCollapsed);
   }
 
-  logout() {
-    console.log('Déconnexion...');
-  }
+
 }

@@ -18,53 +18,6 @@
 
   <!-- Formulaire de synchronisation -->
   <div class="sync-form">
-    <!-- Sélection du projet -->
-    <div class="form-group">
-      <label class="form-label">
-        <i class="fa-solid fa-folder"></i>
-        Projet
-        <span class="required-star">*</span>
-      </label>
-      <div class="select-wrapper">
-        <select
-          [(ngModel)]="selectedProjet"
-          name="projet"
-          class="form-select"
-          [class.select-filled]="selectedProjet"
-          (change)="onProjetChange()">
-         <option [ngValue]="null" disabled>Choisir un projet</option>
-          <option *ngFor="let projet of projets" [value]="projet.id">
-            {{ projet.nom }}
-          </option>
-        </select>
-        <i class="fa-solid fa-chevron-down select-arrow"></i>
-      </div>
-    </div>
-
-    <!-- Sélection de la facture -->
-    <div class="form-group">
-      <label class="form-label">
-        <i class="fa-solid fa-file-invoice"></i>
-        Facture
-        <span class="required-star">*</span>
-      </label>
-      <div class="select-wrapper">
-        <select
-          [(ngModel)]="selectedFacture"
-          name="facture"
-          class="form-select"
-          [class.select-filled]="selectedFacture"
-          [disabled]="!filteredFactures.length">
-          <option [ngValue]="null" disabled>Choisir une facture</option>
-          <option *ngFor="let facture of filteredFactures" [value]="facture.id">
-            {{ facture.ref }} - {{ getClientNameById(facture.socid) }} - {{ formatDateForDisplay(facture.date_creation) }}
-          </option>
-          <option disabled *ngIf="filteredFactures.length === 0">Aucune facture correspondante</option>
-        </select>
-        <i class="fa-solid fa-chevron-down select-arrow"></i>
-      </div>
-    </div>
-
     <!-- Sélection de la date -->
     <div class="form-group">
       <label class="form-label">
@@ -90,6 +43,65 @@
       </span>
     </div>
   </div>
+    <div class="form-group">
+  <label class="form-label">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    Projet
+    <span class="required-star">*</span>
+  </label>
+  <div class="search-wrapper">
+    <input type="text"
+           [(ngModel)]="searchProjetTerm"
+           (input)="onSearchProjet()"
+           (focus)="onSearchProjet()"
+           placeholder="Rechercher un projet (nom, client, tjm)..."
+           class="form-control search-input"
+           autocomplete="off">
+    <div *ngIf="filteredProjets.length > 0 && searchProjetTerm" class="autocomplete-list">
+      <div *ngFor="let projet of filteredProjets"
+           class="autocomplete-item"
+           (click)="selectProjet(projet)">
+        <div class="projet-name">{{ projet.nom }}</div>
+        <div class="projet-details">
+          <span class="projet-client">{{ projet.client }}</span>
+          <span class="projet-tjm">TJM: {{ projet.tjm }} €</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Affichage du projet sélectionné -->
+  <div *ngIf="selectedProjetObj" class="selected-projet">
+    <i class="fa-solid fa-check-circle"></i>
+    {{ selectedProjetObj.nom }} (TJM: {{ selectedProjetObj.tjm }} € - Client: {{ selectedProjetObj.client }})
+    <button type="button" class="clear-btn" (click)="clearProjetSelection()">✖</button>
+  </div>
+</div>
+
+    <!-- Sélection de la facture -->
+    <div class="form-group" *ngIf="selectedProjet">
+      <label class="form-label">
+        <i class="fa-solid fa-file-invoice"></i>
+        Facture
+        <span class="required-star">*</span>
+      </label>
+      <div class="select-wrapper">
+        <select
+          [(ngModel)]="selectedFacture"
+          name="facture"
+          class="form-select"
+          [class.select-filled]="selectedFacture"
+          [disabled]="!filteredFactures.length">
+          <option [ngValue]="null" disabled>Choisir une facture</option>
+          <option *ngFor="let facture of filteredFactures" [ngValue]="facture.id">
+            {{ facture.ref }} - {{ getClientNameById(facture.socid) }} - {{ formatDateForDisplay(facture.date_creation) }}
+          </option>
+          <option disabled *ngIf="filteredFactures.length === 0">Aucune facture correspondante</option>
+        </select>
+        <i class="fa-solid fa-chevron-down select-arrow"></i>
+      </div>
+    </div>
+
+
 
   <!-- Messages -->
   <div class="error-message" *ngIf="syncError">

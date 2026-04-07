@@ -14,16 +14,6 @@ export class GestionSalariesComponent implements OnInit {
   showModal = false;
   modalMode: string = 'add';
   selectedSalarie: any = null;
-
-  roles: string[] = [
-  'Développeur',
-  'Chef de projet',
-  'Designer',
-  'Commercial',
-  'Data',
-  'DevOps',
-  'Product Owner'
-];
 filteredSalaries: Salarie[] = [];
 searchText: string = '';
 selectedRole: string = '';
@@ -31,7 +21,7 @@ selectedRole: string = '';
   currentPage: number = 1;
   itemsPerPage: number = 3;
   totalPages: number = 1;
-
+  roles:any[]=[];
   // KPI
   totalSalaries: number = 0;
   tjmMoyen: number = 0;
@@ -52,6 +42,7 @@ selectedRole: string = '';
 
   ngOnInit(): void {
     this.loadSalaries();
+    this.loadRoles()
   }
 
   loadSalaries(): void {
@@ -63,6 +54,16 @@ selectedRole: string = '';
         this.filterSalaries();
         this.calculerKPIs();
         console.log('Salariés chargés:', this.salaries);
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+  }
+  loadRoles() {
+    this.clientService.getRoles().subscribe({
+      next: (data) => {
+        this.roles = data || [];
       },
       error: (err) => {
         console.error(err);

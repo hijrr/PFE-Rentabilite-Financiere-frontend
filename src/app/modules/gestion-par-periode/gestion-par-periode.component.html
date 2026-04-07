@@ -1,0 +1,203 @@
+<div class="periode-container">
+  <!-- EN-TÊTE -->
+  <div class="periode-header">
+    <div class="header-icon"><i class="fas fa-calendar-alt"></i></div>
+    <div class="header-title">
+      <h1>Gestion par période</h1>
+      <p>Importez les archives ZIP, modifiez les données et sauvegardez</p>
+    </div>
+  </div>
+
+  <!-- SÉLECTION SALARIÉ (autocomplete) -->
+  <div class="card">
+    <div class="form-group">
+      <label><i class="fas fa-user"></i> Salarié</label>
+      <div class="search-wrapper">
+        <input type="text"
+               [(ngModel)]="salarieSearchTerm"
+               (input)="onSalarieSearch()"
+               placeholder="Rechercher un salarié (nom, email)..."
+               class="form-control search-input"
+               autocomplete="off" />
+        <div *ngIf="filteredSalaries.length > 0 && salarieSearchTerm" class="autocomplete-list">
+          <div *ngFor="let s of filteredSalaries" class="autocomplete-item" (click)="selectSalarie(s)">
+            <div class="salarie-name">{{ s.username }}</div>
+            <div class="salarie-details">{{ s.email }} - {{ s.role }}</div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="selectedSalarie" class="selected-salarie-info">
+        <i class="fas fa-check-circle"></i> {{ selectedSalarie.username }}
+        <button class="clear-selection" (click)="clearSalarieSelection()">✖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONE D'IMPORT (3 CARTES) -->
+  <div *ngIf="selectedSalarie" class="documents-grid">
+    <!-- Carte Fiches de paie -->
+    <div class="document-card">
+      <div class="card-header">
+        <div class="header-icon"><i class="fas fa-file-invoice"></i></div>
+        <h3 class="card-title">Fiches de paie</h3>
+        <span class="badge">ZIP</span>
+      </div>
+      <p class="card-description">Archive contenant les fiches de paie (PDF)</p>
+      <div class="file-input-wrapper">
+        <input type="file" accept=".zip" (change)="onFileSelected($event, 'paie')" id="file-paie" />
+        <label for="file-paie" class="file-label">
+          <i class="fas fa-cloud-upload-alt upload-icon"></i>
+          <span class="upload-text">{{ selectedFileNames.paie || 'Choisir un fichier' }}</span>
+          <span class="upload-hint">.zip</span>
+        </label>
+      </div>
+      <div *ngIf="selectedFileNames.paie" class="file-info">
+        <span class="file-size">{{ selectedFiles.paie?.size | number }} octets</span>
+        <button class="remove-file" (click)="removeFile('paie')">
+          <i class="fas fa-trash-alt"></i> Supprimer
+        </button>
+      </div>
+      <div *ngIf="loading.paie" class="loading"><i class="fas fa-spinner fa-pulse"></i> Extraction...</div>
+      <div *ngIf="extractedData.paie.length" class="success">✓ {{ extractedData.paie.length }} fichier(s) extrait(s)</div>
+    </div>
+
+    <!-- Carte Notes de frais -->
+    <div class="document-card">
+      <div class="card-header">
+        <div class="header-icon"><i class="fas fa-receipt"></i></div>
+        <h3 class="card-title">Notes de frais</h3>
+        <span class="badge">ZIP</span>
+      </div>
+      <p class="card-description">Archive contenant les notes de frais (Excel)</p>
+      <div class="file-input-wrapper">
+        <input type="file" accept=".zip" (change)="onFileSelected($event, 'frais')" id="file-frais" />
+        <label for="file-frais" class="file-label">
+          <i class="fas fa-cloud-upload-alt upload-icon"></i>
+          <span class="upload-text">{{ selectedFileNames.frais || 'Choisir un fichier' }}</span>
+          <span class="upload-hint">.zip</span>
+        </label>
+      </div>
+      <div *ngIf="selectedFileNames.frais" class="file-info">
+        <span class="file-size">{{ selectedFiles.frais?.size | number }} octets</span>
+        <button class="remove-file" (click)="removeFile('frais')">
+          <i class="fas fa-trash-alt"></i> Supprimer
+        </button>
+      </div>
+      <div *ngIf="loading.frais" class="loading"><i class="fas fa-spinner fa-pulse"></i> Extraction...</div>
+      <div *ngIf="extractedData.frais.length" class="success">✓ {{ extractedData.frais.length }} fichier(s) extrait(s)</div>
+    </div>
+
+    <!-- Carte Notes de frais kilométriques -->
+    <div class="document-card">
+      <div class="card-header">
+        <div class="header-icon"><i class="fas fa-car"></i></div>
+        <h3 class="card-title">Notes de frais kilométriques</h3>
+        <span class="badge">ZIP</span>
+      </div>
+      <p class="card-description">Archive contenant les notes de frais kilométriques (Excel)</p>
+      <div class="file-input-wrapper">
+        <input type="file" accept=".zip" (change)="onFileSelected($event, 'km')" id="file-km" />
+        <label for="file-km" class="file-label">
+          <i class="fas fa-cloud-upload-alt upload-icon"></i>
+          <span class="upload-text">{{ selectedFileNames.km || 'Choisir un fichier' }}</span>
+          <span class="upload-hint">.zip</span>
+        </label>
+      </div>
+      <div *ngIf="selectedFileNames.km" class="file-info">
+        <span class="file-size">{{ selectedFiles.km?.size | number }} octets</span>
+        <button class="remove-file" (click)="removeFile('km')">
+          <i class="fas fa-trash-alt"></i> Supprimer
+        </button>
+      </div>
+      <div *ngIf="loading.km" class="loading"><i class="fas fa-spinner fa-pulse"></i> Extraction...</div>
+      <div *ngIf="extractedData.km.length" class="success">✓ {{ extractedData.km.length }} fichier(s) extrait(s)</div>
+    </div>
+  </div>
+
+  <!-- LISTE DES PÉRIODES (ACCORDÉON AVEC ÉDITION) -->
+  <div *ngIf="groupedData.length > 0" class="data-section">
+    <h2><i class="fas fa-chart-line"></i> Données par période</h2>
+    <div class="period-list">
+      <div *ngFor="let period of groupedData" class="period-item">
+        <div class="period-header" (click)="togglePeriod(period)">
+          <i class="fas" [class.fa-chevron-down]="period.expanded" [class.fa-chevron-right]="!period.expanded"></i>
+          <span class="period-name">{{ period.periodName }}</span>
+          <span class="period-badge">{{ period.recordsCount }} enregistrement(s)</span>
+        </div>
+        <div *ngIf="period.expanded" class="period-details">
+          <!-- Fiche de paie (éditable) -->
+          <div *ngIf="period.paie" class="detail-block">
+            <strong><i class="fas fa-file-invoice"></i> Fiche de paie -{{period.paie.filename}}</strong>
+            <div class="detail-grid">
+              <div class="detail-item"><label>Salaire brut</label><input type="number" class="form-control" [(ngModel)]="period.paie.salaire_brut" step="0.01"></div>
+              <div class="detail-item"><label>Total cotisations</label><input type="number" class="form-control" [(ngModel)]="period.paie.total_cotisations_salariales" step="0.01"></div>
+              <div class="detail-item"><label>Charges patronales</label><input type="number" class="form-control" [(ngModel)]="period.paie.charges_patronales" step="0.01"></div>
+              <div class="detail-item"><label>Repas restaurant</label><input type="number" class="form-control" [(ngModel)]="period.paie.repas_restaurant" step="0.01"></div>
+              <div class="detail-item"><label>Net avant impôt</label><input type="number" class="form-control" [(ngModel)]="period.paie.net_avant_impot" step="0.01"></div>
+              <div class="detail-item"><label>Net payé</label><input type="number" class="form-control" [(ngModel)]="period.paie.net_paye" step="0.01"></div>
+            </div>
+          </div>
+          <!-- Note de frais -->
+          <div *ngIf="period.frais" class="detail-block">
+            <strong><i class="fas fa-receipt"></i> Note de frais -{{period.frais.filename}}</strong>
+            <div class="detail-grid">
+              <div class="detail-item"><label>Total à verser</label><input type="number" class="form-control" [(ngModel)]="period.frais.total_a_verser" step="0.01"></div>
+            </div>
+          </div>
+          <!-- Note kilométrique -->
+          <div *ngIf="period.km" class="detail-block">
+            <strong><i class="fas fa-car"></i> Note de frais kilométrique -{{period.km.filename}}</strong>
+            <div class="detail-grid">
+              <div class="detail-item"><label>Total</label><input type="number" class="form-control" [(ngModel)]="period.km.total_en_euro" step="0.01"></div>
+            </div>
+          </div>
+
+          <!-- Recherche et sélection de projet -->
+          <div class="period-projet" *ngIf="projetsSalarie.length">
+            <label>Rechercher un projet :</label>
+            <div class="search-wrapper small">
+              <input type="text"
+                     [(ngModel)]="period.projetSearchTerm"
+                     (input)="filterProjetsForPeriod(period)"
+                     placeholder="Nom, client ou TJM..."
+                     class="form-control search-input"
+                     autocomplete="off" />
+              <div *ngIf="period.filteredProjets && period.filteredProjets.length > 0 && period.projetSearchTerm" class="autocomplete-list">
+                <div *ngFor="let p of period.filteredProjets" class="autocomplete-item" (click)="selectProjetForPeriod(period, p)">
+                  <div class="projet-name">{{ p.nom }}</div>
+                  <div class="projet-details"><span>{{ p.client }}</span><span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="period.selectedProjet" class="selected-projet-info">
+              <i class="fas fa-check-circle"></i> Projet : {{ period.selectedProjet.nom }}
+              <button class="clear-projet" (click)="clearProjetForPeriod(period)">✖</button>
+            </div>
+            <div *ngIf="period.selectedProjet && !period.factureAssociee" class="no-facture-message">
+    <i class="fas fa-exclamation-circle"></i> Aucune facture trouvée pour ce projet et cette période.
+  </div>
+            <!-- Facture associée (éditable) -->
+            <div *ngIf="period.factureAssociee" class="detail-block facture-block">
+              <strong><i class="fas fa-file-invoice-dollar"></i> Facture associée</strong>
+              <div class="detail-grid">
+                <div class="detail-item"><label>Jours travaillés</label><input type="number" class="form-control" [(ngModel)]="period.factureAssociee.jours_travailles" step="0.01"></div>
+                <div class="detail-item"><label>Facture (HT)</label><input type="number" class="form-control" [(ngModel)]="period.factureAssociee.total_ht" step="0.01"></div>
+                <div class="detail-item"><label>TJM</label><input type="number" class="form-control" [(ngModel)]="period.factureAssociee.tjm" step="0.01"></div>
+                <div class="detail-item"><label>Payé</label><input type="number" class="form-control" [(ngModel)]="period.factureAssociee.paye" step="0.01"></div>
+              </div>
+            <button class="btn-primary" [disabled]="!areAllFilesUploaded || !isPeriodValid(period)" (click)="savePeriodData(period)">
+  <i class="fas fa-save"></i> Enregistrer
+</button>
+<div *ngIf="!areAllFilesUploaded" class="warning-message">
+  <i class="fas fa-exclamation-triangle"></i> Veuillez importer les 3 fichiers ZIP (paie, frais, kilométriques).
+</div>
+<div *ngIf="areAllFilesUploaded && !isPeriodValid(period)" class="warning-message">
+  <i class="fas fa-exclamation-triangle"></i> Tous les champs (paie, frais, kilométriques, facture) doivent être remplis.
+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -28,4 +28,10 @@ export class ProjetService {
      updateProjet(id: number, data: any): Observable<Projet> {
         return this.http.put<Projet>(`http://localhost:8000/projet/${id}`, data);
       }
+      deleteProjet(id:Number):Observable<Projet> {
+        return this.http.delete<Projet>(`http://localhost:8000/projet/${id}`);
+      }
+       getProjetsById(id: number): Observable<Projet[]> {
+        return this.http.get<Projet[]>(`http://localhost:8000/projets/${id}`);
+      }
 }

@@ -1,1 +1,45 @@
-<p>page-main works!</p>
+<div class="charts-grid">
+  <!-- Top 3 TJM salariés -->
+  <div class="chart-card">
+    <h3>Top 3 TJM salariés</h3>
+    <div style="height: 350px;">
+      <canvas baseChart
+              [data]="tjmChartData"
+              type="bar"
+              [options]="barChartOptions"></canvas>
+    </div>
+  </div>
+
+  <!-- Top clients CA -->
+  <div class="chart-card">
+    <h3>Top 10 clients (CA)</h3>
+    <div style="height: 350px;">
+      <canvas baseChart
+              [data]="topClientsChartData"
+              type="pie"
+              [options]="pieChartOptions"></canvas>
+    </div>
+  </div>
+
+  <!-- Top 3 salariés rentables -->
+  <div class="chart-card">
+    <h3>Top 3 salariés rentables</h3>
+    <div style="height: 350px;">
+      <canvas baseChart
+              [data]="rentabiliteSalarieChartData"
+              type="bar"
+              [options]="barChartOptions"></canvas>
+    </div>
+  </div>
+
+  <!-- Top 3 projets rentables -->
+  <div class="chart-card">
+    <h3>Top 3 projets rentables</h3>
+    <div style="height: 350px;">
+      <canvas baseChart
+              [data]="topProjetsChartData"
+              type="bar"
+              [options]="barChartOptions"></canvas>
+    </div>
+  </div>
+</div>

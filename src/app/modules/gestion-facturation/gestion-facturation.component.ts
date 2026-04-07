@@ -44,7 +44,7 @@ export class GestionFacturationComponent implements OnInit {
 
   loadInvoices(): void {
     this.isLoading = true;
-    this.clientService.getInvoices().subscribe({
+    this.clientService.getInvoicesBD().subscribe({
       next: (data) => {
         this.invoices = data.invoices || [];
         // Trier par date de création (plus récent d'abord)

@@ -34,7 +34,7 @@
       </div>
       <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleChange()">
   <option value="">Tous les rôles</option>
-  <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+  <option *ngFor="let r of roles" [value]="r.name">{{ r.name }}</option>
 </select>
 
       <button class="btn-add" (click)="openAddModal()">
@@ -249,7 +249,7 @@
               [class.is-invalid]="isFieldInvalid('role')"
             >
               <option value="">Sélectionner un rôle</option>
-              <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+              <option *ngFor="let r of roles" [value]="r.name">{{ r.name }}</option>
             </select>
             <div class="error-message" *ngIf="isFieldInvalid('role')">
               Le rôle est requis

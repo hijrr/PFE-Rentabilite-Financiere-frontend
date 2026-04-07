@@ -111,6 +111,21 @@
   </ul>
   <ul class="nav-list">
     <li class="nav-item"
+        [class.active]="activeItem === 'calculparsalaire'">
+
+      <a class="nav-link"
+         (click)="setActive('calculparsalaire')" routerLink="CalculParSalaire">
+
+      <i class="fas fa-user-tie"></i>
+
+        <span class="nav-label">Calcul rentabilité par salarié</span>
+
+      </a>
+    </li>
+  </ul>
+
+  <ul class="nav-list">
+    <li class="nav-item"
         [class.active]="activeItem === 'Facturation'">
 
       <a class="nav-link"
@@ -123,10 +138,38 @@
       </a>
     </li>
   </ul>
+     <ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem ==='calculParGroupe'">
+
+      <a class="nav-link"
+         (click)="setActive('calculParGroupe')" routerLink="CalculParGroupe">
+
+<i class="fas fa-user-friends"></i>
+
+        <span class="nav-label">Calcul rentabilité par groupe</span>
+
+      </a>
+    </li>
+  </ul>
   </nav>
 
 
   <div class="sidebar-footer">
+    <ul class="nav-list">
+    <li class="nav-item"
+        [class.active]="activeItem === 'parametres'">
+
+      <a class="nav-link"
+         (click)="setActive('parametres')" routerLink="Parametres">
+
+        <i class="fa-solid fa-gear"></i>
+
+        <span class="nav-label">Paramétres</span>
+
+      </a>
+    </li>
+  </ul>
     <button class="logout-btn" (click)="authService.logout()">
        <i class="fa-solid fa-right-from-bracket"></i>
       <span class="logout-label">Déconnexion</span>

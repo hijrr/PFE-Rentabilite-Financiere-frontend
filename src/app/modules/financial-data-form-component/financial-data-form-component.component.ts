@@ -109,6 +109,7 @@ onSubmit() {
     const dataToSend = {
       date: this.dolibarData.date || null,
         salarie_id: this.dolibarData.salarie_id || null,
+        projet_id: this.dolibarData.projet_id || null,
       ...financeData,
       ...kpiData
     };

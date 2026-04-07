@@ -19,6 +19,10 @@ import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.
 import { HeaderComponent } from './modules/header/header.component';
 import { PageMainComponent } from './modules/page-main/page-main.component';
 import { HistoriqueSalarieComponent } from './modules/historique-salarie/historique-salarie.component';
+import { ParametresComponent } from './modules/parametres/parametres.component';
+import { GestionParPeriodeComponent } from './modules/gestion-par-periode/gestion-par-periode.component';
+import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gestion-par-salaries.component';
+import { NgChartsModule } from 'ng2-charts';
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,13 +39,17 @@ import { HistoriqueSalarieComponent } from './modules/historique-salarie/histori
     HeaderComponent,
     PageMainComponent,
     HistoriqueSalarieComponent,
+    ParametresComponent,
+    GestionParPeriodeComponent,
+    GestionParSalariesComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgChartsModule,
   ],
   providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]

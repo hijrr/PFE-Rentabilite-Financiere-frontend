@@ -69,9 +69,4 @@ rotateWord() {
   get password(){
     return this.loginForm.get('password');
   }
- logout() {
-  localStorage.removeItem('token'); // supprime le token
-  this.loggedIn.next(false);
-   this.router.navigate(['/login']);
-}
 }

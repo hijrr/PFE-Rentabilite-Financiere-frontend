@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -17,4 +17,29 @@ export class ClientService {
    getInvoices(): Observable<any> {
     return this.http.get<any>('http://localhost:8000/invoices?limit=10000');
   }
+  getclientsBD(): Observable<any> {
+    return this.http.get<any>('http://localhost:8000/GETClients');  }
+  getInvoicesBD(): Observable<any> {
+    return this.http.get<any>('http://localhost:8000/GETFactures');  }
+
+  syncClients(): Observable<any> {
+
+    return this.http.get<any>(`http://localhost:8000/clientsBD`);
+  }
+
+  syncInvoices(): Observable<any> {
+    return this.http.get<any>(`http://localhost:8000/facturesBD`);
+  }
+  getRoles(): Observable<any[]> {
+        return this.http.get<any[]>('http://localhost:8000/roles');
+      }
+       addRole(data: any): Observable<any> {
+      return this.http.post<any>(`http://localhost:8000/role`, data);
+    }
+     updateRole(id: number, data: any): Observable<any> {
+      return this.http.put<any>(`http://localhost:8000/role/${id}`, data);
+    }
+     deleteRole(id: number): Observable<any> {
+      return this.http.delete(`http://localhost:8000/role/${id}`);
+    }
 }

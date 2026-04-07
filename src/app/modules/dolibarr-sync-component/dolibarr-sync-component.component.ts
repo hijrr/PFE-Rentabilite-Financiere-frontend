@@ -18,7 +18,9 @@ export class DolibarrSyncComponentComponent implements OnInit {
   selectedFacture: number | null = null;
   extractedData: any = { tjm: null, jours_travailles: null, paye: null,salarie_id:null,date:null };
   filteredFactures: any[] = [];
-
+searchProjetTerm: string = '';
+filteredProjets: any[] = [];
+selectedProjetObj: any = null;
   isSyncing: boolean = false;
   syncSuccess: boolean = false;
   syncError: string = '';
@@ -31,13 +33,41 @@ export class DolibarrSyncComponentComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProjets();
+    this.filteredProjets=[];
     this.loadInvoices();
     this.loadClients();
   }
+onSearchProjet(): void {
+  if (!this.searchProjetTerm.trim()) {
+    this.filteredProjets = [];
+    return;
+  }
+  const term = this.searchProjetTerm.toLowerCase().trim();
+  this.filteredProjets = this.projets.filter(projet =>
+    projet.nom?.toLowerCase().includes(term) ||
+    projet.client?.toLowerCase().includes(term) ||
+    projet.tjm?.toString().includes(term)
+  );
+}
 
+selectProjet(projet: any): void {
+  this.selectedProjetObj = projet;
+  this.selectedProjet = projet.id;        // pour la compatibilité avec l'existant
+  this.searchProjetTerm = projet.nom;     // affiche le nom dans l'input
+  this.filteredProjets = [];
+  this.onProjetChange();                  // déclenche le filtrage des factures
+}
+
+clearProjetSelection(): void {
+  this.selectedProjetObj = null;
+  this.selectedProjet = null;
+  this.searchProjetTerm = '';
+  this.filteredFactures = [...this.invoices];
+  this.selectedFacture = null;
+}
   // ==================== CHARGEMENT DES DONNÉES ====================
   loadClients(): void {
-    this.clientService.getClients().subscribe({
+    this.clientService.getclientsBD().subscribe({
       next: (data) => {
         this.clients = data.clients || [];
         console.log('Clients chargés :', this.clients.map(c => ({ id: c.id, name: c.name })));
@@ -62,7 +92,7 @@ export class DolibarrSyncComponentComponent implements OnInit {
   }
 
   loadInvoices(): void {
-    this.clientService.getInvoices().subscribe({
+    this.clientService.getInvoicesBD().subscribe({
       next: (data) => {
         const rawInvoices = data.invoices || [];
         // Normalisation : socid et date_creation en nombre
@@ -72,7 +102,8 @@ export class DolibarrSyncComponentComponent implements OnInit {
           date_creation: Number(v.date_creation)
         })).sort((a: any, b: any) => b.date_creation - a.date_creation);
         this.filteredFactures = [...this.invoices];
-        console.log('Factures chargées, première :', this.invoices[0]);
+         this.selectedFacture = null;
+        console.log('Factures chargées :', this.invoices);
       },
       error: (err) => console.error('Erreur chargement factures:', err)
     });
@@ -103,62 +134,60 @@ export class DolibarrSyncComponentComponent implements OnInit {
     });
   }
 
-  // ==================== FILTRAGE DES FACTURES ====================
-  onProjetChange(): void {
-    const projetId = Number(this.selectedProjet);
-    console.log('ID projet sélectionné :', projetId);
 
-    if (!projetId) {
-      this.filteredFactures = [...this.invoices];
-      this.selectedFacture = null;
-      return;
-    }
+onProjetChange(): void {
+  let projet = this.selectedProjetObj;
 
-    // Vérifier que la liste des projets est chargée
-    if (!this.projets.length) {
-      console.warn('Liste des projets pas encore chargée');
-      return;
-    }
-
-    const projet = this.projets.find(p => Number(p.id) === projetId);
-    if (!projet) {
-      console.warn(`Projet non trouvé pour l'id ${projetId}`);
-      console.log('Liste des projets disponibles :', this.projets.map(p => ({ id: p.id, nom: p.nom })));
-      this.filteredFactures = [];
-      this.selectedFacture = null;
-      return;
-    }
-  this.projetselectionner=projet;
-    const tjmProjet = Number(projet.tjm);
-    const clientName = projet.client;
-    const clientIdProjet = this.getClientIdByName(clientName);
-
-    console.log('Projet trouvé :', projet);
-    console.log(`TJM projet : ${tjmProjet}, client projet : ${clientName} (ID ${clientIdProjet})`);
-
-    if (clientIdProjet === null) {
-      console.warn(`Client du projet non trouvé : "${clientName}"`);
-      this.filteredFactures = [];
-      this.selectedFacture = null;
-      return;
-    }
-
-    // Filtrer les factures correspondant au projet (même TJM et même client)
-    this.filteredFactures = this.invoices.filter(facture => {
-      const clientIdFacture = Number(facture.socid);
-      const line = facture.lines?.[0];
-      const tjmFacture = Number(line?.subprice);
-      const match = clientIdFacture === clientIdProjet && tjmFacture === tjmProjet;
-      if (match) {
-        console.log(`Facture correspondante : ${facture.ref} (client ${clientIdFacture}, tjm ${tjmFacture})`);
-      }
-      return match;
-    });
-
-    console.log(`Nombre de factures filtrées : ${this.filteredFactures.length}`);
-    this.selectedFacture = null;
+  if (!projet && this.selectedProjet) {
+    projet = this.projets.find(p => Number(p.id) === this.selectedProjet);
   }
 
+  if (!projet) {
+    this.filteredFactures = [...this.invoices];
+    this.selectedFacture = null;
+    this.projetselectionner = null;
+    return;
+  }
+
+  this.projetselectionner = projet;
+
+  const tjmProjet = Number(projet.tjm);
+  const clientName = projet.client;
+  const clientIdProjet = this.getClientIdByName(clientName);
+
+  if (clientIdProjet === null) {
+    this.filteredFactures = [];
+    this.selectedFacture = null;
+    return;
+  }
+
+  // 🔹 Filtrage factures : client + tjm + date
+  this.filteredFactures = this.invoices.filter(facture => {
+    const clientIdFacture = Number(facture.socid);
+    const tjmFacture = Number(facture.tjm);
+
+    // Vérifie client + TJM
+    if (clientIdFacture !== clientIdProjet || tjmFacture !== tjmProjet) return false;
+
+    // Vérifie date si sélectionnée
+    if (this.selectedDate) {
+      const [selectedYear, selectedMonth] = this.selectedDate.split('-').map(Number);
+
+      const date = new Date(facture.date_creation * 1000); // timestamp en secondes
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1; // mois commence à 0
+
+      if (year !== selectedYear || month !== selectedMonth) return false;
+    }
+
+    // Facture correspond à tous les critères
+    console.log(`Facture OK : ${facture.ref}`);
+    return true;
+  });
+
+  this.selectedFacture = null;
+  console.log(`Nombre de factures filtrées : ${this.filteredFactures.length}`);
+}
   // ==================== SYNCHRONISATION ====================
   synchroniserDolibarr(): void {
     if (!this.selectedProjet || !this.selectedDate || !this.selectedFacture) {
@@ -174,10 +203,10 @@ export class DolibarrSyncComponentComponent implements OnInit {
       const success = Math.random() > 0.1;
       if (success) {
           // Mettre à jour extractedData
-      const factureObj = this.invoices.find(f => f.id === this.selectedFacture);
+      const factureObj = this.invoices.find(f => f.id === Number(this.selectedFacture));
       console.log('Facture sélectionnée pour extraction :', factureObj);
-       const tjm = factureObj?.lines?.[0]?.subprice;
-      const jours = factureObj?.lines?.[0]?.qty;
+       const tjm = factureObj.tjm;
+      const jours = factureObj.jours_travailles;
       const paye = factureObj?.paye;
       const salarie_id = this.projetselectionner?.salarie_id;
       this.extractedData.tjm = tjm !== undefined ? Number(tjm) : undefined;
@@ -204,6 +233,7 @@ export class DolibarrSyncComponentComponent implements OnInit {
 
     // Fusionner toutes les données extraites
     const mergedData = {
+      projet_id: this.selectedProjet,
        tjm: this.extractedData.tjm ,
       jours_travailles: this.extractedData.jours_travailles ,
       paye: this.extractedData.paye ,

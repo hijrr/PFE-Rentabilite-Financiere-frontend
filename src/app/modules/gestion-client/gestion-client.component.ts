@@ -98,7 +98,7 @@ getClientInitials(client: any): string {
   // Chargement des clients
   loadClients(): void {
 
-    this.clientService.getClients().subscribe({
+    this.clientService.getclientsBD().subscribe({
       next: (data) => {
         this.clients = data.clients || [];
   this.filteredClientsList = [...this.clients];
@@ -132,7 +132,7 @@ getClientInitials(client: any): string {
   // Chargement des factures
   loadInvoices(): void {
     this.isLoading = true;
-    this.clientService.getInvoices().subscribe({
+    this.clientService.getInvoicesBD().subscribe({
       next: (data) => {
        this.invoices = data.invoices || [];
 

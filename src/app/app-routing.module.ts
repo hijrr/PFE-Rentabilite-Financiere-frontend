@@ -1,3 +1,4 @@
+import { GestionParPeriodeComponent } from './modules/gestion-par-periode/gestion-par-periode.component';
 import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DasboardComponent } from './modules/dasboard/dasboard.component';
@@ -10,6 +11,8 @@ import { GestionFacturationComponent } from './modules/gestion-facturation/gesti
 import { GestionProjetComponent } from './modules/gestion-projet/gestion-projet.component';
 import { PageMainComponent } from './modules/page-main/page-main.component';
 import { HistoriqueSalarieComponent } from './modules/historique-salarie/historique-salarie.component';
+import { ParametresComponent } from './modules/parametres/parametres.component';
+import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gestion-par-salaries.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
@@ -20,6 +23,9 @@ const routes: Routes = [
   {path:'Clients',component:GestionClientComponent,canActivate: [AuthGuard]},
   {path:'Projets',component: GestionProjetComponent,canActivate: [AuthGuard]},
   {path:'Historique',component: HistoriqueSalarieComponent,canActivate: [AuthGuard]},
+  {path:'Parametres',component: ParametresComponent,canActivate: [AuthGuard]},
+  {path:'CalculParSalaire',component: GestionParPeriodeComponent,canActivate: [AuthGuard]},
+  {path:'CalculParGroupe',component: GestionParSalariesComponent,canActivate: [AuthGuard]},
   { path: '**', redirectTo: localStorage.getItem('token') ? 'Accueil' : 'login'  }
 ];
 
