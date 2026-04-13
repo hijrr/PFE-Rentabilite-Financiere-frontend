@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
+import { PredictionIAService } from 'src/app/services/prediction-ia.service';
 import { ProjetService } from 'src/app/services/projet.service';
 import { SalarieServiceService } from 'src/app/services/salarie-service.service';
 
@@ -67,10 +68,18 @@ export class HistoriqueSalarieComponent implements OnInit {
   currentPage = 1;
   pageSize = 4;
 
+  // Onglet actif
+  activeTab: 'historique' | 'previsions' = 'historique';
+
+  // Prévisions IA
+  previsionData: any = null;
+  loadingPrevision: boolean = false;
+
   constructor(
     private salarieService: SalarieServiceService,
     private financeDataService: FinanceDataService,
-    private projetService: ProjetService
+    private projetService: ProjetService,
+    private predictionIAService: PredictionIAService
   ) {}
 
   ngOnInit(): void {
@@ -136,6 +145,11 @@ export class HistoriqueSalarieComponent implements OnInit {
     this.buildRawHierarchy();
     this.initFiltersFromData();
     this.applyPreciseFilter();
+
+    // Charger les prévisions si l'onglet actif est 'previsions'
+    if (this.activeTab === 'previsions') {
+      this.loadPrevision(projet.id);
+    }
   }
 
   clearProjetSelection(): void {
@@ -153,6 +167,7 @@ export class HistoriqueSalarieComponent implements OnInit {
     } else if (this.selectedSalarie) this.filterHistoriquesBySalarie(this.selectedSalarie);
     this.rawHierarchy = [];
     this.filteredHierarchy = [];
+    this.previsionData = null; // reset prévisions
   }
 
   // Construction de la hiérarchie brute (année -> mois -> enregistrements)
@@ -181,7 +196,6 @@ export class HistoriqueSalarieComponent implements OnInit {
     }
   }
 
-  // Remplir les listes déroulantes année/mois à partir des données
   initFiltersFromData(): void {
     const yearsSet = new Set<string>();
     for (const yearData of this.rawHierarchy) yearsSet.add(yearData.year);
@@ -218,7 +232,6 @@ export class HistoriqueSalarieComponent implements OnInit {
         months: yr.months.filter(m => m.month === monthNum)
       })).filter(yr => yr.months.length > 0);
     }
-    // Construire la hiérarchie avec état d'expansion et pagination
     this.filteredHierarchy = filtered.map(yr => ({
       year: yr.year,
       expanded: false,
@@ -274,7 +287,11 @@ export class HistoriqueSalarieComponent implements OnInit {
   get filteredSalaries(): any[] {
     if (!this.searchTerm) return this.salaries;
     const term = this.searchTerm.toLowerCase();
-    return this.salaries.filter(s => s.username.toLowerCase().includes(term) || s.email.toLowerCase().includes(term) || s.role.toLowerCase().includes(term));
+    return this.salaries.filter(s => {
+      const username = s.username ? s.username.toLowerCase() : '';
+      const email = s.email ? s.email.toLowerCase() : '';
+      return username.includes(term) || email.includes(term) ;
+    });
   }
   get paginatedSalaries(): any[] {
     const start = (this.currentPage - 1) * this.pageSize;
@@ -288,52 +305,79 @@ export class HistoriqueSalarieComponent implements OnInit {
   get totalFacture(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.facture||0),0); }
   get totalRentabilite(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.rentabilite||0),0); }
 
+  // Modals
   openRecordModal(record: any): void { this.selectedRecord = record; this.showRecordModal = true; }
   closeRecordModal(): void { this.showRecordModal = false; this.selectedRecord = null; }
+
+  // Export CSV
   exportToCSV(): void {
-  if (!this.selectedProjetObj) return;
-
-  // Utiliser tous les enregistrements du projet (non filtrés par année/mois)
-  const recordsToExport = this.filteredHistoriques;
-
-  if (recordsToExport.length === 0) {
-    alert('Aucun enregistrement à exporter pour ce projet.');
-    return;
+    if (!this.selectedProjetObj) return;
+    const recordsToExport = this.filteredHistoriques;
+    if (recordsToExport.length === 0) {
+      alert('Aucun enregistrement à exporter pour ce projet.');
+      return;
+    }
+    const columns = [
+      'date', 'salaireBrut', 'netPayer', 'chargesPatronales', 'repasRestaurant',
+      'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique',
+      'tjm', 'joursTravailles', 'facture', 'paye', 'totalePercu', 'totaleFacture', 'rentabilite'
+    ];
+    const headers = [
+      'Date', 'Salaire brut', 'Net payer', 'Charges patronales', 'Repas restaurant',
+      'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques',
+      'TJM', 'Jours travaillés', 'Facture', 'Payé', 'Total perçu', 'Total facture', 'Rentabilité'
+    ];
+    const rows = recordsToExport.map(record =>
+      columns.map(col => record[col] !== undefined && record[col] !== null ? record[col] : '').join(',')
+    );
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    const fileName = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
+    link.setAttribute('href', url);
+    link.setAttribute('download', fileName);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
-  // Définir les colonnes du CSV
-  const columns = [
-    'date', 'salaireBrut', 'netPayer', 'chargesPatronales', 'repasRestaurant',
-    'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique',
-    'tjm', 'joursTravailles', 'facture', 'paye', 'totalePercu', 'totaleFacture', 'rentabilite'
-  ];
+  // Prévisions IA
+  loadPrevision(projetId: number) {
+    this.loadingPrevision = true;
+    this.predictionIAService.getPrevisionMarge(projetId).subscribe({
+      next: (data) => {
+        this.previsionData = data;
+        this.loadingPrevision = false;
+      },
+      error: (err) => {
+        console.error('Erreur chargement prévisions', err);
+        alert('Impossible de charger les prévisions pour ce projet.');
+        this.loadingPrevision = false;
+      }
+    });
+  }
 
-  // En-têtes lisibles
-  const headers = [
-    'Date', 'Salaire brut', 'Net payer', 'Charges patronales', 'Repas restaurant',
-    'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques',
-    'TJM', 'Jours travaillés', 'Facture', 'Payé', 'Total perçu', 'Total facture', 'Rentabilité'
-  ];
+  // Changement d'onglet
+  setActiveTab(tab: 'historique' | 'previsions') {
+    this.activeTab = tab;
+    if (tab === 'previsions' && this.selectedProjetObj && !this.previsionData) {
+      this.loadPrevision(this.selectedProjetObj.id);
+    }
+  }
 
-  // Générer les lignes CSV
-  const rows = recordsToExport.map(record =>
-    columns.map(col => record[col] !== undefined && record[col] !== null ? record[col] : '').join(',')
-  );
+  // Calculs pour les KPIs
+  getAvgCaEstime(): number {
+    if (!this.previsionData?.predictions) return 0;
+    const sum = this.previsionData.predictions.reduce((acc: number, p: any) => acc + (p.ca_estime || 0), 0);
+    return sum / this.previsionData.predictions.length;
+  }
 
-  const csvContent = [headers.join(','), ...rows].join('\n');
-
-  // Téléchargement
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  const fileName = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
-
-  link.setAttribute('href', url);
-  link.setAttribute('download', fileName);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
+  getAvgMargePaye(): number {
+    if (!this.previsionData?.predictions) return 0;
+    const sum = this.previsionData.predictions.reduce((acc: number, p: any) => acc + (p.marge_si_paye || 0), 0);
+    return sum / this.previsionData.predictions.length;
+  }
 }

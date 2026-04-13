@@ -21,19 +21,17 @@
     </div>
 
 
-      <div class="actions">
-        <button class="btn-primary" (click)="sync('clients')" [disabled]="isLoadingClients">
-          <i [class.fa-spinner]="isLoadingClients" [class.fa-pulse]="isLoadingClients" class="fas"
-             [ngClass]="{'fa-cloud-upload-alt': !isLoadingClients, 'fa-spinner': isLoadingClients}"></i>
-          {{ isLoadingClients ? 'Synchronisation des clients...' : 'Synchroniser les clients' }}
-        </button>
+    <div class="actions">
+  <button class="btn-primary" (click)="syncAll()" [disabled]="isLoading">
+    <i class="fas"
+       [ngClass]="{
+         'fa-cloud-upload-alt': !isLoading,
+         'fa-spinner fa-pulse': isLoading
+       }"></i>
 
-        <button class="btn-primary" (click)="sync('invoices')" [disabled]="isLoadingInvoices">
-          <i [class.fa-spinner]="isLoadingInvoices" [class.fa-pulse]="isLoadingInvoices" class="fas"
-             [ngClass]="{'fa-file-invoice': !isLoadingInvoices, 'fa-spinner': isLoadingInvoices}"></i>
-          {{ isLoadingInvoices ? 'Synchronisation des factures...' : 'Synchroniser les factures' }}
-        </button>
-      </div>
+    {{ isLoading ? 'Synchronisation en cours...' : 'Synchroniser clients & factures' }}
+  </button>
+</div>
 
       <div *ngIf="message" class="alert" [ngClass]="{'alert-success': message.type === 'success', 'alert-error': message.type === 'error'}">
         <i [ngClass]="{'fa-check-circle': message.type === 'success', 'fa-exclamation-circle': message.type === 'error'}"></i>

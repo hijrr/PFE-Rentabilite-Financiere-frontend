@@ -27,7 +27,7 @@ salariesList: any[] = [];
   showModal = false;
   modalMode: string = 'add';
   selectedProjet: any = null;
-
+margeMoyen : number = 0;
 
   // Pour l'autocomplete client
   filteredClients: any[] = [];
@@ -102,6 +102,9 @@ salariesList: any[] = [];
 // Calcul des KPI
   calculerKPIs(): void {
     this.totalProjets = this.projets.length;
+    if (this.totalProjets > 0) {
+      this.margeMoyen = this.projets.reduce((sum, projet) => sum + (projet?.marge_cible ?? 0), 0) / this.totalProjets;
+    }
   }
 
   // Filtrage

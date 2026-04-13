@@ -34,7 +34,7 @@
       </div>
       <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleChange()">
   <option value="">Tous les rôles</option>
-  <option *ngFor="let r of roles" [value]="r.name">{{ r.name }}</option>
+  <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.name }}</option>
 </select>
 
       <button class="btn-add" (click)="openAddModal()">
@@ -110,7 +110,7 @@
             </div>
           </td>
 
-          <td>{{ s.role }}</td>
+          <td>{{ getRoleName(s.role_id) }}</td>
 
           <td>{{ s.email || '-' }}</td>
 
@@ -245,13 +245,13 @@
             <label>Rôle <span class="required">*</span></label>
             <select
               class="form-control"
-              formControlName="role"
-              [class.is-invalid]="isFieldInvalid('role')"
+              formControlName="role_id"
+              [class.is-invalid]="isFieldInvalid('role_id')"
             >
               <option value="">Sélectionner un rôle</option>
-              <option *ngFor="let r of roles" [value]="r.name">{{ r.name }}</option>
+              <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
             </select>
-            <div class="error-message" *ngIf="isFieldInvalid('role')">
+            <div class="error-message" *ngIf="isFieldInvalid('role_id')">
               Le rôle est requis
             </div>
           </div>
@@ -339,7 +339,7 @@
         </div>
         <div>
           <h2>{{ selectedSalarie?.username }}</h2>
-          <p class="salarie-subtitle">{{ selectedSalarie?.role }}</p>
+          <p class="salarie-subtitle">{{ getRoleName(selectedSalarie?.role_id) }}</p>
         </div>
       </div>
       <button class="close-btn" (click)="closeModal()">
@@ -357,7 +357,7 @@
         <div class="details-grid">
           <div class="detail-item">
             <span class="detail-label">Rôle</span>
-            <span class="detail-value">{{ selectedSalarie?.role }}</span>
+            <span class="detail-value">{{ getRoleName(selectedSalarie?.role_id) }}</span>
           </div>
            <div class="detail-item">
             <span class="detail-label">Numéro de Sécurité Sociale</span>
@@ -378,10 +378,6 @@
            <div class="detail-item">
             <span class="detail-label">Date d'Entrée</span>
             <span class="detail-value">{{ selectedSalarie.date_entree | date:'dd/MM/yyyy' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">ID</span>
-            <span class="detail-value">{{ selectedSalarie?.id }}</span>
           </div>
         </div>
       </div>

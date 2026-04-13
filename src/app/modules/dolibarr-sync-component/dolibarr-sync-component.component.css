@@ -458,16 +458,22 @@
 .search-wrapper {
   position: relative;
   width: 100%;
-  
+
 
 }
 
 .search-input {
-  width: 90%;
-  height: 40%;
-  padding-right: 2rem;
+  width: 630px;
+  height: 25px;
+  padding: 0.8rem 1rem;
   border: 1.5px solid var(--elzei-border);
+   border-radius: 10px;
 
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--elzei-green);
+  box-shadow: 0 0 0 3px rgba(111, 207, 151, 0.15);
 }
 
 .autocomplete-list {

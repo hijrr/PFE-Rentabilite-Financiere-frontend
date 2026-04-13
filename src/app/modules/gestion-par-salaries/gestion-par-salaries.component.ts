@@ -172,18 +172,22 @@ export class GestionParSalariesComponent implements OnInit {
     const found = this.salariesList.find(s => s.normalizedKey === key);
     this.selectedSalarieDisplayName = found ? found.displayName : key;
     this.loadProjetsForSalarie(key);
+    this.groupedDataForSalarie.forEach(p => {
+    p.projetSearchTerm = '';
+    p.filteredProjets = [];
+  });
   }
 
-  loadProjetsForSalarie(normalizedKey: string): void {
+ loadProjetsForSalarie(normalizedKey: string): void {
   this.projetService.getProjets().subscribe({
     next: (projets) => {
-      // Filtrer par salarié si possible
-      const filtered = projets.filter(p => {
-        if (!p.salarie?.username) return false;
-        return this.normalizeName(p.salarie.username) === normalizedKey;
-      });
-      // Si aucun projet trouvé pour ce salarié, on affiche tous les projets
-      this.projetsSalarie = filtered.length > 0 ? filtered : projets;
+
+      const projetsSalarie = projets.filter(p =>
+        p.salarie?.username &&
+        this.normalizeName(p.salarie.username) === normalizedKey
+      );
+
+      this.projetsSalarie = projetsSalarie.length > 0 ? projetsSalarie : projets;
     },
     error: (err) => console.error(err)
   });
@@ -233,17 +237,22 @@ export class GestionParSalariesComponent implements OnInit {
   }
 
   filterProjetsForPeriod(period: any): void {
-    const term = period.projetSearchTerm.toLowerCase().trim();
-    if (!term) {
-      period.filteredProjets = [];
-      return;
-    }
-    period.filteredProjets = this.projetsSalarie.filter(p =>
-      p.nom?.toLowerCase().includes(term) ||
-      p.client?.toLowerCase().includes(term) ||
-      p.tjm?.toString().includes(term)
-    );
+  const term = period.projetSearchTerm?.toLowerCase().trim();
+
+  // Toujours partir des projets du salarié sélectionné
+  const base = this.projetsSalarie || [];
+
+  if (!term) {
+    period.filteredProjets = base;
+    return;
   }
+
+  period.filteredProjets = base.filter(p =>
+    (p.nom || '').toLowerCase().includes(term) ||
+    (p.client || '').toLowerCase().includes(term) ||
+    (p.tjm || '').toString().includes(term)
+  );
+}
 
   selectProjetForPeriod(period: any, projet: any): void {
     period.selectedProjet = projet;

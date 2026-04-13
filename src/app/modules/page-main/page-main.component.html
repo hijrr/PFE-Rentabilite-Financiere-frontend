@@ -1,45 +1,63 @@
-<div class="charts-grid">
-  <!-- Top 3 TJM salariés -->
-  <div class="chart-card">
-    <h3>Top 3 TJM salariés</h3>
-    <div style="height: 350px;">
-      <canvas baseChart
-              [data]="tjmChartData"
-              type="bar"
-              [options]="barChartOptions"></canvas>
-    </div>
+<section class="dashboard-wrapper">
+ <header class="dashboard-header">
+  <div>
+    <h1>Tableau de bord</h1>
+    <p>Vue synthétique des performances de rentabilité, des salariés, des clients et des projets.</p>
+  </div>
+  <div class="status-badge-header">
+    <i class="fas fa-circle"></i>
+    <span>Données à jour</span>
+  </div>
+</header>
+
+  <!-- KPIs améliorés -->
+  <div class="kpi-grid">
+    <article class="kpi-card">
+      <span class="kpi-title">TJM moyen</span>
+      <strong>{{ avgTjm | number:'1.0-0' }} €</strong>
+      <p>Valeur moyenne du taux journalier.</p>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-title">Marge moyenne</span>
+      <strong>{{ avgmarge | number:'1.2-2' }} %</strong>
+      <p>Marge cible moyenne des projets.</p>
+    </article>
+    <article class="kpi-card">
+      <span class="kpi-title">Rentabilité totale</span>
+      <strong>{{ rentabiliteTotal | number:'1.0-0' }} €</strong>
+      <p>Somme des rentabilités historiques.</p>
+    </article>
   </div>
 
-  <!-- Top clients CA -->
-  <div class="chart-card">
-    <h3>Top 10 clients (CA)</h3>
-    <div style="height: 350px;">
-      <canvas baseChart
-              [data]="topClientsChartData"
-              type="pie"
-              [options]="pieChartOptions"></canvas>
+  <!-- Graphiques -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Top 3 TJM salariés</h3>
+      <div class="chart-wrapper"><canvas baseChart [data]="tjmChartData" type="bar" [options]="barChartOptions"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top clients (CA)</h3>
+      <div class="chart-wrapper"><canvas baseChart [data]="topClientsChartData" type="pie" [options]="pieChartOptions"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top 3 salariés rentables</h3>
+      <div class="chart-wrapper"><canvas baseChart [data]="rentabiliteSalarieChartData" type="bar" [options]="barChartOptions"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Top 3 projets rentables</h3>
+      <div class="chart-wrapper"><canvas baseChart [data]="topProjetsChartData" type="bar" [options]="barChartOptions"></canvas></div>
+    </div>
+    <div class="chart-card full-width">
+      <h3>Évolution du chiffre d'affaires</h3>
+      <div class="filter-bar">
+        <label>Filtrer par année :</label>
+        <select [(ngModel)]="selectedYear" (change)="onYearFilterChange()">
+          <option [ngValue]="null">Toutes les années</option>
+          <option *ngFor="let y of availableYears" [ngValue]="y">{{ y }}</option>
+        </select>
+        <button *ngIf="selectedYear" class="reset-btn" (click)="resetYearFilter()">Réinitialiser</button>
+      </div>
+      <div class="chart-wrapper"><canvas baseChart [data]="evolutionCAChartData" type="line" [options]="lineChartOptions"></canvas></div>
     </div>
   </div>
-
-  <!-- Top 3 salariés rentables -->
-  <div class="chart-card">
-    <h3>Top 3 salariés rentables</h3>
-    <div style="height: 350px;">
-      <canvas baseChart
-              [data]="rentabiliteSalarieChartData"
-              type="bar"
-              [options]="barChartOptions"></canvas>
-    </div>
-  </div>
-
-  <!-- Top 3 projets rentables -->
-  <div class="chart-card">
-    <h3>Top 3 projets rentables</h3>
-    <div style="height: 350px;">
-      <canvas baseChart
-              [data]="topProjetsChartData"
-              type="bar"
-              [options]="barChartOptions"></canvas>
-    </div>
-  </div>
-</div>
+</section>

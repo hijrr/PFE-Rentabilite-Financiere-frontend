@@ -93,7 +93,7 @@
           [disabled]="!filteredFactures.length">
           <option [ngValue]="null" disabled>Choisir une facture</option>
           <option *ngFor="let facture of filteredFactures" [ngValue]="facture.id">
-            {{ facture.ref }} - {{ getClientNameById(facture.socid) }} - {{ formatDateForDisplay(facture.date_creation) }}
+            {{ facture.ref }} - {{ getClientNameById(facture.socid) }} - {{ formatDateForDisplay(facture.date) }}
           </option>
           <option disabled *ngIf="filteredFactures.length === 0">Aucune facture correspondante</option>
         </select>

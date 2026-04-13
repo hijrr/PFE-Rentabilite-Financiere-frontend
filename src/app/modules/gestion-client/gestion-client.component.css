@@ -1081,7 +1081,7 @@
   background: #f8f9ff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  color: #66ea89;
+  color: #179c3b;
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
@@ -1089,9 +1089,9 @@
 }
 
 .btn-reset-filter:hover {
-  background: #75ea66;
+  background: #e65946dc;
   color: white;
-  border-color: #87ea66;
+  border-color: rgb(221, 85, 85);
 }
 
 .btn-reset-filter i {

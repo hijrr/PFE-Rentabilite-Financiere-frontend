@@ -19,9 +19,6 @@ private hideTimeout: any;
   totalClients: number = 0;
   clientsActifs: number = 0;
   totalProspects: number = 0;
-  clientTrend: number = 5;
-  actifsTrend: number = 3;
-  prospectsTrend: number = -2;
 
   // Pagination
   currentPage: number = 1;

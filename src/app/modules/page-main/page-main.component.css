@@ -1,12 +1,421 @@
+/* =============================================
+   ELZEI DASHBOARD — page-main.component.css
+   ============================================= */
+
+:host {
+  --g50: #E8F8F0;
+  --g100: #C0EDD6;
+  --g200: #97D4B4;
+  --g400: #6FCF97;
+  --g600: #27AE60;
+  --g800: #1A6B3C;
+
+  --t-main: #1F2937;
+  --t-sec: #4B5563;
+  --t-muted: #9CA3AF;
+
+  --bd: #E5E7EB;
+  --bg: #F9FAFB;
+  --white: #FFFFFF;
+
+  --r: 14px;
+  --tr: all 0.2s ease;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+   --elzei-border: #E5E7EB;
+  --elzei-green: #6FCF97;
+  --elzei-green-light: #E8F8F0;
+  --elzei-green-dark: #27AE60;
+  --elzei-white: #FFFFFF;
+  --elzei-gray-dark: #1F2937;
+  --elzei-gray: #4B5563;
+  --elzei-gray-light: #9CA3AF;
+  --elzei-border: #E5E7EB;
+  --elzei-bg: #F9FAFB;
+  --shadow-sm: 0 2px 8px rgba(111, 207, 151, 0.08);
+  --shadow-md: 0 4px 12px rgba(111, 207, 151, 0.12);
+  --shadow-lg: 0 8px 24px rgba(111, 207, 151, 0.15);
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --transition: all 0.2s ease;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :host {
+    --t-main: #F3F4F6;
+    --t-sec: #9CA3AF;
+    --t-muted: #6B7280;
+    --bd: #374151;
+    --bg: #111827;
+    --white: #1F2937;
+    --g50: #0D2B1A;
+    --g100: #14422A;
+  }
+}
+
+/* =============================================
+   LAYOUT GLOBAL
+   ============================================= */
+
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 1.5rem;
+  font-family: var(--font);
+  background: var(--bg);
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+
+/* ========== HEADER AMÉLIORÉ ========== */
+.dashboard-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.dashboard-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--elzei-green), var(--elzei-green-dark));
+  border-radius: 3px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--elzei-gray-dark) 0%, var(--elzei-green-dark) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-header p {
+  margin: 0.3rem 0 0;
+  font-size: 0.9rem;
+  color: var(--elzei-gray);
+  max-width: 560px;
+}
+
+/* Badge de statut (optionnel) */
+.status-badge-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--elzei-green-light);
+  padding: 0.4rem 1rem;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--elzei-green-dark);
+  border: 1px solid var(--elzei-green);
+  white-space: nowrap;
+}
+
+.status-badge-header i {
+  font-size: 0.7rem;
+  color: var(--elzei-green-dark);
+  animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* =============================================
+   KPI CARDS
+   ============================================= */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: var(--tr);
+  animation: fadeUp 0.35s ease forwards;
+  opacity: 0;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--g400);
+  border-radius: var(--r) 0 0 var(--r);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--g200);
+}
+
+.kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-card:nth-child(2) { animation-delay: 0.10s; }
+.kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.kpi-card:nth-child(4) { animation-delay: 0.20s; }
+
+.kpi-title {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--t-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.kpi-card strong {
+  display: block;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--t-main);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.kpi-card p {
+  font-size: 12px;
+  color: var(--t-sec);
+  margin: 0;
+}
+
+/* =============================================
+   INSIGHT CARDS
+   ============================================= */
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.insight-card {
+  background: var(--white);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 1.25rem 1.4rem;
+  transition: var(--tr);
+  animation: fadeUp 0.35s ease forwards;
+  opacity: 0;
+}
+
+.insight-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--g200);
+}
+
+.insight-card:nth-child(1) { animation-delay: 0.25s; }
+.insight-card:nth-child(2) { animation-delay: 0.30s; }
+.insight-card:nth-child(3) { animation-delay: 0.35s; }
+
+.insight-card h2 {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--t-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
+
+.insight-value {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--t-main);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.insight-note {
+  font-size: 12px;
+  color: var(--t-sec);
+}
+
+/* =============================================
+   CHART CARDS
+   ============================================= */
+
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
 .chart-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  background: var(--white);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  transition: var(--tr);
+  animation: fadeUp 0.35s ease forwards;
+  opacity: 0;
+  animation-delay: 0.40s;
+}
+
+.chart-card:hover {
+  border-color: var(--g200);
+}
+
+.chart-card.full-width {
+  grid-column: span 2;
+}
+
+.chart-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.1rem;
+}
+
+.chart-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--t-main);
+  margin: 0;
+}
+
+.chart-badge {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--g50);
+  color: var(--g800);
+  font-weight: 500;
+  border: 1px solid var(--g100);
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 220px;
+}
+
+.chart-wrapper.tall {
+  height: 240px;
+}
+
+/* =============================================
+   FILTRE CA MENSUEL
+   ============================================= */
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-bar label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t-sec);
+}
+
+.filter-bar select {
+  font-size: 13px;
+  padding: 6px 10px;
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--t-main);
+  outline: none;
+  cursor: pointer;
+  transition: var(--tr);
+}
+
+.filter-bar select:focus,
+.filter-bar select:hover {
+  border-color: var(--g400);
+}
+
+.reset-btn {
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: none;
+  background: #FEE2E2;
+  color: #B91C1C;
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--tr);
+}
+
+.reset-btn:hover {
+  background: #B91C1C;
+  color: #fff;
+}
+
+/* =============================================
+   ANIMATIONS
+   ============================================= */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  .chart-card.full-width {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-wrapper {
+    padding: 1.25rem 1rem;
+  }
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .kpi-card strong {
+    font-size: 1.6rem;
+  }
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

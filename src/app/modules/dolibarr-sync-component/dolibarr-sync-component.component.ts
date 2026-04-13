@@ -124,17 +124,15 @@ clearProjetSelection(): void {
     return client ? client.name : 'Client inconnu';
   }
 
-  formatDateForDisplay(timestamp: number): string {
-      if (!timestamp) return '—';
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  }
-
-
+formatDateForDisplay(timestamp: number): string {
+  if (!timestamp) return '—';
+  const date = this.parseTimestamp(timestamp);
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
 onProjetChange(): void {
   let projet = this.selectedProjetObj;
 
@@ -173,7 +171,7 @@ onProjetChange(): void {
     if (this.selectedDate) {
       const [selectedYear, selectedMonth] = this.selectedDate.split('-').map(Number);
 
-      const date = new Date(facture.date_creation * 1000); // timestamp en secondes
+      const date = new Date(facture.date * 1000); // timestamp en secondes
       const year = date.getFullYear();
       const month = date.getMonth() + 1; // mois commence à 0
 
@@ -268,4 +266,17 @@ onProjetChange(): void {
     ];
     return `${mois[parseInt(month) - 1]} ${year}`;
   }
+  private parseTimestamp(timestamp: number): Date {
+  if (!timestamp) return new Date();
+
+  const ts = Number(timestamp);
+
+  // si déjà en millisecondes (13 chiffres)
+  if (ts > 100000000000) {
+    return new Date(ts);
+  }
+
+  // sinon en secondes (10 chiffres)
+  return new Date(ts * 1000);
+}
 }

@@ -5,7 +5,7 @@ export interface Salarie {
   id:number;
   username: string;
   email: string;
-  role: string;
+  role_id: number;
   date_entree: Date;
   tjm?: number | null;
   adresse?: string | null;

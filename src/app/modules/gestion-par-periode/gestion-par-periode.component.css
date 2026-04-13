@@ -113,6 +113,9 @@
   position: relative;
   width: 100%;
 }
+.search-input {
+  width: 100% !important;
+}
 .autocomplete-list {
   position: absolute;
   top: 100%;

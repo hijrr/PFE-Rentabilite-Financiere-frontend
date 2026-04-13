@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,15 +21,6 @@ export class ClientService {
     return this.http.get<any>('http://localhost:8000/GETClients');  }
   getInvoicesBD(): Observable<any> {
     return this.http.get<any>('http://localhost:8000/GETFactures');  }
-
-  syncClients(): Observable<any> {
-
-    return this.http.get<any>(`http://localhost:8000/clientsBD`);
-  }
-
-  syncInvoices(): Observable<any> {
-    return this.http.get<any>(`http://localhost:8000/facturesBD`);
-  }
   getRoles(): Observable<any[]> {
         return this.http.get<any[]>('http://localhost:8000/roles');
       }
@@ -42,4 +33,7 @@ export class ClientService {
      deleteRole(id: number): Observable<any> {
       return this.http.delete(`http://localhost:8000/role/${id}`);
     }
+  syncAll(): Observable<any> {
+  return this.http.get('http://localhost:8000/syncAll');
+}
 }

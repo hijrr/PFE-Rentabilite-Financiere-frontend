@@ -105,13 +105,13 @@ export class GestionFacturationComponent implements OnInit {
       const term = this.searchTerm.toLowerCase();
       this.filteredClients = this.clients.filter(client =>
         client.name?.toLowerCase().includes(term) ||
-        client.email?.toLowerCase().includes(term) ||
-        client.code_client?.toLowerCase().includes(term)
+        client.email?.toLowerCase().includes(term)
       );
     } else {
       this.filteredClients = [...this.clients];
     }
   }
+   
 
   hideClientListWithDelay(): void {
     this.hideTimeout = setTimeout(() => {

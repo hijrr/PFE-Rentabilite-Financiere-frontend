@@ -9,10 +9,7 @@
       <div class="kpi-content">
         <span class="kpi-label">Total Clients</span>
         <span class="kpi-value">{{ totalClients }}</span>
-        <span class="kpi-trend" [class.positive]="clientTrend > 0" [class.negative]="clientTrend < 0">
-          <i class="fa-solid" [ngClass]="clientTrend > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ clientTrend > 0 ? '+' : '' }}{{ clientTrend }}%
-        </span>
+
       </div>
     </div>
 
@@ -23,10 +20,6 @@
       <div class="kpi-content">
         <span class="kpi-label">Clients Actifs</span>
         <span class="kpi-value">{{ clientsActifs }}</span>
-        <span class="kpi-trend" [class.positive]="actifsTrend > 0" [class.negative]="actifsTrend < 0">
-          <i class="fa-solid" [ngClass]="actifsTrend > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ actifsTrend > 0 ? '+' : '' }}{{ actifsTrend }}%
-        </span>
       </div>
     </div>
 
@@ -37,10 +30,6 @@
       <div class="kpi-content">
         <span class="kpi-label">Prospects</span>
         <span class="kpi-value">{{ totalProspects }}</span>
-        <span class="kpi-trend" [class.positive]="prospectsTrend > 0" [class.negative]="prospectsTrend < 0">
-          <i class="fa-solid" [ngClass]="prospectsTrend > 0 ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
-          {{ prospectsTrend > 0 ? '+' : '' }}{{ prospectsTrend }}%
-        </span>
       </div>
     </div>
 

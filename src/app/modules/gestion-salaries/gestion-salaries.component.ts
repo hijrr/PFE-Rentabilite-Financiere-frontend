@@ -30,7 +30,7 @@ selectedRole: string = '';
 
   salarieForm: FormGroup= new FormGroup({
      username:new FormControl( ['', Validators.required]),
-      role: new FormControl('', Validators.required),
+      role_id: new FormControl('', Validators.required),
       email: new FormControl('', [Validators.email, Validators.required]),
       tjm: new FormControl(0, [ Validators.min(0)]),
       adresse:new FormControl(''),
@@ -70,7 +70,10 @@ selectedRole: string = '';
       }
     });
   }
-
+getRoleName(role_id: number): string {
+  const role = this.roles.find(r => r.id === role_id);
+  return role ? role.name : '-';
+}
     // Calcul des KPI
   calculerKPIs(): void {
     this.totalSalaries = this.filteredSalaries.length; // ✅ nombre visible après filtre
@@ -91,9 +94,8 @@ filterSalaries(): void {
     const matchesClient = s.email ? s.email.toLowerCase().includes(search) : false;
     const matchesTjm = s.tjm !== null && s.tjm !== undefined ? s.tjm.toString().includes(search) : false;
 
-    const matchesRole = this.selectedRole ? s.role === this.selectedRole : true;
-
-    return matchesRole && (matchesName || matchesClient || matchesTjm);
+    const matchesRole = this.selectedRole? s.role_id === Number(this.selectedRole): true;
+    return (matchesName || matchesClient || matchesTjm) && matchesRole;
   });
   this.currentPage = 1;
   this.updatePagination();
@@ -186,7 +188,7 @@ onRoleChange(): void {
     this.selectedSalarie = null;
     this.salarieForm.reset({
       username: '',
-      role: '',
+      role_id: '',
       projet: '',
       email: '',
       tjm: 0,
@@ -205,9 +207,10 @@ onRoleChange(): void {
     console.log(s);
     this.salarieForm.patchValue({
       username: s.username,
-      role: s.role,
+      role_id: s.role_id,
       client: s.client || '',
       tjm: s.tjm || 0,
+      email: s.email || '',
       adresse: s.adresse || '',
       num_securite_sociale: s.num_securite_sociale,
       date_entree: s.date_entree ? s.date_entree.split('T')[0] : ''

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { map } from 'rxjs';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-financial-data-form-component',
@@ -37,6 +37,17 @@ togglePaye() {
   this.financeForm.get('paye')?.setValue(!current);
   this.updateKPI();
 }
+updateFacture() {
+  const tjm = Number(this.financeForm.get('tjm')?.value) || 0;
+  const jours = Number(this.financeForm.get('joursTravailles')?.value) || 0;
+
+  const facture = tjm * jours;
+
+  this.financeForm.patchValue(
+    { facture: facture },
+    { emitEvent: false } // ⚠️ très important
+  );
+}
   ngOnInit(): void {
 
      // S'abonner au service pour recevoir les données
@@ -59,20 +70,21 @@ togglePaye() {
 this.financeDataService.dolibarData$.subscribe(data => {
   if (data) {
     this.dolibarData=data;
-    console.log("donneee rabi lali:", this.dolibarData);
     this.financeForm.patchValue({
       tjm: Number(data.tjm),
       joursTravailles: Number(data.jours_travailles),
-      facture: Number(data.tjm) * Number(data.jours_travailles),
       paye: data.paye,
     });
+    this.updateFacture();
     console.log('Données Dolibarr reçues dans le formulaire :', data);
   }
 });
- this.financeForm.valueChanges.subscribe(() => {
-    this.updateKPI();
-  });
+ this.financeForm.valueChanges.subscribe(() => {this.updateKPI(); });
+ this.financeForm.get('tjm')?.valueChanges.subscribe(() => this.updateFacture());
+this.financeForm.get('joursTravailles')?.valueChanges.subscribe(() => this.updateFacture());
+
 }
+
 updateKPI() {
   const netHorsRepas = this.financeForm.get('netAvantImpot')?.value - (this.financeForm.get('repasRestaurant')?.value || 0);
   const totalPercu = netHorsRepas +
@@ -116,6 +128,14 @@ onSubmit() {
     console.log('Données à envoyer :', dataToSend);
      this.financeDataService.createHistorique(dataToSend).subscribe({
       next: (res) => {
+        Swal.fire({
+  icon: 'success',
+  title: 'Succès',
+  text: 'Les données ont été enregistrées avec succès !',
+  confirmButtonColor: '#28a745',
+  timer: 2500,
+  showConfirmButton: false
+});
         console.log('Historique créé avec succès :', res);
       },
       error: (err) => {
