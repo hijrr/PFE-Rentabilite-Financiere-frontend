@@ -13,6 +13,7 @@ import { PageMainComponent } from './modules/page-main/page-main.component';
 import { HistoriqueSalarieComponent } from './modules/historique-salarie/historique-salarie.component';
 import { ParametresComponent } from './modules/parametres/parametres.component';
 import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gestion-par-salaries.component';
+import { ChatbotComponent } from './modules/chatbot/chatbot.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
@@ -26,6 +27,7 @@ const routes: Routes = [
   {path:'Parametres',component: ParametresComponent,canActivate: [AuthGuard]},
   {path:'CalculParSalaire',component: GestionParPeriodeComponent,canActivate: [AuthGuard]},
   {path:'CalculParGroupe',component: GestionParSalariesComponent,canActivate: [AuthGuard]},
+  {path:'Chatbot',component: ChatbotComponent,canActivate: [AuthGuard]},
   { path: '**', redirectTo: localStorage.getItem('token') ? 'Accueil' : 'login'  }
 ];
 

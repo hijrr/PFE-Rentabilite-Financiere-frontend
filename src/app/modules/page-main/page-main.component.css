@@ -38,6 +38,31 @@
   --transition: all 0.2s ease;
 }
 
+:host-context(body.dark-theme) {
+  --t-main: #F3F4F6;
+  --t-sec: #CBD5E1;
+  --t-muted: #94A3B8;
+  --bd: #334155;
+  --bg: #111827;
+  --white: #1F2937;
+  --g50: #0d2b1a;
+  --g100: #14422a;
+  --g200: #1e4d30;
+  --g400: #2f6c4c;
+  --g600: #27AE60;
+  --g800: #1A6B3C;
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-green-light: #183f26;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   :host {

@@ -23,7 +23,20 @@
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-
+:host-context(body.dark-theme) {
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-bg-alt: #111827;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-gray-soft: #1f2937;
+  --elzei-green-light: #183f26;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
 
 /* Container principal */
 .elzei-container {
@@ -594,7 +607,7 @@ input[type=number] {
   left: 4px;
   width: calc(50% - 6px);
   height: calc(100% - 8px);
-  background: white;
+  background: var(--elzei-white);
   border-radius: 40px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transition: left 0.25s ease;

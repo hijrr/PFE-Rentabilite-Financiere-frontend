@@ -23,6 +23,8 @@ import { ParametresComponent } from './modules/parametres/parametres.component';
 import { GestionParPeriodeComponent } from './modules/gestion-par-periode/gestion-par-periode.component';
 import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gestion-par-salaries.component';
 import { NgChartsModule } from 'ng2-charts';
+import { ChatbotComponent } from './modules/chatbot/chatbot.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 @NgModule({
   declarations: [
     AppComponent,
@@ -42,6 +44,7 @@ import { NgChartsModule } from 'ng2-charts';
     ParametresComponent,
     GestionParPeriodeComponent,
     GestionParSalariesComponent,
+    ChatbotComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,6 +53,7 @@ import { NgChartsModule } from 'ng2-charts';
     ReactiveFormsModule,
     HttpClientModule,
     NgChartsModule,
+    NgSelectModule
   ],
   providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]

@@ -80,7 +80,9 @@ clearProjetSelection(): void {
     this.projetService.getProjets().subscribe({
       next: (data) => {
         // Normalisation : id et tjm en nombre
-        this.projets = (data || []).map(p => ({
+        this.projets = (data || [])
+        .filter(p => p.status_paiement?.toLowerCase() === 'en_attente') // 🔥 filtre ici
+        .map(p => ({
           ...p,
           id: Number(p.id),
           tjm: Number(p.tjm)

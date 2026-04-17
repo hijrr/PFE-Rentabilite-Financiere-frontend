@@ -21,6 +21,45 @@
   --transition-slow: all 0.3s ease;
 }
 
+:host-context(body.dark-theme) {
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-bg-alt: #111827;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-gray-soft: #1f2937;
+  --elzei-green-light: #183f26;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* ===== BOUTON DÉCONNEXION : MODE SOMBRE (ROUGE) ===== */
+:host-context(body.dark-theme) .logout-btn {
+  color: #f87171; /* rouge clair */
+}
+
+:host-context(body.dark-theme) .logout-btn:hover {
+  background: #7f1d1d; /* fond rouge foncé */
+  color: #fecaca; /* rouge très clair */
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+:host-context(body.dark-theme) .logout-btn:hover i {
+  color: #fecaca;
+}
+
+/* Optionnel : icône et label en rouge au repos */
+:host-context(body.dark-theme) .logout-btn i,
+:host-context(body.dark-theme) .logout-label {
+  color: #f87171;
+}
+
+:host-context(body.dark-theme) .logout-btn:hover .logout-label {
+  color: #fecaca;
+}
 /* Import de la police Inter */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 

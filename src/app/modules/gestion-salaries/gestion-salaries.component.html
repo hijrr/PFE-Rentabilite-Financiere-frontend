@@ -1,10 +1,11 @@
 <div class="salarie-container">
+  <!-- Loader extraction -->
   <div *ngIf="isLoading" class="loader-overlay">
     <div class="spinner"></div>
-     <p class="loading-text">Extraction en cours...</p>
+    <p class="loading-text">Extraction en cours...</p>
   </div>
 
-<input type="file" #fileInput hidden (change)="onFileSelected($event)">
+  <input type="file" #fileInput hidden (change)="onFileSelected($event)">
 
   <!-- HEADER -->
   <div class="salarie-header">
@@ -12,388 +13,263 @@
       <div class="header-icon">
         <i class="fa-solid fa-users"></i>
       </div>
-
       <h1>Gestion des Salariés</h1>
-
-        <span class="salarie-count">
-        {{ filteredSalaries.length }} salarié(s)
-      </span>
+      <span class="salarie-count">{{ filteredSalaries.length }} salarié(s)</span>
     </div>
-
     <div class="header-actions">
-
-      <div class="search-wrapper">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Rechercher un salarié..."
-           [(ngModel)]="searchText"
-    (ngModelChange)="onSearchTextChange()"
-        >
-      </div>
-      <select [(ngModel)]="selectedRole" (ngModelChange)="onRoleChange()">
-  <option value="">Tous les rôles</option>
-  <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.name }}</option>
-</select>
-
       <button class="btn-add" (click)="openAddModal()">
-        <i class="fa-solid fa-plus"></i>
-        Ajouter un salarié
+        <i class="fa-solid fa-plus"></i> Ajouter un salarié
       </button>
-<button class="btn-add" (click)="openExtractModal()">
-  <i class="fa-solid fa-file-import"></i>
-  Extraire fiche de paie
-</button>
+      <button class="btn-add" (click)="openExtractModal()">
+        <i class="fa-solid fa-file-import"></i> Extraire fiche de paie
+      </button>
     </div>
   </div>
-<!-- KPI SECTION -->
+
+  <!-- SECTION FILTRES -->
+  <div class="filters-section">
+    <!-- Recherche textuelle -->
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Rechercher un salarié (nom, email, TJM)..."
+        [(ngModel)]="searchText"
+        (ngModelChange)="onSearchTextChange()"
+      >
+    </div>
+
+    <!-- Filtre par rôle (autocomplete) -->
+    <div class="custom-select-wrapper">
+      <div class="custom-select">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Filtrer par rôle..."
+          [(ngModel)]="roleSearchText"
+          (focus)="showRoleList = true"
+          (blur)="hideRoleListWithDelay()"
+          autocomplete="off"
+        >
+        <div class="dropdown" *ngIf="showRoleList">
+          <div
+            class="dropdown-item"
+            *ngFor="let r of filteredRoles()"
+            (mousedown)="selectRole(r)"
+          >
+            {{ r.name }}
+          </div>
+          <div *ngIf="filteredRoles().length === 0" class="no-result">Aucun rôle trouvé</div>
+        </div>
+      </div>
+      <button
+        class="btn-reset-filter"
+        (click)="resetAllFilters()"
+        title="Réinitialiser tous les filtres"
+        *ngIf="roleSearchText || searchText || selectedRoleId"
+      >
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI SECTION -->
   <div class="kpi-section">
     <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-users"></i>
-      </div>
+      <div class="kpi-icon"><i class="fa-solid fa-users"></i></div>
       <div class="kpi-content">
         <span class="kpi-label">Total Salariés</span>
         <span class="kpi-value">{{ totalSalaries }}</span>
       </div>
     </div>
-
     <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-calculator"></i>
-      </div>
+      <div class="kpi-icon"><i class="fa-solid fa-calculator"></i></div>
       <div class="kpi-content">
         <span class="kpi-label">TJM Moyen</span>
         <span class="kpi-value">{{ tjmMoyen }} €</span>
       </div>
     </div>
   </div>
-<div class="loading-container" *ngIf="isLoadingSalaries">
-  <div class="spinnerr"></div>
-  <p>Chargement des salarie...</p>
-</div>
-  <!-- TABLE -->
-  <div class="table-wrapper"*ngIf="!isLoadingSalaries">
-    <table class="salarie-table">
 
-      <thead >
+  <!-- LOADER TABLEAU -->
+  <div class="loading-container" *ngIf="isLoadingSalaries">
+    <div class="spinnerr"></div>
+    <p>Chargement des salariés...</p>
+  </div>
+
+  <!-- TABLEAU -->
+  <div class="table-wrapper" *ngIf="!isLoadingSalaries">
+    <table class="salarie-table">
+      <thead>
         <tr>
           <th>Numéro de Sécurité Sociale</th>
           <th>Salarié</th>
           <th>Rôle</th>
           <th>Email</th>
-          <th>TJM Réference (€)</th>
+          <th>TJM Référence (€)</th>
           <th>Adresse</th>
           <th>Date d'Entrée</th>
           <th>Actions</th>
         </tr>
       </thead>
-
       <tbody>
-
         <tr *ngFor="let s of paginatedSalaries">
           <td class="ref-cell"><span class="ref-badge">{{ s.num_securite_sociale }}</span></td>
           <td class="salarie-cell">
             <div class="salarie-info">
-
               <div class="salarie-avatar">
                 <div class="avatar-placeholder" [ngClass]="getAvatarClass(s)">
                   {{ s.username.substring(0,1) | uppercase }}
                 </div>
               </div>
-
               <div class="salarie-details">
                 <span class="salarie-name">{{ s.username }}</span>
               </div>
-
             </div>
           </td>
-
           <td>{{ getRoleName(s.role_id) }}</td>
-
           <td>{{ s.email || '-' }}</td>
-
-          <td class="montant-cell">
-            {{ s.tjm || 0 }} €
-          </td>
+          <td class="montant-cell">{{ s.tjm || 0 }} €</td>
           <td>{{ s.adresse }}</td>
           <td>{{ s.date_entree | date:'dd/MM/yyyy' }}</td>
           <td class="actions-cell">
-
-            <button
-              class="action-btn view"
-              (click)="openDetailsModal(s)"
-              title="Voir détails"
-            >
-              <i class="fa-solid fa-eye"></i>
-            </button>
-
-            <button
-              class="action-btn edit"
-              (click)="openEditModal(s)"
-              title="Modifier"
-            >
-              <i class="fa-solid fa-pen"></i>
-            </button>
-
-            <button
-              class="action-btn delete"
-              (click)="deleteSalarie(s.id)"
-              title="Supprimer"
-            >
-              <i class="fa-solid fa-trash"></i>
-            </button>
-
+            <button class="action-btn view" (click)="openDetailsModal(s)" title="Voir détails"><i class="fa-solid fa-eye"></i></button>
+            <button class="action-btn edit" (click)="openEditModal(s)" title="Modifier"><i class="fa-solid fa-pen"></i></button>
+            <button class="action-btn delete" (click)="deleteSalarie(s.id)" title="Supprimer"><i class="fa-solid fa-trash"></i></button>
           </td>
-
         </tr>
-
       </tbody>
-
     </table>
-
   </div>
-<!-- PAGINATION -->
+
+  <!-- PAGINATION -->
   <div class="pagination-section" *ngIf="filteredSalaries.length > itemsPerPage">
-    <span class="pagination-info">
-      Affichage de {{ getPaginationStart() }} à {{ getPaginationEnd() }} sur {{ filteredSalaries.length }} salariés
-    </span>
+    <span class="pagination-info">Affichage de {{ getPaginationStart() }} à {{ getPaginationEnd() }} sur {{ filteredSalaries.length }} salariés</span>
     <div class="pagination-controls" *ngIf="totalPages > 1">
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)">
-        <i class="fa-solid fa-chevron-left"></i>
-      </button>
-      <button
-        *ngFor="let page of pageNumbers"
-        class="page-btn"
-        [ngClass]="{ active: page === currentPage, ellipsis: page === '...' }"
-        [disabled]="page === '...'"
-        (click)="onPageClick(page)">
-        {{ page }}
-      </button>
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="changePage(currentPage + 1)">
-        <i class="fa-solid fa-chevron-right"></i>
-      </button>
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)"><i class="fa-solid fa-chevron-left"></i></button>
+      <button *ngFor="let page of pageNumbers" class="page-btn" [ngClass]="{ active: page === currentPage, ellipsis: page === '...' }" [disabled]="page === '...'" (click)="onPageClick(page)">{{ page }}</button>
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
   </div>
 </div>
 
-
-
-
-
 <!-- MODAL AJOUT/MODIFICATION -->
 <div class="modal-overlay" *ngIf="showModal && (modalMode === 'add' || modalMode === 'edit')">
   <div class="modal-container">
-
     <div class="modal-header">
-      <h2>
-        <i class="fa-solid" [ngClass]="modalMode === 'add' ? 'fa-user-plus' : 'fa-user-pen'"></i>
-        {{ modalMode === 'add' ? 'Ajouter un salarié' : 'Modifier le salarié' }}
-      </h2>
-      <button class="close-btn" (click)="closeModal()">
-        <i class="fa-solid fa-times"></i>
-      </button>
+      <h2><i class="fa-solid" [ngClass]="modalMode === 'add' ? 'fa-user-plus' : 'fa-user-pen'"></i> {{ modalMode === 'add' ? 'Ajouter un salarié' : 'Modifier le salarié' }}</h2>
+      <button class="close-btn" (click)="closeModal()"><i class="fa-solid fa-times"></i></button>
     </div>
-
     <form [formGroup]="salarieForm" (ngSubmit)="onSubmit()">
       <div class="modal-body">
-
-
         <div class="form-grid">
-
           <!-- Nom d'utilisateur -->
           <div class="form-group">
             <label>Nom d'utilisateur <span class="required">*</span></label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="username"
-              [class.is-invalid]="isFieldInvalid('username')"
-              placeholder="Ex: Jean Dupont"
-            >
-            <div class="error-message" *ngIf="isFieldInvalid('username')">
-              Le nom d'utilisateur est requis
-            </div>
+            <input type="text" class="form-control" formControlName="username" [class.is-invalid]="isFieldInvalid('username')" placeholder="Ex: Jean Dupont">
+            <div class="error-message" *ngIf="isFieldInvalid('username')">Le nom d'utilisateur est requis</div>
           </div>
 
           <!-- Numéro de Sécurité Sociale -->
           <div class="form-group">
             <label>Numéro de sécurité sociale <span class="required">*</span></label>
-            <input
-              type="number"
-              class="form-control"
-              formControlName="num_securite_sociale"
-              min="0"
-              step="1"
-              [class.is-invalid]="isFieldInvalid('num_securite_sociale')"
-              placeholder="0"
-            >
-            <div class="error-message" *ngIf="isFieldInvalid('num_securite_sociale')">
-              Le numéro de sécurité sociale est requis et doit être un entier
-            </div>
+            <input type="number" class="form-control" formControlName="num_securite_sociale" min="0" step="1" [class.is-invalid]="isFieldInvalid('num_securite_sociale')" placeholder="0">
+            <div class="error-message" *ngIf="isFieldInvalid('num_securite_sociale')">Le numéro de sécurité sociale est requis et doit être un entier</div>
           </div>
 
-          <!-- Rôle -->
+          <!-- Rôle (autocomplete) avec champ caché pour lier le formulaire -->
           <div class="form-group">
             <label>Rôle <span class="required">*</span></label>
-            <select
-              class="form-control"
-              formControlName="role_id"
-              [class.is-invalid]="isFieldInvalid('role_id')"
-            >
-              <option value="">Sélectionner un rôle</option>
-              <option *ngFor="let r of roles" [value]="r.id">{{ r.name }}</option>
-            </select>
-            <div class="error-message" *ngIf="isFieldInvalid('role_id')">
-              Le rôle est requis
+            <div class="custom-select">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Rechercher un rôle..."
+                [(ngModel)]="roleSearchTextModal"
+                [ngModelOptions]="{standalone: true}"
+                (focus)="showRoleListModal = true"
+                (blur)="hideRoleListModalWithDelay()"
+                [class.is-invalid]="isFieldInvalid('role_id')"
+                autocomplete="off"
+              >
+              <div class="dropdown" *ngIf="showRoleListModal">
+                <div class="dropdown-item" *ngFor="let r of filteredRolesModal()" (mousedown)="selectRoleModal(r)">{{ r.name }}</div>
+                <div *ngIf="filteredRolesModal().length === 0" class="no-result">Aucun rôle trouvé</div>
+              </div>
             </div>
+            <input type="hidden" formControlName="role_id">
+            <div class="error-message" *ngIf="isFieldInvalid('role_id')">Le rôle est requis</div>
           </div>
 
-          <!-- email -->
+          <!-- Email -->
           <div class="form-group">
-            <label>Email<span class="required">*</span></label>
-            <input
-              type="email"
-              class="form-control"
-              formControlName="email"
-              [class.is-invalid]="isFieldInvalid('email')"
-              placeholder="Ex: jean.dupont@example.com"
-            >
-            <div class="error-message" *ngIf="isFieldInvalid('email')">
-              L'email est requis et doit être valide
-            </div>
+            <label>Email <span class="required">*</span></label>
+            <input type="email" class="form-control" formControlName="email" [class.is-invalid]="isFieldInvalid('email')" placeholder="Ex: jean.dupont@example.com">
+            <div class="error-message" *ngIf="isFieldInvalid('email')">L'email est requis et doit être valide</div>
           </div>
+
           <!-- TJM -->
           <div class="form-group">
-            <label>TJM Réference (€)</label>
-            <input
-              type="number"
-              class="form-control"
-              formControlName="tjm"
-              min="0"
-              step="10"
-              [class.is-invalid]="isFieldInvalid('tjm')"
-              placeholder="0"
-            >
-            <div class="error-message" *ngIf="isFieldInvalid('tjm')">
-              Le TJM est requis et doit être positif
-            </div>
+            <label>TJM Référence (€)</label>
+            <input type="number" class="form-control" formControlName="tjm" min="0" step="10" [class.is-invalid]="isFieldInvalid('tjm')" placeholder="0">
           </div>
 
           <!-- Adresse -->
           <div class="form-group">
             <label>Adresse</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="adresse"
-              placeholder="Ex: 123 Rue de la Paix"
-            >
+            <input type="text" class="form-control" formControlName="adresse" placeholder="Ex: 123 Rue de la Paix">
           </div>
 
           <!-- Date d'entrée -->
           <div class="form-group">
-            <label>Date d'entrée<span class="required">*</span></label>
-            <input
-              type="date"
-              class="form-control"
-              formControlName="date_entree"
-              [class.is-invalid]="isFieldInvalid('date_entree')"
-            >
-            <div class="error-message" *ngIf="isFieldInvalid('date_entree')">
-              La date d'entrée est requise
-            </div>
+            <label>Date d'entrée <span class="required">*</span></label>
+            <input type="date" class="form-control" formControlName="date_entree" [class.is-invalid]="isFieldInvalid('date_entree')">
+            <div class="error-message" *ngIf="isFieldInvalid('date_entree')">La date d'entrée est requise</div>
           </div>
         </div>
       </div>
-
       <div class="modal-footer">
         <button type="button" class="btn-secondary" (click)="closeModal()">Annuler</button>
         <button type="submit" class="btn-primary" [disabled]="salarieForm.invalid">
-          <i class="fa-solid fa-check"></i>
-          {{ modalMode === 'add' ? 'Ajouter' : 'Modifier' }}
+          <i class="fa-solid fa-check"></i> {{ modalMode === 'add' ? 'Ajouter' : 'Modifier' }}
         </button>
       </div>
     </form>
-
   </div>
 </div>
+
 <!-- MODAL DETAILS -->
 <div class="modal-overlay" *ngIf="showModal && modalMode === 'details'">
-
   <div class="modal-container">
-
     <div class="modal-header">
       <div class="modal-title">
         <div class="salarie-avatar large">
-          <div class="avatar-placeholder large" [ngClass]="getAvatarClass(selectedSalarie)">
-            {{ selectedSalarie?.username?.substring(0,2) | uppercase }}
-          </div>
+          <div class="avatar-placeholder large" [ngClass]="getAvatarClass(selectedSalarie)">{{ selectedSalarie?.username?.substring(0,2) | uppercase }}</div>
         </div>
         <div>
           <h2>{{ selectedSalarie?.username }}</h2>
           <p class="salarie-subtitle">{{ getRoleName(selectedSalarie?.role_id) }}</p>
         </div>
       </div>
-      <button class="close-btn" (click)="closeModal()">
-        <i class="fa-solid fa-times"></i>
-      </button>
+      <button class="close-btn" (click)="closeModal()"><i class="fa-solid fa-times"></i></button>
     </div>
-
     <div class="modal-body">
-
       <div class="details-section">
-        <h3>
-          <i class="fa-solid fa-address-card"></i>
-          Informations
-        </h3>
+        <h3><i class="fa-solid fa-address-card"></i> Informations</h3>
         <div class="details-grid">
-          <div class="detail-item">
-            <span class="detail-label">Rôle</span>
-            <span class="detail-value">{{ getRoleName(selectedSalarie?.role_id) }}</span>
-          </div>
-           <div class="detail-item">
-            <span class="detail-label">Numéro de Sécurité Sociale</span>
-            <span class="detail-value">{{ selectedSalarie.num_securite_sociale }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Email</span>
-            <span class="detail-value">{{ selectedSalarie.email  }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">TJM Réference</span>
-            <span class="detail-value">{{ selectedSalarie?.tjm || 0 }} €</span>
-          </div>
-            <div class="detail-item">
-            <span class="detail-label">Adresse</span>
-            <span class="detail-value">{{ selectedSalarie?.adresse || '-' }}</span>
-          </div>
-           <div class="detail-item">
-            <span class="detail-label">Date d'Entrée</span>
-            <span class="detail-value">{{ selectedSalarie.date_entree | date:'dd/MM/yyyy' }}</span>
-          </div>
+          <div class="detail-item"><span class="detail-label">Rôle</span><span class="detail-value">{{ getRoleName(selectedSalarie?.role_id) }}</span></div>
+          <div class="detail-item"><span class="detail-label">Numéro de Sécurité Sociale</span><span class="detail-value">{{ selectedSalarie.num_securite_sociale }}</span></div>
+          <div class="detail-item"><span class="detail-label">Email</span><span class="detail-value">{{ selectedSalarie.email }}</span></div>
+          <div class="detail-item"><span class="detail-label">TJM Référence</span><span class="detail-value">{{ selectedSalarie?.tjm || 0 }} €</span></div>
+          <div class="detail-item"><span class="detail-label">Adresse</span><span class="detail-value">{{ selectedSalarie?.adresse || '-' }}</span></div>
+          <div class="detail-item"><span class="detail-label">Date d'Entrée</span><span class="detail-value">{{ selectedSalarie.date_entree | date:'dd/MM/yyyy' }}</span></div>
         </div>
       </div>
-
     </div>
-
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeModal()">
-        Fermer
-      </button>
-      <button class="btn-primary" (click)="openEditModal(selectedSalarie)">
-        <i class="fa-solid fa-pen"></i>
-        Modifier
-      </button>
+      <button class="btn-secondary" (click)="closeModal()">Fermer</button>
+      <button class="btn-primary" (click)="openEditModal(selectedSalarie)"><i class="fa-solid fa-pen"></i> Modifier</button>
     </div>
-
   </div>
-
 </div>

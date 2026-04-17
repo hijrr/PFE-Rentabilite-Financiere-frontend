@@ -181,13 +181,15 @@ export class GestionParSalariesComponent implements OnInit {
  loadProjetsForSalarie(normalizedKey: string): void {
   this.projetService.getProjets().subscribe({
     next: (projets) => {
-
-      const projetsSalarie = projets.filter(p =>
+       const enAttente = projets.filter(p =>
+        (p.status_paiement || '').toString().trim().toLowerCase() === 'en_attente'
+      );
+      const projetsSalarie = enAttente.filter(p =>
         p.salarie?.username &&
         this.normalizeName(p.salarie.username) === normalizedKey
       );
 
-      this.projetsSalarie = projetsSalarie.length > 0 ? projetsSalarie : projets;
+      this.projetsSalarie = projetsSalarie.length > 0 ? projetsSalarie : enAttente;
     },
     error: (err) => console.error(err)
   });

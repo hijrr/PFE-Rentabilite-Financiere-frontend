@@ -78,16 +78,20 @@ selectedFileNames = {
 
   // Recherche salarié
   onSalarieSearch(): void {
-    const term = this.salarieSearchTerm.toLowerCase().trim();
-    if (!term) {
+    const term = (this.salarieSearchTerm || '').toLowerCase().trim();
+
+    if (!term || !this.salaries || this.salaries.length === 0) {
       this.filteredSalaries = [];
       return;
     }
-    this.filteredSalaries = this.salaries.filter(s =>
-      s.username.toLowerCase().includes(term) ||
-      s.email.toLowerCase().includes(term) ||
-      s.role.toLowerCase().includes(term)
-    );
+
+    this.filteredSalaries = this.salaries.filter(s => {
+      const username = (s.username || '').toLowerCase();
+      const email = (s.email || '').toLowerCase();
+      const role = (s.role || '').toLowerCase();
+
+      return username.includes(term) || email.includes(term) || role.includes(term);
+    });
   }
 
   selectSalarie(salarie: any): void {
@@ -111,13 +115,18 @@ selectedFileNames = {
     }
   }
 
-  loadProjetsForSalarie(salarieId: number): void {
-    this.projetService.getProjetsById(salarieId).subscribe({
-      next: (projets) => this.projetsSalarie = projets || [],
-      error: (err) => console.error(err)
-    });
-  }
+loadProjetsForSalarie(salarieId: number): void {
+  this.projetService.getProjetsById(salarieId).subscribe({
+    next: (projets) => {
 
+      this.projetsSalarie = (projets || []).filter(p =>
+        (p.status_paiement || '').toLowerCase() === 'en_attente'
+      );
+
+    },
+    error: (err) => console.error(err)
+  });
+}
   resetAll(): void {
     this.extractedData = { paie: [], frais: [], km: [] };
     this.groupedData = [];

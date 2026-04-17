@@ -20,11 +20,36 @@
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+:host-context(body.dark-theme) {
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-bg-alt: #111827;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-gray-soft: #1f2937;
+  --elzei-green-light: #183f26;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+:host-context(body.dark-theme) .no-facture-message {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+:host-context(body.dark-theme) .warning-message {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 
 .periode-container {
   max-width: 1400px;
@@ -300,6 +325,34 @@
   font-weight: 600;
   color: var(--elzei-gray-dark);
 }
+:host-context(body.dark-theme) .period-header:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+:host-context(body.dark-theme) .remove-file:hover {
+  background: rgba(220, 38, 38, 0.12);
+}
+:host-context(body.dark-theme) .autocomplete-list {
+  background: var(--elzei-white);
+  border-color: #334155;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+:host-context(body.dark-theme) .autocomplete-item {
+  border-color: #334155;
+}
+:host-context(body.dark-theme) .autocomplete-item:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+:host-context(body.dark-theme) .facture-block {
+  background: #1f2937;
+  color: var(--elzei-gray);
+}
+:host-context(body.dark-theme) .file-label {
+  background: #111827;
+  border-color: #334155;
+}
+:host-context(body.dark-theme) .file-label:hover {
+  background: #111827;
+}
 .period-badge {
   background: var(--elzei-green);
   color: white;
@@ -370,7 +423,7 @@
   border: 1.5px solid var(--elzei-border);
   border-radius: 8px;
   font-size: 0.9rem;
-  background: white;
+  background: var(--elzei-white);
   transition: var(--transition);
 }
 .form-control:focus {
@@ -399,7 +452,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 10px;
   max-height: 250px;

@@ -15,7 +15,7 @@
       <div class="search-wrapper">
         <input type="text"
                [(ngModel)]="salarieSearchTerm"
-               (input)="onSalarieSearch()"
+              (ngModelChange)="onSalarieSearch()"
                placeholder="Rechercher un salarié (nom, email)..."
                class="form-control search-input"
                autocomplete="off" />

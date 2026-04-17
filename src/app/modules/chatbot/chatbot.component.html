@@ -1,0 +1,68 @@
+<!-- 🔵 Bouton flottant -->
+<div class="chat-bubble" *ngIf="!isChatOpen" (click)="openChat()">
+  <i class="fas fa-comment-dots"></i>
+</div>
+
+<!-- 💬 Chat window -->
+<div class="chat-window" *ngIf="isChatOpen">
+
+  <!-- HEADER -->
+  <div class="chat-header">
+    <div class="header-title">
+      <i class="fas fa-robot"></i>
+      <span>Elzei AI Assistant</span>
+    </div>
+    <button class="close-btn" (click)="closeChat()">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="chat-messages" #scrollMe>
+    <div *ngFor="let msg of messages" class="message" [ngClass]="msg.sender">
+      <div class="bubble">
+        <div class="bubble-text">{{ msg.text }}</div>
+        <div class="bubble-footer">
+          <span class="timestamp">{{ formatDate(msg.timestamp) }}</span>
+          <div class="message-actions">
+            <button class="action-btn copy" (click)="copyMessage(msg.text)" title="Copier">
+              <i class="fas fa-copy"></i>
+            </button>
+            <button class="action-btn reply" (click)="replyToMessage(msg.text)" title="Répondre">
+              <i class="fas fa-reply"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- typing indicator -->
+    <div *ngIf="isTyping" class="message bot">
+      <div class="bubble typing-indicator">
+        <span>🤖</span>
+        <span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+        <span>Elzei AI réfléchit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="chat-input">
+    <input
+      type="text"
+      [(ngModel)]="userMessage"
+      placeholder="Écrire ou parler..."
+      (keyup.enter)="sendMessage()"
+    />
+    <button class="send-btn" (click)="sendMessage()" title="Envoyer">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+   <button class="mic-btn"
+        (click)="isListening ? stopVoice() : startVoice()"
+        [class.active]="isListening"
+        title="Parler / Stop">
+  <i class="fas" [ngClass]="isListening ? 'fa-stop' : 'fa-microphone'"></i>
+</button>
+  </div>
+
+</div>

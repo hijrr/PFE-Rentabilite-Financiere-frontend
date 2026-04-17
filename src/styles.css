@@ -1,1 +1,310 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-alt: #f3f4f6;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #27ae60;
+  --card-shadow: 0 2px 8px rgba(111, 207, 151, 0.08);
+  --elzei-green: #6FCF97;
+  --elzei-green-dark: #27AE60;
+  --elzei-green-light: #E8F8F0;
+  --elzei-white: #FFFFFF;
+  --elzei-gray-dark: #1F2937;
+  --elzei-gray: #4B5563;
+  --elzei-gray-light: #9CA3AF;
+  --elzei-gray-soft: #F3F4F6;
+  --elzei-border: #E5E7EB;
+  --elzei-bg: #F9FAFB;
+  --elzei-bg-alt: #F3F4F6;
+}
+
+html, body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+body.dark-theme {
+  color-scheme: dark;
+  --bg: #0f172a;
+  --surface: #111827;
+  --surface-alt: #1f2937;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --border: #334155;
+  --primary: #6ee7b7;
+  --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-bg-alt: #111827;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-gray-soft: #1f2937;
+  --elzei-green-light: #183f26;
+  background: #020617;
+}
+
+body.dark-theme * {
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body.dark-theme,
+body.dark-theme .main-content,
+body.dark-theme app-root,
+body.dark-theme .main-content * {
+  color: var(--text);
+}
+
+body.dark-theme .main-content,
+body.dark-theme .app-layout,
+body.dark-theme .dashboard-wrapper,
+body.dark-theme .dashboard-header,
+body.dark-theme .status-badge-header,
+body.dark-theme .filter-bar,
+body.dark-theme .modal-container,
+body.dark-theme .modal-header,
+body.dark-theme .modal-body,
+body.dark-theme .modal-footer {
+  background: var(--bg);
+}
+
+body.dark-theme a {
+  color: #93c5fd;
+}
+
+body.dark-theme .main-content .card,
+body.dark-theme .main-content .auth-card,
+body.dark-theme .main-content .document-card,
+body.dark-theme .main-content .kpi-card,
+body.dark-theme .main-content .chart-card,
+body.dark-theme .main-content .insight-card,
+body.dark-theme .main-content .component-card,
+body.dark-theme .main-content .form-panel,
+body.dark-theme .main-content .image-panel,
+body.dark-theme .main-content .notification-dropdown,
+body.dark-theme .main-content .user-dropdown,
+body.dark-theme .main-content .notification-item,
+body.dark-theme .main-content .user-menu,
+body.dark-theme .main-content .theme-toggle,
+body.dark-theme .main-content .notification-btn,
+body.dark-theme .elzei-sidebar,
+body.dark-theme .sidebar-logo,
+body.dark-theme .sidebar-profile,
+body.dark-theme .sidebar-nav,
+body.dark-theme .sidebar-footer,
+body.dark-theme .modal-container,
+body.dark-theme .modal-header,
+body.dark-theme .modal-body,
+body.dark-theme .modal-footer,
+body.dark-theme .btn-primary,
+body.dark-theme .btn-secondary,
+body.dark-theme .btn-add,
+body.dark-theme .card,
+body.dark-theme .table,
+body.dark-theme .table th,
+body.dark-theme .table td {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+body.dark-theme .main-content .card:hover,
+body.dark-theme .main-content .kpi-card:hover,
+body.dark-theme .main-content .chart-card:hover,
+body.dark-theme .main-content .insight-card:hover,
+body.dark-theme .main-content .component-card:hover,
+body.dark-theme .main-content .document-card:hover,
+body.dark-theme .main-content .notification-item:hover,
+body.dark-theme .main-content .user-dropdown a:hover,
+body.dark-theme .btn-primary:hover,
+body.dark-theme .btn-secondary:hover,
+body.dark-theme .btn-add:hover {
+  background: var(--surface-alt);
+}
+
+body.dark-theme input,
+body.dark-theme textarea,
+body.dark-theme select,
+body.dark-theme button,
+body.dark-theme .form-control,
+body.dark-theme .form-group,
+body.dark-theme .form-field,
+body.dark-theme .search-input {
+  background: #1f2937;
+  color: var(--text);
+  border-color: #334155;
+}
+
+body.dark-theme input::placeholder,
+body.dark-theme textarea::placeholder,
+body.dark-theme ::placeholder {
+  color: #94a3b8;
+}
+
+body.dark-theme .autocomplete-list,
+body.dark-theme .client-autocomplete-list,
+body.dark-theme .autocomplete-item,
+body.dark-theme .client-autocomplete-list li {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+body.dark-theme .autocomplete-item:hover,
+body.dark-theme .client-autocomplete-list li:hover {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+body.dark-theme table,
+body.dark-theme th,
+body.dark-theme td {
+  color: var(--text);
+  border-color: #334155;
+}
+
+body.dark-theme .badge,
+body.dark-theme .chip,
+body.dark-theme .notification-badge {
+  background: #334155;
+  color: var(--text);
+}
+
+body.dark-theme .modal-overlay {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+body.dark-theme .elzei-sidebar .nav-link:hover,
+body.dark-theme .elzei-sidebar .sidebar-footer,
+body.dark-theme .elzei-sidebar .sidebar-profile,
+body.dark-theme .elzei-sidebar .sidebar-version {
+  background: #111827;
+}
+
+body.dark-theme .elzei-sidebar .nav-link,
+body.dark-theme .elzei-sidebar .logo-text,
+body.dark-theme .elzei-sidebar .profile-info,
+body.dark-theme .elzei-sidebar .logout-label {
+  color: var(--text);
+}
+
+body.dark-theme .main-header,
+body.dark-theme .auth-container,
+body.dark-theme .auth-card,
+body.dark-theme .image-content,
+body.dark-theme .elzei-message,
+body.dark-theme .login-panel,
+body.dark-theme .auth-form,
+body.dark-theme .import-container,
+body.dark-theme .document-card,
+body.dark-theme .factures-container,
+body.dark-theme .client-container,
+body.dark-theme .periode-container,
+body.dark-theme .historique-container,
+body.dark-theme .salarie-container,
+body.dark-theme .projet-container,
+body.dark-theme .param-page,
+body.dark-theme .elzei-container,
+body.dark-theme .chat-window,
+body.dark-theme .dashboard-wrapper,
+body.dark-theme .sidebar-logo,
+body.dark-theme .sidebar-profile,
+body.dark-theme .sidebar-nav,
+body.dark-theme .main-content,
+body.dark-theme .component-card,
+body.dark-theme .card,
+body.dark-theme .form-section,
+body.dark-theme .panel-header,
+body.dark-theme .employees-panel,
+body.dark-theme .search-input,
+body.dark-theme .modal-container,
+body.dark-theme .btn-secondary,
+body.dark-theme .notification-dropdown,
+body.dark-theme .notification-item,
+body.dark-theme .notification-item.unread,
+body.dark-theme .notification-btn,
+body.dark-theme .theme-toggle {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+body.dark-theme .auth-container {
+  background: #020617;
+}
+
+body.dark-theme .image-content {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+body.dark-theme .elzei-message {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.dark-theme .notification-dropdown {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-theme .notification-item:hover {
+  background: #111827;
+}
+
+body.dark-theme .notification-item.unread {
+  background: #111827;
+}
+
+body.dark-theme .theme-toggle:hover,
+body.dark-theme .notification-btn:hover {
+  background: #1f2937;
+}
+
+/* Corrections mode sombre supplémentaires pour composants */
+body.dark-theme .action-btn,
+body.dark-theme .page-btn,
+body.dark-theme .page-btn.ellipsis,
+body.dark-theme .status-badge,
+body.dark-theme .alert-error,
+body.dark-theme .btn-secondary,
+body.dark-theme .btn-icon,
+body.dark-theme .notification-btn,
+body.dark-theme .theme-toggle {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+body.dark-theme .action-btn.view:hover,
+body.dark-theme .action-btn.edit:hover,
+body.dark-theme .action-btn.delete:hover,
+body.dark-theme .action-btn.contact:hover,
+body.dark-theme .page-btn:hover:not(:disabled),
+body.dark-theme .page-btn.active,
+body.dark-theme .btn-secondary:hover,
+body.dark-theme .btn-icon.edit:hover,
+body.dark-theme .btn-icon.delete:hover,
+body.dark-theme .notification-btn:hover,
+body.dark-theme .theme-toggle:hover {
+  background: var(--surface-alt) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+body.dark-theme .status-rentable,
+body.dark-theme .status-tres-rentable,
+body.dark-theme .status-pending,
+body.dark-theme .status-low,
+body.dark-theme .alert-success,
+body.dark-theme .alert-error {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--text) !important;
+  border-color: rgba(255,255,255,0.12) !important;
+}

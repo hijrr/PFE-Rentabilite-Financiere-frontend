@@ -58,7 +58,7 @@
         </button>
       </div>
 
-      <!-- Contenu Historique -->
+      <!-- ==================== CONTENU HISTORIQUE ==================== -->
       <div *ngIf="activeTab === 'historique'">
         <!-- En-tête statistiques -->
         <div class="stats-header">
@@ -88,9 +88,7 @@
         <div *ngIf="selectedProjetObj" class="selected-projet-info">
           <i class="fas fa-check-circle"></i> Projet : {{ selectedProjetObj.nom }} (TJM: {{ selectedProjetObj.tjm }} € - Client: {{ selectedProjetObj.client }})
           <div class="selected-actions">
-            <button class="btn-export" (click)="exportToCSV()">
-              <i class="fas fa-file-csv"></i> Exporter CSV
-            </button>
+            <button class="btn-export" (click)="exportToCSV()"><i class="fas fa-file-csv"></i> Exporter CSV</button>
             <button class="clear-projet" (click)="clearProjetSelection()">✖</button>
           </div>
         </div>
@@ -148,28 +146,23 @@
         <div *ngIf="!selectedProjetObj && filteredHistoriques.length===0" class="no-data">Aucun historique pour ce salarié.</div>
       </div>
 
-      <!-- Contenu Prévisions IA -->
+      <!-- ==================== CONTENU PRÉVISIONS IA ==================== -->
       <div *ngIf="activeTab === 'previsions'">
         <div class="previsions-container" *ngIf="selectedProjetObj; else noProjet">
           <!-- Loading -->
           <div *ngIf="loadingPrevision" class="loading-spinner">
             <i class="fas fa-spinner fa-pulse"></i> Chargement des prévisions...
           </div>
-          <!-- Données -->
+
+          <!-- Données chargées -->
           <div *ngIf="!loadingPrevision && previsionData">
             <!-- Alerte animée -->
             <div *ngIf="previsionData.alerte_globale" class="global-alert pulse-animation">
               <i class="fas fa-exclamation-triangle"></i> Attention : des marges négatives sont prévues dans les prochains mois.
             </div>
+
             <!-- KPIs -->
             <div class="prevision-kpis">
-              <div class="kpi-card">
-                <i class="fas fa-chart-line"></i>
-                <div class="kpi-info">
-                  <span class="kpi-label">CA moyen estimé</span>
-                  <span class="kpi-value">{{ getAvgCaEstime() | currency:'EUR' }}</span>
-                </div>
-              </div>
               <div class="kpi-card">
                 <i class="fas fa-euro-sign"></i>
                 <div class="kpi-info">
@@ -187,6 +180,17 @@
                 </div>
               </div>
             </div>
+
+            <!-- Graphique en lignes des prévisions -->
+            <h3>Prévisions sur les 3 prochains mois</h3>
+            <div class="chart-wrapper" style="height: 300px;">
+              <canvas baseChart
+                      [data]="lineChartData"
+                      [options]="lineChartOptions"
+                      type="line">
+              </canvas>
+            </div>
+
             <!-- Métriques de fiabilité -->
             <div class="prevision-metrics">
               <div class="metric-card">
@@ -197,68 +201,21 @@
                 <span class="metric-label">Mois d'historique</span>
                 <span class="metric-value">{{ previsionData.nb_mois_historique }}</span>
               </div>
-              <div class="metric-card">
-                <span class="metric-label">Fiabilité</span>
-                <span class="metric-value" [class.faible]="previsionData.metriques.fiabilite === 'faible'">
-                  {{ previsionData.message_fiabilite }}
-                </span>
-              </div>
             </div>
-            <!-- Tableau des prédictions -->
-            <h3>Prévisions pour les 3 prochains mois</h3>
-            <div class="table-responsive">
-              <table class="prevision-table">
-                <thead>
-                  <tr>
-                    <th>Mois</th>
-                    <th>CA estimé (€)</th>
-                    <th>Coût estimé (€)</th>
-                    <th>Marge si payé (€)</th>
-                    <th>Marge si non payé (€)</th>
-                    <th>Alerte</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let p of previsionData.predictions">
-                    <td><strong>{{ p.mois }}</strong></td>
-                    <td>{{ p.ca_estime | currency:'EUR' }}</td>
-                    <td>{{ p.cout_estime | currency:'EUR' }}</td>
-                    <td [class.positive]="p.marge_si_paye >= 0" [class.negative]="p.marge_si_paye < 0">
-                      {{ p.marge_si_paye | currency:'EUR' }}
-                    </td>
-                    <td [class.positive]="p.marge_si_non_paye >= 0" [class.negative]="p.marge_si_non_paye < 0">
-                      {{ p.marge_si_non_paye | currency:'EUR' }}
-                    </td>
-                    <td class="text-center">
-                      <i *ngIf="p.alerte" class="fas fa-exclamation-triangle" style="color: #f44336;"></i>
-                      <span *ngIf="!p.alerte">—</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <!-- Historique utilisé (détail) -->
+
+            <!-- Détail de l'historique utilisé -->
             <details class="historique-details">
               <summary>Voir l'historique utilisé pour l'apprentissage</summary>
               <div class="table-responsive">
-                <table class="prevision-table small">
-                  <thead>
-                    <tr><th>Date</th><th>Total perçu (€)</th><th>Facture (€)</th><th>Rentabilité (€)</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let h of previsionData.historique">
-                      <td>{{ h.date }}</td>
-                      <td>{{ h.totalePercu | currency:'EUR' }}</td>
-                      <td>{{ h.totaleFacture | currency:'EUR' }}</td>
-                      <td [class.positive]="h.rentabilite >= 0" [class.negative]="h.rentabilite < 0">
-                        {{ h.rentabilite | currency:'EUR' }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+               <h3>Évolution historique de la rentabilité</h3>
+<div class="chart-wrapper" style="height: 250px;">
+  <canvas baseChart [data]="historyChartData" [options]="historyChartOptions" type="line"></canvas>
+</div>
               </div>
             </details>
           </div>
+
+          <!-- Aucune donnée -->
           <div *ngIf="!loadingPrevision && !previsionData && selectedProjetObj" class="no-data">
             Aucune prévision disponible.
           </div>

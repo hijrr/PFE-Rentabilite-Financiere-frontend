@@ -16,12 +16,31 @@
 
   --border-radius: 16px;
   --transition: all 0.2s ease;
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-
-  /* Largeur de la sidebar - À AJUSTER SELON VOTRE SIDEBAR */
+  --font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
   --sidebar-width: 310px;
   --sidebar-collapsed-width: 130px;
+ --sidebar-collapsed-width: 130px;
+  /* Largeur de la sidebar - À AJUSTER SELON VOTRE SIDEBAR */
 }
+
+:host-context(body.dark-theme) {
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-bg-alt: #111827;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-gray-soft: #1f2937;
+  --elzei-green-light: #183f26;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Largeur de la sidebar - À AJUSTER SELON VOTRE SIDEBAR */
+
+
 
 /* Container principal - AJUSTÉ POUR LA SIDEBAR */
 .client-container {
@@ -120,10 +139,21 @@
   transition: var(--transition);
 }
 
+:host-context(body.dark-theme) .search-input {
+  background: var(--elzei-bg);
+  color: var(--text);
+  border-color: var(--elzei-border);
+}
+
 .search-input:focus {
   outline: none;
   border-color: var(--elzei-green);
   box-shadow: 0 0 0 3px rgba(111, 207, 151, 0.15);
+}
+
+:host-context(body.dark-theme) .search-input:focus {
+  border-color: var(--elzei-green-light);
+  box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.15);
 }
 
 /* Section KPI */
@@ -270,7 +300,7 @@
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
 }
 
@@ -389,7 +419,7 @@
   height: 30px;
   border: 1px solid var(--elzei-border);
   border-radius: 6px;
-  background: white;
+  background: var(--elzei-white);
   color: var(--elzei-gray);
   cursor: pointer;
   transition: var(--transition);
@@ -466,7 +496,7 @@
   height: 36px;
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
-  background: white;
+  background: var(--elzei-white);
   color: var(--elzei-gray);
   cursor: pointer;
   transition: var(--transition);
@@ -741,7 +771,7 @@
   width: 36px;
   height: 36px;
   border: none;
-  background: white;
+  background: var(--elzei-white);
   border-radius: 8px;
   color: var(--elzei-gray);
   cursor: pointer;
@@ -925,7 +955,7 @@
 }
 
 .btn-secondary {
-  background: white;
+  background: var(--elzei-white);
   color: var(--elzei-gray);
   border: 1px solid var(--elzei-border);
 }
@@ -969,7 +999,7 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background: white;
+  background: var(--elzei-white);
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   margin: 1rem 0;
@@ -993,7 +1023,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   margin-top: 5px;
@@ -1001,6 +1031,12 @@
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+}
+
+:host-context(body.dark-theme) .client-autocomplete-list {
+  background: var(--elzei-bg);
+  border-color: #334155;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 .client-autocomplete-list ul {
@@ -1016,12 +1052,20 @@
   transition: background 0.2s;
 }
 
+:host-context(body.dark-theme) .client-autocomplete-list li {
+  border-color: #1f2937;
+}
+
 .client-autocomplete-list li:last-child {
   border-bottom: none;
 }
 
 .client-autocomplete-list li:hover {
   background: #f8f9ff;
+}
+
+:host-context(body.dark-theme) .client-autocomplete-list li:hover {
+  background: rgba(56, 189, 248, 0.12);
 }
 /* ========== CLIENT ITEM IN AUTOCOMPLETE ========== */
 .client1-item {

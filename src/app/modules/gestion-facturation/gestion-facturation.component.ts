@@ -13,6 +13,9 @@ export class GestionFacturationComponent implements OnInit {
   filteredClients: any[] = [];
   searchTerm: string = '';
   selectedClientId: string = '';
+  searchRef: string = '';
+selectedDate: string = ''; // format YYYY-MM
+selectedStatus: string = '';
 
   // Autocomplete
   showClientList: boolean = false;
@@ -111,7 +114,7 @@ export class GestionFacturationComponent implements OnInit {
       this.filteredClients = [...this.clients];
     }
   }
-   
+
 
   hideClientListWithDelay(): void {
     this.hideTimeout = setTimeout(() => {
@@ -132,25 +135,66 @@ export class GestionFacturationComponent implements OnInit {
     this.searchTerm = '';
     this.applyFilters();
   }
-
+resetAllFilters(): void {
+  this.selectedClientId = '';
+  this.searchTerm = '';
+  this.searchRef = '';
+  this.selectedDate = '';
+  this.selectedStatus = '';
+  this.applyFilters();
+}
+hasActiveFilters(): boolean {
+  return !!(this.selectedClientId || this.searchRef || this.selectedDate || this.selectedStatus);
+}
   getSelectedClientName(): string {
     const client = this.clients.find(c => c.id == this.selectedClientId);
     return client ? client.name : '';
   }
 
   // ========== FILTRAGE ==========
-  applyFilters(): void {
-    let filtered = this.invoices;
+applyFilters(): void {
+  let filtered = this.invoices;
 
-    // Filtre par client
-    if (this.selectedClientId) {
-      filtered = filtered.filter(inv => inv.socid == this.selectedClientId);
-    }
-
-    this.filteredInvoices = filtered;
-    this.currentPage = 1;
-    this.updatePagination();
+  // Filtre par client
+  if (this.selectedClientId) {
+    filtered = filtered.filter(inv => inv.socid == this.selectedClientId);
   }
+
+  // Filtre par référence
+  if (this.searchRef) {
+    const refLower = this.searchRef.toLowerCase();
+    filtered = filtered.filter(inv => inv.ref?.toLowerCase().includes(refLower));
+  }
+
+  // Filtre par date d'émission (mois)
+ if (this.selectedDate) {
+  const [year, month, day] = this.selectedDate.split('-').map(Number);
+  filtered = filtered.filter(inv => {
+    if (!inv.date) return false;
+    const date = new Date(inv.date * 1000);
+    return date.getFullYear() === year &&
+           (date.getMonth() + 1) === month &&
+           date.getDate() === day;
+  });
+}
+
+  // Filtre par statut
+  if (this.selectedStatus) {
+    filtered = filtered.filter(inv => {
+      switch (this.selectedStatus) {
+        case 'payee': return inv.paye === "1" && inv.statut === "2";
+        case 'attente': return inv.paye === "0" && inv.statut === "1";
+        case 'brouillon': return inv.statut === "0";
+        default: return true;
+      }
+    });
+  }
+
+  this.filteredInvoices = filtered;
+  this.currentPage = 1;
+  this.updatePagination();
+}
+
 
   // ========== CLIENTS UTILS ==========
   getClientName(clientId: string): string {

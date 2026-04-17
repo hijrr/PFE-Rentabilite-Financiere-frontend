@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ChartConfiguration } from 'chart.js';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
 import { PredictionIAService } from 'src/app/services/prediction-ia.service';
 import { ProjetService } from 'src/app/services/projet.service';
@@ -74,6 +75,15 @@ export class HistoriqueSalarieComponent implements OnInit {
   // Prévisions IA
   previsionData: any = null;
   loadingPrevision: boolean = false;
+  lineChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
+lineChartOptions: any = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (ctx: any) => ctx.raw + ' €' } } },
+  scales: { y: { ticks: { callback: (val: number) => val + ' €' } } }
+};
+historyChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
+historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } };
 
   constructor(
     private salarieService: SalarieServiceService,
@@ -345,21 +355,60 @@ export class HistoriqueSalarieComponent implements OnInit {
   }
 
   // Prévisions IA
-  loadPrevision(projetId: number) {
-    this.loadingPrevision = true;
-    this.predictionIAService.getPrevisionMarge(projetId).subscribe({
-      next: (data) => {
-        this.previsionData = data;
-        this.loadingPrevision = false;
-      },
+ loadPrevision(projetId: number) {
+  this.loadingPrevision = true;
+  this.predictionIAService.getPrevisionMarge(projetId).subscribe({
+    next: (data) => {
+      this.previsionData = data;
+      // Construire le graphique
+      const predictions = data.predictions;
+      this.lineChartData = {
+        labels: predictions.map((p: any) => p.mois),
+        datasets: [
+          {
+            label: 'Marge si payé (€)',
+            data: predictions.map((p: any) => p.marge_si_paye),
+            borderColor: '#6FCF97',
+            backgroundColor: 'rgba(111, 207, 151, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#27AE60'
+          },
+          {
+            label: 'Marge si non payé (€)',
+            data: predictions.map((p: any) => p.marge_si_non_paye),
+            borderColor: '#FF9800',
+            backgroundColor: 'rgba(255, 152, 0, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#F57C00'
+          }
+        ]
+      };
+      this.loadingPrevision = false;
+      const historique = data.historique;
+this.historyChartData = {
+  labels: historique.map((h: any) => h.date),
+  datasets: [
+    {
+      label: 'Rentabilité réelle (€)',
+      data: historique.map((h: any) => h.rentabilite),
+      borderColor: '#6FCF97',
+      backgroundColor: 'rgba(111, 207, 151, 0.1)',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#27AE60'
+    }
+  ]
+};
+    },
+
       error: (err) => {
         console.error('Erreur chargement prévisions', err);
-        alert('Impossible de charger les prévisions pour ce projet.');
         this.loadingPrevision = false;
       }
     });
-  }
-
+}
   // Changement d'onglet
   setActiveTab(tab: 'historique' | 'previsions') {
     this.activeTab = tab;

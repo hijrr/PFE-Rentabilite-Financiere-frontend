@@ -18,6 +18,21 @@
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+:host-context(body.dark-theme) {
+  --elzei-white: #111827;
+  --elzei-bg: #0f172a;
+  --elzei-bg-alt: #111827;
+  --elzei-border: #334155;
+  --elzei-gray-dark: #e2e8f0;
+  --elzei-gray: #cbd5e1;
+  --elzei-gray-light: #94a3b8;
+  --elzei-gray-soft: #1f2937;
+  --elzei-green-light: #183f26;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -205,7 +220,7 @@
   height: 32px;
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
-  background: white;
+  background: var(--elzei-white);
   cursor: pointer;
   transition: var(--transition);
 }
@@ -300,7 +315,7 @@
   color: white;
 }
 .projet-tjm {
-  background: white;
+  background: var(--elzei-white);
   padding: 0.2rem 0.5rem;
   border-radius: 20px;
   color: var(--elzei-green-dark);
@@ -441,7 +456,7 @@
   background: var(--elzei-bg);
 }
 .btn-secondary {
-  background: white;
+  background: var(--elzei-white);
   color: var(--elzei-gray);
   border: 1px solid var(--elzei-border);
   padding: 0.5rem 1rem;
@@ -520,7 +535,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
   max-height: 200px;
@@ -600,7 +615,7 @@
   padding-left: 1.5rem;
 }
 .record-card {
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
   padding: 0.5rem;
@@ -628,7 +643,7 @@
   margin: 0.5rem 0;
 }
 .pagination-records button {
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -665,7 +680,7 @@
   padding: 0.4rem 0.8rem;
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
-  background: white;
+  background: var(--elzei-white);
   font-size: 0.85rem;
 }
 .clear-filters {
@@ -690,7 +705,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
   max-height: 200px;
@@ -746,7 +761,7 @@
 }
 .records-list { padding-left: 1.5rem; }
 .record-card {
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
   padding: 0.5rem;
@@ -758,7 +773,7 @@
 .record-summary { font-size: 0.8rem; color: var(--elzei-gray); }
 .pagination-records { display: flex; justify-content: center; gap: 0.5rem; margin: 0.5rem 0; }
 .pagination-records button {
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -769,7 +784,7 @@
 
 /* Modals */
 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000; backdrop-filter: blur(4px); }
-.modal-container { background: white; border-radius: 20px; max-width: 700px; width:90%; max-height:85vh; overflow-y:auto; box-shadow: var(--shadow-lg); }
+.modal-container { background: var(--elzei-white); border-radius: 20px; max-width: 700px; width:90%; max-height:85vh; overflow-y:auto; box-shadow: var(--shadow-lg); }
 .modal-header { padding:1rem 1.5rem; border-bottom:1px solid var(--elzei-border); display:flex; justify-content:space-between; align-items:center; background:var(--elzei-green-light); border-radius:20px 20px 0 0; }
 .close-btn { background:none; border:none; font-size:1.5rem; cursor:pointer; }
 .detail-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.8rem; padding:1rem; }
@@ -981,7 +996,7 @@
   padding: 0.4rem 0.8rem;
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
-  background: white;
+  background: var(--elzei-white);
   font-size: 0.85rem;
 }
 .clear-filters {
@@ -1039,7 +1054,7 @@
   padding-left: 1.5rem;
 }
 .record-card {
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
   padding: 0.5rem;
@@ -1070,7 +1085,7 @@
   margin: 0.5rem 0;
 }
 .pagination-records button {
-  background: white;
+  background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -1225,7 +1240,7 @@
   backdrop-filter: blur(4px);
 }
 .modal-container {
-  background: white;
+  background: var(--elzei-white);
   border-radius: 20px;
   max-width: 700px;
   width: 90%;
@@ -1282,7 +1297,7 @@
   background: var(--elzei-bg);
 }
 .btn-secondary {
-  background: white;
+  background: var(--elzei-white);
   color: var(--elzei-gray);
   border: 1px solid var(--elzei-border);
   padding: 0.5rem 1rem;
@@ -1314,4 +1329,43 @@
   .prevision-kpis {
     grid-template-columns: 1fr;
   }
+}
+.chart-wrapper {
+  min-height: 280px;
+}
+/* ===== STYLE GLOBAL POUR h3 ===== */
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--elzei-gray-dark);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-left: 3px solid var(--elzei-green);
+  padding-left: 0.8rem;
+  letter-spacing: -0.01em;
+}
+
+/* Variante avec une petite icône (optionnelle) */
+h3 i {
+  color: var(--elzei-green-dark);
+  font-size: 1rem;
+}
+
+/* Version avec un point vert devant (alternative) */
+h3.dot-before {
+  position: relative;
+  padding-left: 1.2rem;
+}
+h3.dot-before::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--elzei-green);
+  border-radius: 50%;
 }

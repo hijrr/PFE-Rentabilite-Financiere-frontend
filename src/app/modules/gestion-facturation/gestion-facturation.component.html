@@ -65,16 +65,31 @@
   </div>
 
   <!-- Barre de recherche avec autocomplete -->
-  <div class="factures-header">
-    <div class="header-title">
-      <div class="header-icon">
-        <i class="fa-solid fa-file-invoice"></i>
-      </div>
-      <h1>Liste des Factures</h1>
-      <span class="factures-count">{{ filteredInvoices.length }} facture(s)</span>
-    </div>
+   <div class="filters-bar">
+  <div class="filter-group">
+    <label><i class="fa-solid fa-hashtag"></i> Référence</label>
+    <input type="text" class="filter-input" placeholder="Réf. facture..." [(ngModel)]="searchRef" (input)="applyFilters()">
+  </div>
 
-    <div class="search-container">
+  <div class="filter-group">
+    <label><i class="fa-solid fa-calendar"></i> Date d'émission</label>
+    <input type="date" class="filter-input" [(ngModel)]="selectedDate" (change)="applyFilters()">
+  </div>
+
+  <div class="filter-group">
+    <label><i class="fa-solid fa-tag"></i> Statut</label>
+    <select class="filter-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+      <option value="">Tous</option>
+      <option value="payee">Payée</option>
+      <option value="attente">En attente</option>
+      <option value="brouillon">Brouillon</option>
+    </select>
+  </div>
+
+  <button class="btn-reset-all" (click)="resetAllFilters()" *ngIf="hasActiveFilters()">
+    <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+  </button>
+   <div class="search-container">
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input type="text" class="search-input" placeholder="Rechercher un client..." [(ngModel)]="searchTerm"
@@ -107,6 +122,17 @@
         {{ getSelectedClientName() }}
       </button>
     </div>
+</div>
+  <div class="factures-header">
+    <div class="header-title">
+      <div class="header-icon">
+        <i class="fa-solid fa-file-invoice"></i>
+      </div>
+      <h1>Liste des Factures</h1>
+      <span class="factures-count">{{ filteredInvoices.length }} facture(s)</span>
+    </div>
+
+
   </div>
 
   <!-- Tableau des factures -->
@@ -295,16 +321,12 @@
             <span class="stat-value">{{ selectedInvoice?.total_ht | number:'1.0-2' }} €</span>
           </div>
           <div class="stat-card">
-            <span class="stat-label">TVA</span>
+            <span class="stat-label">Montant TVA (20%)</span>
             <span class="stat-value">{{ selectedInvoice?.total_tva | number:'1.0-2' }} €</span>
           </div>
           <div class="stat-card">
             <span class="stat-label">Montant TTC</span>
             <span class="stat-value highlight">{{ selectedInvoice?.total_ttc | number:'1.0-2' }} €</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Déjà payé</span>
-            <span class="stat-value">{{ selectedInvoice?.sumpayed | number:'1.0-2' }} €</span>
           </div>
           <div class="stat-card" *ngIf="selectedInvoice?.resteapayer && selectedInvoice.resteapayer != '0'">
             <span class="stat-label">Reste à payer</span>

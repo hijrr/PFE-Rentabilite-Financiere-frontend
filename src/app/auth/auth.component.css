@@ -514,6 +514,72 @@
   }
 }
 
+:host-context(body.dark-theme) .auth-container {
+  background: #020617;
+}
+
+:host-context(body.dark-theme) .auth-card {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: var(--card-shadow);
+}
+
+:host-context(body.dark-theme) .image-content {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+:host-context(body.dark-theme) .elzei-message {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:host-context(body.dark-theme) .logo-main,
+:host-context(body.dark-theme) .logo-sub,
+:host-context(body.dark-theme) .image-title,
+:host-context(body.dark-theme) .word {
+  color: var(--text);
+}
+
+:host-context(body.dark-theme) .word.active {
+  color: #6ee7b7;
+}
+
+:host-context(body.dark-theme) .form-header h2,
+:host-context(body.dark-theme) .form-header p,
+:host-context(body.dark-theme) .input-group label,
+:host-context(body.dark-theme) .message-icon i {
+  color: var(--text);
+}
+
+:host-context(body.dark-theme) .input-field {
+  background: #1f2937;
+  border-color: #334155;
+}
+
+:host-context(body.dark-theme) .input-field:hover,
+:host-context(body.dark-theme) .input-field:focus-within {
+  background: #111827;
+  border-color: #4ade80;
+  box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.35);
+}
+
+:host-context(body.dark-theme) .input-field i {
+  color: #94a3b8;
+}
+
+:host-context(body.dark-theme) .input-field input {
+  color: var(--text);
+}
+
+:host-context(body.dark-theme) .input-field input::placeholder {
+  color: #94a3b8;
+}
+
+:host-context(body.dark-theme) .btn-auth {
+  background: #16a34a;
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
+}
+
 /* Responsive */
 @media (max-width: 968px) {
   .auth-card {
