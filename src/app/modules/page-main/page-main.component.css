@@ -400,6 +400,14 @@
   background: #B91C1C;
   color: #fff;
 }
+:host-context(body.dark-theme) .reset-btn{
+  border-color: #DC2626 !important;
+  background-color: rgba(209, 62, 62, 0.555);  /* légèrement plus marqué sur fond sombre */
+}
+:host-context(body.dark-theme) .reset-btn:hover{
+  border-color: #DC2626 !important;
+  background-color: rgba(99, 11, 11, 0.863);  /* légèrement plus marqué sur fond sombre */
+}
 
 /* =============================================
    ANIMATIONS

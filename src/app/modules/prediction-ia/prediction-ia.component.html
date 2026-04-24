@@ -1,0 +1,85 @@
+<div class="prediction-container">
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-diagram-project"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Projets</span>
+        <span class="kpi-value">{{ data?.kpis?.nb_projets }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card danger">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Projets en risque</span>
+        <span class="kpi-value">{{ data?.kpis?.projets_en_risque }}</span>
+      </div>
+    </div>
+
+    <div class="kpi-card success">
+      <div class="kpi-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="kpi-content">
+        <span class="kpi-label">Marge globale</span>
+        <span class="kpi-value">{{ data?.kpis?.marge_globale_moyenne | number:'1.0-2' }} €</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Boutons de période -->
+  <div class="period-buttons">
+    <button class="btn-period" [class.active]="mois === 3" (click)="changeMois(3)">3 mois</button>
+    <button class="btn-period" [class.active]="mois === 6" (click)="changeMois(6)">6 mois</button>
+  </div>
+
+  <!-- Graphique -->
+  <div class="chart-card">
+    <h3><i class="fa-solid fa-chart-line"></i> Évolution financière</h3>
+    <div class="chart-wrapper">
+      <canvas baseChart
+        [data]="{
+          labels: chartLabels,
+          datasets: [
+            { data: margeData, label: 'Marge (€)', borderColor: '#6FCF97', backgroundColor: 'rgba(111, 207, 151, 0.1)', fill: true, tension: 0.4 },
+            { data: coutData, label: 'Coût (€)', borderColor: '#F59E0B', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.4 },
+            { data: factureData, label: 'Facture (€)', borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4 }
+          ]
+        }"
+        [type]="'line'"
+        [options]="chartOptions">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Liste des projets -->
+  <div class="projects-section">
+    <h2><i class="fa-solid fa-list"></i> Analyse par projet</h2>
+    <div class="projects-grid">
+      <div *ngFor="let p of data?.projets" class="project-card" [class.danger]="isDanger(p)">
+        <div class="project-header">
+          <i class="fa-solid fa-folder-open"></i>
+          <span class="project-name">{{ p.nom }}</span>
+          <span *ngIf="isDanger(p)" class="alert-badge">
+            <i class="fa-solid fa-exclamation-triangle"></i> Risque
+          </span>
+        </div>
+        <div class="project-details">
+          <div class="detail-item">
+            <span class="detail-label">Marge moyenne</span>
+            <span class="detail-value">{{ p.marge_moyenne | number:'1.0-2' }} €</span>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="data?.projets?.length === 0" class="no-data">
+        <i class="fa-solid fa-folder-open"></i>
+        <p>Aucun projet trouvé</p>
+      </div>
+    </div>
+  </div>
+</div>

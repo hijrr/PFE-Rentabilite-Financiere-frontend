@@ -191,31 +191,41 @@ export class GestionProjetComponent implements OnInit {
   }
 
   deleteProjet(id: number): void {
-    Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Cette action est irréversible !",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler',
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.projetservice.deleteProjet(id).subscribe({
-          next: () => {
-            this.loadProjets();
-            Swal.fire('Supprimé !', 'Le projet a été supprimé.', 'success');
-            this.closeModal();
-          },
-          error: (err) => {
-            console.error(err);
-            Swal.fire('Erreur !', 'Une erreur est survenue.', 'error');
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: "Cette action est irréversible !",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Oui, supprimer !',
+    cancelButtonText: 'Annuler',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.projetservice.deleteProjet(id).subscribe({
+        next: () => {
+          this.loadProjets();
+          Swal.fire('Supprimé !', 'Le projet a été supprimé.', 'success');
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error(err);
+
+          let message = 'Une erreur est survenue.';
+
+          // ✅ récupérer message backend
+          if (typeof err.error === 'string') {
+            message = err.error;
+          } else if (err.error?.detail) {
+            message = err.error.detail;
           }
-        });
-      }
-    });
-  }
+
+          Swal.fire('Erreur !', message, 'error');
+        }
+      });
+    }
+  });
+}
 
   changePage(page: number): void {
     if (page >= 1 && page <= this.totalPages) this.currentPage = page;

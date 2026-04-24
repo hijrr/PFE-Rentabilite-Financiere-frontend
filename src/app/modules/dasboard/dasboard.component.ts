@@ -34,6 +34,7 @@ export class DasboardComponent implements OnInit {
       case 'parametres':return 'parametres'
       case 'calculpargroupe': return 'calculParGroupe';
       case'calculparsalaire': return 'calculparsalaire';
+      case'prediction': return 'prediction';
       default: return 'accueil';
     }
   }

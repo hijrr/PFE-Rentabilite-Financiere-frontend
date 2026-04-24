@@ -548,3 +548,81 @@
   .salaries-badges { flex-direction: column; }
   .salarie-badge { width: fit-content; }
 }
+/* ========== BOUTONS – COULEURS IDENTIQUES AU MODE CLAIR ========== */
+:host-context(body.dark-theme) .btn-primary {
+  background: linear-gradient(135deg, #6FCF97 0%, #27AE60 100%) !important;
+  color: white !important;
+  border: none !important;
+}
+:host-context(body.dark-theme) .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #27AE60 0%, #6FCF97 100%) !important;
+}
+
+:host-context(body.dark-theme) .clear-projet {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border: 1px solid #FECACA !important;
+}
+:host-context(body.dark-theme) .clear-projet:hover {
+  background: #DC2626 !important;
+  color: white !important;
+  border-color: #DC2626 !important;
+}
+
+:host-context(body.dark-theme) .remove-file {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border: 1px solid #FECACA !important;
+}
+:host-context(body.dark-theme) .remove-file:hover {
+  background: #DC2626 !important;
+  color: white !important;
+}
+
+:host-context(body.dark-theme) .action-btn {
+  background: white !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+}
+:host-context(body.dark-theme) .action-btn.view:hover {
+  background: #E8F8F0 !important;
+  color: #27AE60 !important;
+  border-color: #6FCF97 !important;
+}
+:host-context(body.dark-theme) .action-btn.edit:hover {
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+  border-color: #2563EB !important;
+}
+:host-context(body.dark-theme) .action-btn.delete:hover {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border-color: #FECACA !important;
+}
+
+:host-context(body.dark-theme) .page-btn {
+  background: white !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+}
+:host-context(body.dark-theme) .page-btn:hover:not(:disabled) {
+  background: #6FCF97 !important;
+  color: white !important;
+  border-color: #27AE60 !important;
+}
+:host-context(body.dark-theme) .page-btn.active {
+  background: #6FCF97 !important;
+  color: white !important;
+  border-color: #27AE60 !important;
+}
+
+:host-context(body.dark-theme) .btn-secondary {
+  background: white !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+}
+:host-context(body.dark-theme) .btn-secondary:hover {
+  background: #E8F8F0 !important;
+  border-color: #6FCF97 !important;
+  color: #27AE60 !important;
+}

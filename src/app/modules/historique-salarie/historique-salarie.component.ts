@@ -127,13 +127,18 @@ historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugi
     this.currentPage = 1;
   }
 
-  loadProjetsForSalarie(salarieId: number): void {
-    this.projetService.getProjetsById(salarieId).subscribe({
-      next: (projets) => { this.projetsSalarie = projets || []; },
-      error: (err) => console.error(err)
-    });
-  }
+loadProjetsForSalarie(salarieId: number): void {
+  this.projetService.getProjetsById(salarieId).subscribe({
+    next: (projets) => {
+      const enAttente = (projets || []).filter(p =>
+        (p.status_paiement || '').toString().trim().toLowerCase() === 'en_attente'
+      );
 
+      this.projetsSalarie = enAttente;
+    },
+    error: (err) => console.error(err)
+  });
+}
   // Recherche projet
   onProjetSearch(): void {
     const term = this.projetSearchTerm.toLowerCase().trim();
@@ -319,55 +324,145 @@ historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugi
   openRecordModal(record: any): void { this.selectedRecord = record; this.showRecordModal = true; }
   closeRecordModal(): void { this.showRecordModal = false; this.selectedRecord = null; }
 
-  // Export CSV
-  exportToCSV(): void {
-    if (!this.selectedProjetObj) return;
-    const recordsToExport = this.filteredHistoriques;
-    if (recordsToExport.length === 0) {
-      alert('Aucun enregistrement à exporter pour ce projet.');
-      return;
-    }
-    const columns = [
-      'date', 'salaireBrut', 'netPayer', 'chargesPatronales', 'repasRestaurant',
-      'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique',
-      'tjm', 'joursTravailles', 'facture', 'paye', 'totalePercu', 'totaleFacture', 'rentabilite'
-    ];
-    const headers = [
-      'Date', 'Salaire brut', 'Net payer', 'Charges patronales', 'Repas restaurant',
-      'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques',
-      'TJM', 'Jours travaillés', 'Facture', 'Payé', 'Total perçu', 'Total facture', 'Rentabilité'
-    ];
-    const rows = recordsToExport.map(record =>
-      columns.map(col => record[col] !== undefined && record[col] !== null ? record[col] : '').join(',')
-    );
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    const fileName = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
-    link.setAttribute('href', url);
-    link.setAttribute('download', fileName);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  private parseYearMonth(dateStr: string): number {
+  if (!dateStr) return 0;
+  return new Date(dateStr + '-01').getTime();
+}
+
+// Export CSV
+exportToCSV(): void {
+  if (!this.selectedProjetObj) return;
+
+  let recordsToExport = [...this.filteredHistoriques];
+
+  if (recordsToExport.length === 0) {
+    alert('Aucun enregistrement à exporter pour ce projet.');
+    return;
   }
 
+  // (optionnel) tri par date ancien → récent
+  recordsToExport.sort((a, b) => {
+    return new Date(a.date + '-01').getTime() - new Date(b.date + '-01').getTime();
+  });
+
+  // ✅ date en PREMIÈRE colonne
+  const columns = [
+    'date',
+    'salaireBrut','netAvantImpot', 'netPayer', 'chargesPatronales', 'repasRestaurant',
+    'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique',
+    'tjm', 'joursTravailles', 'facture', 'paye', 'totalePercu','salaireNetHorsRepas',
+    'totaleFacture', 'rentabilite'
+  ];
+
+  const headers = [
+    'Date',
+    'Salaire brut', 'Net avant impôt', 'Net payer', 'Charges patronales', 'Repas restaurant',
+    'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques',
+    'TJM', 'Jours travaillés', 'Facture', 'Payé', 'Total perçu','Salaire net hors repas',
+    'Total facture', 'Rentabilité'
+  ];
+
+  const rows = recordsToExport.map(record =>
+    columns.map(col =>
+      record[col] !== undefined && record[col] !== null ? record[col] : ''
+    ).join(',')
+  );
+
+  const csvContent = [headers.join(','), ...rows].join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+
+  const fileName = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
+  link.download = fileName;
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+}
   // Prévisions IA
- loadPrevision(projetId: number) {
+
+loadPrevision(projetId: number) {
   this.loadingPrevision = true;
   this.predictionIAService.getPrevisionMarge(projetId).subscribe({
     next: (data) => {
       this.previsionData = data;
-      // Construire le graphique
       const predictions = data.predictions;
+
+      // ── Graphique des prévisions avec intervalles de confiance Prophet ──
       this.lineChartData = {
         labels: predictions.map((p: any) => p.mois),
         datasets: [
+          // Bande de confiance haute (marge_upper)
+          {
+            label: 'Borne haute (€)',
+            data: predictions.map((p: any) => p.marge_upper),
+            borderColor: 'transparent',
+            backgroundColor: 'rgba(111, 207, 151, 0.15)',
+            fill: '+1',   // remplit jusqu'au dataset suivant
+            pointRadius: 0,
+            tension: 0.4,
+          },
+          // Marge centrale si payé
           {
             label: 'Marge si payé (€)',
             data: predictions.map((p: any) => p.marge_si_paye),
+            borderColor: '#6FCF97',
+            backgroundColor: 'rgba(111, 207, 151, 0.1)',
+            fill: false,
+            tension: 0.4,
+            pointBackgroundColor: '#27AE60',
+            pointRadius: 5,
+          },
+          // Bande de confiance basse (marge_lower)
+          {
+            label: 'Borne basse (€)',
+            data: predictions.map((p: any) => p.marge_lower),
+            borderColor: 'transparent',
+            backgroundColor: 'rgba(111, 207, 151, 0.15)',
+            fill: '-1',   // remplit vers le dataset précédent
+            pointRadius: 0,
+            tension: 0.4,
+          },
+          // Marge probable (pondérée par taux_paiement)
+          {
+            label: 'Marge probable (€)',
+            data: predictions.map((p: any) => p.marge_probable),
+            borderColor: '#F2994A',
+            backgroundColor: 'rgba(242, 153, 74, 0.08)',
+            fill: false,
+            tension: 0.4,
+            pointBackgroundColor: '#E2711D',
+            pointRadius: 4,
+            borderDash: [5, 4],
+          },
+          // Marge si non payé
+          {
+            label: 'Marge si non payé (€)',
+            data: predictions.map((p: any) => p.marge_si_non_paye),
+            borderColor: '#FF9800',
+            backgroundColor: 'rgba(255, 152, 0, 0.08)',
+            fill: false,
+            tension: 0.4,
+            pointBackgroundColor: '#F57C00',
+            pointRadius: 4,
+          }
+        ]
+      };
+
+      // ── Historique ────────────────────────────────────────────────────
+      const historique = data.historique;
+      this.historyChartData = {
+        labels: historique.map((h: any) => h.date),
+        datasets: [
+          {
+            label: 'Rentabilité réelle (€)',
+            data: historique.map((h: any) => h.rentabilite),
             borderColor: '#6FCF97',
             backgroundColor: 'rgba(111, 207, 151, 0.1)',
             fill: true,
@@ -375,39 +470,24 @@ historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugi
             pointBackgroundColor: '#27AE60'
           },
           {
-            label: 'Marge si non payé (€)',
-            data: predictions.map((p: any) => p.marge_si_non_paye),
-            borderColor: '#FF9800',
-            backgroundColor: 'rgba(255, 152, 0, 0.1)',
-            fill: true,
+            label: 'Coût réel (€)',
+            data: historique.map((h: any) => h.cout),
+            borderColor: '#EB5757',
+            backgroundColor: 'rgba(235, 87, 87, 0.08)',
+            fill: false,
             tension: 0.4,
-            pointBackgroundColor: '#F57C00'
+            pointBackgroundColor: '#C0392B'
           }
         ]
       };
-      this.loadingPrevision = false;
-      const historique = data.historique;
-this.historyChartData = {
-  labels: historique.map((h: any) => h.date),
-  datasets: [
-    {
-      label: 'Rentabilité réelle (€)',
-      data: historique.map((h: any) => h.rentabilite),
-      borderColor: '#6FCF97',
-      backgroundColor: 'rgba(111, 207, 151, 0.1)',
-      fill: true,
-      tension: 0.4,
-      pointBackgroundColor: '#27AE60'
-    }
-  ]
-};
-    },
 
-      error: (err) => {
-        console.error('Erreur chargement prévisions', err);
-        this.loadingPrevision = false;
-      }
-    });
+      this.loadingPrevision = false;
+    },
+    error: (err) => {
+      console.error('Erreur chargement prévisions', err);
+      this.loadingPrevision = false;
+    }
+  });
 }
   // Changement d'onglet
   setActiveTab(tab: 'historique' | 'previsions') {

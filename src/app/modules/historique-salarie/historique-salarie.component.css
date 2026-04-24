@@ -314,6 +314,7 @@
   background: #DC2626;
   color: white;
 }
+
 .projet-tjm {
   background: var(--elzei-white);
   padding: 0.2rem 0.5rem;
@@ -427,9 +428,11 @@
   cursor: pointer;
   color: var(--elzei-gray);
 }
+
 .close-btn:hover {
   color: #DC2626;
 }
+
 .modal-body {
   padding: 1.5rem;
 }
@@ -1368,4 +1371,104 @@ h3.dot-before::before {
   height: 6px;
   background: var(--elzei-green);
   border-radius: 50%;
+}
+
+/* ========== CORRECTIONS DES BOUTONS EN MODE SOMBRE ========== */
+/* Bouton de fermeture (modal) */
+:host-context(body.dark-theme) .close-btn {
+  background: var(--elzei-white) !important;
+  color: var(--elzei-gray) !important;
+  border: 1px solid var(--elzei-border) !important;
+}
+:host-context(body.dark-theme) .close-btn:hover {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border-color: #FECACA !important;
+}
+
+/* Bouton clear projet / reset filtre */
+:host-context(body.dark-theme) .clear-projet,
+:host-context(body.dark-theme) .clear-filters,
+:host-context(body.dark-theme) .btn-reset-filter {
+  background: var(--elzei-green-light) !important;
+  color: var(--elzei-green-dark) !important;
+  border: 1px solid var(--elzei-green) !important;
+}
+:host-context(body.dark-theme) .clear-projet:hover,
+:host-context(body.dark-theme) .clear-filters:hover,
+:host-context(body.dark-theme) .btn-reset-filter:hover {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border-color: #FECACA !important;
+}
+
+/* Boutons secondaires (ex: Fermer dans modals) */
+:host-context(body.dark-theme) .btn-secondary {
+  background: var(--elzei-white) !important;
+  color: var(--elzei-gray) !important;
+  border: 1px solid var(--elzei-border) !important;
+}
+:host-context(body.dark-theme) .btn-secondary:hover {
+  background: var(--elzei-green-light) !important;
+  border-color: var(--elzei-green) !important;
+  color: var(--elzei-green-dark) !important;
+}
+
+/* Bouton d’export CSV */
+:host-context(body.dark-theme) .btn-export {
+  background: var(--elzei-green-dark) !important;
+  color: white !important;
+  border: none !important;
+}
+:host-context(body.dark-theme) .btn-export:hover {
+  background: var(--elzei-green) !important;
+}
+
+/* Pagination (page-btn) */
+:host-context(body.dark-theme) .page-btn {
+  background: var(--elzei-white) !important;
+  color: var(--elzei-gray) !important;
+  border: 1px solid var(--elzei-border) !important;
+}
+:host-context(body.dark-theme) .page-btn:hover:not(:disabled) {
+  background: var(--elzei-green) !important;
+  color: white !important;
+  border-color: var(--elzei-green-dark) !important;
+}
+:host-context(body.dark-theme) .page-btn.active {
+  background: var(--elzei-green) !important;
+  color: white !important;
+  border-color: var(--elzei-green-dark) !important;
+}
+
+/* Boutons d’action (voir, modifier, supprimer) */
+:host-context(body.dark-theme) .action-btn.view {
+  background: var(--elzei-white) !important;
+  color: var(--elzei-gray) !important;
+  border: 1px solid var(--elzei-border) !important;
+}
+:host-context(body.dark-theme) .action-btn.view:hover {
+  background: var(--elzei-green-light) !important;
+  color: var(--elzei-green-dark) !important;
+  border-color: var(--elzei-green) !important;
+}
+:host-context(body.dark-theme) .action-btn.edit {
+  background: var(--elzei-white) !important;
+  color: var(--elzei-gray) !important;
+  border: 1px solid var(--elzei-border) !important;
+}
+:host-context(body.dark-theme) .action-btn.edit:hover {
+  background: #EFF6FF !important;
+  color: #2563EB !important;
+  border-color: #2563EB !important;
+}
+:host-context(body.dark-theme) .action-btn.delete {
+  background: var(--elzei-white) !important;
+  color: var(--elzei-gray) !important;
+  border: 1px solid var(--elzei-border) !important;
+}
+:host-context(body.dark-theme) .action-btn.delete:hover {
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+  border-color: #FECACA !important;
 }

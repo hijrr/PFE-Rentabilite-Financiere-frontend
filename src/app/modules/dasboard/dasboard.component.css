@@ -51,6 +51,11 @@
   color: #fecaca;
 }
 
+:host-context(body.dark-theme) .nav-link:hover {
+  background: var(--elzei-green-light);
+  color: var(--elzei-green-dark);
+  transform: translateX(4px);
+}
 /* Optionnel : icône et label en rouge au repos */
 :host-context(body.dark-theme) .logout-btn i,
 :host-context(body.dark-theme) .logout-label {
@@ -617,4 +622,100 @@
 .logout-btn:focus-visible {
   outline: 2px solid var(--elzei-green);
   outline-offset: 2px;
+}
+/* ===== SECTIONS DE NAVIGATION ===== */
+.nav-section {
+  margin-top: 1.5rem;
+}
+
+.nav-section:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--elzei-gray-light);
+}
+
+.section-title i {
+  font-size: 0.8rem;
+  color: var(--elzei-green-dark);
+}
+
+.elzei-sidebar.collapsed .section-title {
+  justify-content: center;
+}
+
+.elzei-sidebar.collapsed .section-title i {
+  font-size: 1rem;
+}
+
+.elzei-sidebar.collapsed .section-label {
+  display: none;
+}
+
+/* Ajustement pour les icônes dans les sections réduites */
+.elzei-sidebar.collapsed .section-title {
+  padding: 8px 0;
+}
+
+/* Tooltip pour les titres de section en mode réduit (optionnel) */
+.elzei-sidebar.collapsed .section-title:hover::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--elzei-green-dark);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-left: 10px;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+}
+
+/* Supprimer l'animation de slideIn sur les sections pour éviter les chevauchements */
+.nav-section .nav-item {
+  animation: none;
+}
+/* ===== SECTIONS SANS ICÔNES ===== */
+.nav-section {
+  margin-top: 1.5rem;
+}
+
+.nav-section:first-of-type {
+  margin-top: 0.5rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  margin-bottom: 6px;
+  margin-right: 8px;  /* léger margin-right */
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--elzei-gray-light);
+}
+
+.elzei-sidebar.collapsed .section-title {
+  justify-content: center;
+  margin-right: 0;
+}
+
+.elzei-sidebar.collapsed .section-label {
+  display: none;
 }

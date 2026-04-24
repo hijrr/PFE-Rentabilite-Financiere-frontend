@@ -36,4 +36,16 @@ export class ClientService {
   syncAll(): Observable<any> {
   return this.http.get('http://localhost:8000/syncAll');
 }
+ getDolibarrConfig() {
+    return this.http.get<any>(`http://localhost:8000/config/dolibarr`);
+  }
+
+  saveDolibarrConfig(data: any) {
+    return this.http.post(`http://localhost:8000/config/dolibarr`, data);
+  }
+
+  // 🧨 Reset DB
+  resetDatabase() {
+    return this.http.delete(`http://localhost:8000/reset-db`);
+  }
 }

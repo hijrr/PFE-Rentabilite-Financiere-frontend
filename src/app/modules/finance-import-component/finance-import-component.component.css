@@ -549,3 +549,111 @@
   font-weight: bold;
   box-shadow: var(--shadow-sm);
 }
+/* ========== MODE SOMBRE – IMPORT DE DOCUMENTS ========== */
+:host-context(body.dark-theme) .import-container {
+  background: var(--elzei-white);
+  border-color: var(--elzei-border);
+}
+
+:host-context(body.dark-theme) .document-card {
+  background: var(--elzei-white);
+  border-color: var(--elzei-border);
+}
+
+:host-context(body.dark-theme) .document-card:hover {
+  border-color: var(--elzei-green);
+  box-shadow: var(--shadow-md);
+}
+
+:host-context(body.dark-theme) .card-header .header-icon {
+  background: linear-gradient(135deg, var(--elzei-green-light) 0%, var(--elzei-white) 100%);
+  border-color: var(--elzei-green-light);
+}
+
+:host-context(body.dark-theme) .badge {
+  background: var(--elzei-green-light);
+  color: var(--elzei-green-dark);
+  border-color: var(--elzei-green);
+}
+
+:host-context(body.dark-theme) .card-description {
+  color: var(--elzei-gray);
+}
+
+:host-context(body.dark-theme) .file-label {
+  background: var(--elzei-bg);
+  border-color: var(--elzei-border);
+  color: var(--elzei-gray-dark);
+}
+
+:host-context(body.dark-theme) .file-input-wrapper input[type="file"]:hover + .file-label,
+:host-context(body.dark-theme) .file-input-wrapper input[type="file"]:focus + .file-label {
+  border-color: var(--elzei-green);
+  background: var(--elzei-green-light);
+}
+
+:host-context(body.dark-theme) .upload-text {
+  color: var(--elzei-gray-dark);
+}
+
+:host-context(body.dark-theme) .upload-hint {
+  color: var(--elzei-gray-light);
+}
+
+:host-context(body.dark-theme) .error-message {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+:host-context(body.dark-theme) .btn-primary {
+  background: linear-gradient(135deg, var(--elzei-green) 0%, var(--elzei-green-dark) 100%);
+  color: white;
+}
+
+:host-context(body.dark-theme) .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--elzei-green-dark) 0%, var(--elzei-green) 100%);
+}
+
+:host-context(body.dark-theme) .btn-secondary {
+  background: var(--elzei-white);
+  color: var(--elzei-green-dark);
+  border-color: var(--elzei-green);
+}
+
+:host-context(body.dark-theme) .btn-secondary:hover {
+  background: var(--elzei-green-light);
+  border-color: var(--elzei-green-dark);
+}
+
+:host-context(body.dark-theme) .summary-section {
+  background: linear-gradient(135deg, var(--elzei-white) 0%, var(--elzei-green-light) 100%);
+  border-color: var(--elzei-green);
+}
+
+:host-context(body.dark-theme) .summary-item {
+  background: var(--elzei-white);
+  border-color: var(--elzei-border);
+}
+
+:host-context(body.dark-theme) .summary-item:hover {
+  border-color: var(--elzei-green);
+}
+
+:host-context(body.dark-theme) .item-label {
+  color: var(--elzei-gray);
+}
+
+:host-context(body.dark-theme) .item-value {
+  color: var(--elzei-green-dark);
+}
+
+:host-context(body.dark-theme) .file-info {
+  background: var(--elzei-green-light);
+  border-color: var(--elzei-green);
+}
+
+:host-context(body.dark-theme) .remove-file:hover {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+}

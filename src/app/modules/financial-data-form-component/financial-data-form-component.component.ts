@@ -86,14 +86,22 @@ this.financeForm.get('joursTravailles')?.valueChanges.subscribe(() => this.updat
 }
 
 updateKPI() {
-  const netHorsRepas = this.financeForm.get('netAvantImpot')?.value - (this.financeForm.get('repasRestaurant')?.value || 0);
-  const totalPercu = netHorsRepas +
-                     (this.financeForm.get('repasRestaurant')?.value || 0) +
-                     (this.financeForm.get('totalNoteFrais')?.value || 0) +
-                   Number((this.financeForm.get('totalNoteKilometrique')?.value || 0));
+  const netHorsRepas = Math.round(
+  (Number(this.financeForm.get('netAvantImpot')?.value || 0) -
+   Number(this.financeForm.get('repasRestaurant')?.value || 0)) * 100
+) / 100;
+
+const totalPercu = Math.round(
+  (
+    netHorsRepas +
+    Number(this.financeForm.get('repasRestaurant')?.value || 0) +
+    Number(this.financeForm.get('totalNoteFrais')?.value || 0) +
+    Number(this.financeForm.get('totalNoteKilometrique')?.value || 0)
+  ) * 100
+) / 100;
   const factureTotale = (this.financeForm.get('paye')?.value ? 1 : 0) *
                         (this.financeForm.get('facture')?.value || 0);
-  const rentabilite = factureTotale - totalPercu;
+  const rentabilite = Number((factureTotale - totalPercu).toFixed(2));
   console.log('Calcul des KPI :', { netHorsRepas, totalPercu, factureTotale, rentabilite });
 
   this.kpiForm.patchValue({

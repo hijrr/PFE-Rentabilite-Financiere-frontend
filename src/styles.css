@@ -21,6 +21,7 @@
   --elzei-bg-alt: #F3F4F6;
 }
 
+
 html, body {
   min-height: 100%;
   background: var(--bg);
@@ -137,7 +138,6 @@ body.dark-theme .form-control,
 body.dark-theme .form-group,
 body.dark-theme .form-field,
 body.dark-theme .search-input {
-  background: #1f2937;
   color: var(--text);
   border-color: #334155;
 }
@@ -276,10 +276,9 @@ body.dark-theme .btn-secondary,
 body.dark-theme .btn-icon,
 body.dark-theme .notification-btn,
 body.dark-theme .theme-toggle {
-  background: var(--surface) !important;
-  color: var(--text) !important;
-  border-color: var(--border) !important;
-  box-shadow: none !important;
+  color: var(--text) ;
+  border-color: var(--border) ;
+  box-shadow: none ;
 }
 
 body.dark-theme .action-btn.view:hover,
@@ -293,9 +292,9 @@ body.dark-theme .btn-icon.edit:hover,
 body.dark-theme .btn-icon.delete:hover,
 body.dark-theme .notification-btn:hover,
 body.dark-theme .theme-toggle:hover {
-  background: var(--surface-alt) !important;
-  color: var(--text) !important;
-  border-color: var(--border) !important;
+  background: var(--surface-alt) ;
+  color: var(--text) ;
+  border-color: var(--border) ;
 }
 
 body.dark-theme .status-rentable,
@@ -304,7 +303,10 @@ body.dark-theme .status-pending,
 body.dark-theme .status-low,
 body.dark-theme .alert-success,
 body.dark-theme .alert-error {
-  background: rgba(255,255,255,0.06) !important;
-  color: var(--text) !important;
-  border-color: rgba(255,255,255,0.12) !important;
+  background: rgba(255,255,255,0.06) ;
+  color: var(--text) ;
+  border-color: rgba(255,255,255,0.12) ;
 }
+
+
+

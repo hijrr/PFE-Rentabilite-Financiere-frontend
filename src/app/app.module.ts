@@ -25,6 +25,7 @@ import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gest
 import { NgChartsModule } from 'ng2-charts';
 import { ChatbotComponent } from './modules/chatbot/chatbot.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { PredictionIAComponent } from './modules/prediction-ia/prediction-ia.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,6 +46,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     GestionParPeriodeComponent,
     GestionParSalariesComponent,
     ChatbotComponent,
+    PredictionIAComponent,
   ],
   imports: [
     BrowserModule,

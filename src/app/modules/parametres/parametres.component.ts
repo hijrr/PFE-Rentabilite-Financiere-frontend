@@ -8,90 +8,183 @@ import Swal from 'sweetalert2';
   styleUrls: ['./parametres.component.css']
 })
 export class ParametresComponent implements OnInit {
+
+  // ================= SYNC =================
   isLoading = false;
+  syncMessage: { type: 'success' | 'error'; text: string } | null = null;
+
+  // ================= CONFIG =================
+  dolibarrUrl: string = '';
+  dolibarrApiKey: string = '';
+  isConfigLoading = false;
+  showApiKey = false;
+
   message: { type: 'success' | 'error'; text: string } | null = null;
- // Propriétés pour la gestion des rôles
+
+  // ================= ROLES =================
   roles: any[] = [];
   rolesLoading = false;
+
   currentRoleName = '';
-   currentRoleDescription = '';
+  currentRoleDescription = '';
   editingRoleId: number | null = null;
+
   roleMessage: { type: 'success' | 'error'; text: string } | null = null;
 
-  constructor(private clientservice:ClientService) { }
+  searchRoleTerm: string = '';
+  filteredRoles: any[] = [];
+
+  currentPage: number = 1;
+  pageSize: number = 3;
+  totalPages: number = 1;
+
+  constructor(private clientservice: ClientService) {}
 
   ngOnInit(): void {
     this.loadRoles();
+    this.loadDolibarrConfig();
   }
+
+  // ================= SYNC =================
   syncAll() {
-  this.isLoading = true;
+    this.isLoading = true;
 
-  this.clientservice.syncAll().subscribe({
-    next: (res) => {
-      this.isLoading = false;
-      const clientsCount = res.clients.count;
-      const facturesCount = res.invoices.count;
-      this.message = {
-        type: 'success',
-        text: `Clients synchronisés : ${clientsCount} nouveaux clients importés. | Factures synchronisés  : ${facturesCount} nouveaux factures importés.`
-      };
+    this.clientservice.syncAll().subscribe({
+      next: (res) => {
+        this.isLoading = false;
 
-      setTimeout(() => this.message = null, 5000);
-    },
-    error: (err) => {
-      this.isLoading = false;
+        this.syncMessage = {
+          type: 'success',
+          text: `Clients: ${res.clients.count} | Factures: ${res.invoices.count}`
+        };
 
-      this.message = {
-        type: 'error',
-        text: `Erreur : ${err.error?.detail || err.message}`
-      };
-    }
-  });
-}
-   // --- Gestion des rôles ---
-  loadRoles() {
-    this.rolesLoading = true;
-    this.clientservice.getRoles().subscribe({
-      next: (data) => {
-        this.roles = data || [];
-        this.rolesLoading = false;
+        setTimeout(() => this.syncMessage = null, 5000);
       },
       error: (err) => {
-        console.error(err);
-        this.rolesLoading = false;
-        this.showRoleMessage('error', 'Erreur lors du chargement des rôles');
+        this.isLoading = false;
+
+        this.syncMessage = {
+          type: 'error',
+          text: err.error?.detail || err.message
+        };
       }
     });
   }
 
-   saveRole() {
+  // ================= CONFIG =================
+  loadDolibarrConfig() {
+    this.clientservice.getDolibarrConfig().subscribe({
+      next: (res) => {
+        this.dolibarrUrl = res.url;
+        this.dolibarrApiKey = res.api_key;
+      },
+      error: () => {
+        this.message = {
+          type: 'error',
+          text: 'Impossible de charger la configuration'
+        };
+      }
+    });
+  }
+
+  saveConfig() {
+    if (!this.dolibarrUrl || !this.dolibarrApiKey) {
+      this.message = {
+        type: 'error',
+        text: 'URL et API Key obligatoires'
+      };
+      return;
+    }
+
+    this.isConfigLoading = true;
+
+    this.clientservice.saveDolibarrConfig({
+      url: this.dolibarrUrl,
+      apiKey: this.dolibarrApiKey
+    }).subscribe({
+      next: () => {
+        this.isConfigLoading = false;
+
+        this.message = {
+          type: 'success',
+          text: 'Configuration mise à jour avec succès'
+        };
+      },
+      error: (err) => {
+        this.isConfigLoading = false;
+
+        this.message = {
+          type: 'error',
+          text: err.error?.detail || 'Erreur sauvegarde'
+        };
+      }
+    });
+  }
+
+  // ================= RESET =================
+  resetDatabase() {
+    Swal.fire({
+      title: 'Reset base locale ?',
+      text: 'Tous les clients et factures seront supprimés',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.clientservice.resetDatabase().subscribe({
+          next: () => Swal.fire('Succès', 'Base vidée', 'success'),
+          error: () => Swal.fire('Erreur', 'Impossible de reset', 'error')
+        });
+      }
+    });
+  }
+
+  // ================= ROLES =================
+  loadRoles() {
+    this.rolesLoading = true;
+
+    this.clientservice.getRoles().subscribe({
+      next: (data) => {
+        this.roles = data || [];
+        this.filterRoles();
+        this.rolesLoading = false;
+      },
+      error: () => {
+        this.rolesLoading = false;
+        this.roleMessage = { type: 'error', text: 'Erreur chargement rôles' };
+      }
+    });
+  }
+
+  saveRole() {
     if (!this.currentRoleName.trim()) return;
 
     const roleData = {
       name: this.currentRoleName,
-      description: this.currentRoleDescription || ''
+      description: this.currentRoleDescription
     };
 
     if (this.editingRoleId) {
       this.clientservice.updateRole(this.editingRoleId, roleData).subscribe({
         next: () => {
-          this.showRoleMessage('success', 'Rôle mis à jour avec succès');
+          this.roleMessage = { type: 'success', text: 'Rôle mis à jour' };
           this.resetRoleForm();
           this.loadRoles();
         },
-        error: (err) => {
-          this.showRoleMessage('error', err.error?.detail || 'Erreur lors de la mise à jour');
+        error: () => {
+          this.roleMessage = { type: 'error', text: 'Erreur update rôle' };
         }
       });
     } else {
       this.clientservice.addRole(roleData).subscribe({
         next: () => {
-          this.showRoleMessage('success', 'Rôle ajouté avec succès');
+          this.roleMessage = { type: 'success', text: 'Rôle ajouté' };
           this.resetRoleForm();
           this.loadRoles();
         },
-        error: (err) => {
-          this.showRoleMessage('error', err.error?.detail || 'Erreur lors de l’ajout');
+        error: () => {
+          this.roleMessage = { type: 'error', text: 'Erreur ajout rôle' };
         }
       });
     }
@@ -99,7 +192,7 @@ export class ParametresComponent implements OnInit {
 
   editRole(role: any) {
     this.currentRoleName = role.name;
-    this.currentRoleDescription = role.description || '';
+    this.currentRoleDescription = role.description;
     this.editingRoleId = role.id;
   }
 
@@ -107,58 +200,51 @@ export class ParametresComponent implements OnInit {
     this.resetRoleForm();
   }
 
- deleteRole(id: number) {
-  Swal.fire({
-    title: 'Supprimer ce rôle ?',
-    text: "Attention : ce rôle peut être utilisé par des salariés.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Oui, supprimer',
-    cancelButtonText: 'Annuler',
-    confirmButtonColor: '#d33',
-    cancelButtonColor: '#3085d6'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.clientservice.deleteRole(id).subscribe({
-        next: () => {
-          Swal.fire(
-            'Supprimé !',
-            'Le rôle a été supprimé avec succès.',
-            'success'
-          );
-
-          if (this.editingRoleId === id) this.resetRoleForm();
-          this.loadRoles();
-        },
-        error: (err) => {
-  let message = 'Une erreur est survenue lors de la suppression.';
-
-  // Si le statut 400 ou 409, on donne un message précis
-  if (err.status === 400 || err.status === 409) {
-    message = "Impossible de supprimer ce rôle : il est déjà attribué à un ou plusieurs salariés.";
+  deleteRole(id: number) {
+    Swal.fire({
+      title: 'Supprimer ce rôle ?',
+      icon: 'warning',
+      showCancelButton: true
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.clientservice.deleteRole(id).subscribe({
+          next: () => this.loadRoles(),
+          error: () => Swal.fire('Erreur', 'Suppression impossible', 'error')
+        });
+      }
+    });
   }
 
-  // Priorité au message exact du backend
-  if (err.error?.detail) {
-    message = err.error.detail;
-  }
-
-  Swal.fire('Erreur', message, 'error');
-}
-      });
-    }
-  });
-}
-
-  private resetRoleForm() {
+  resetRoleForm() {
     this.currentRoleName = '';
-     this.currentRoleDescription = '';
+    this.currentRoleDescription = '';
     this.editingRoleId = null;
   }
 
-  private showRoleMessage(type: 'success' | 'error', text: string) {
-    this.roleMessage = { type, text };
-    setTimeout(() => this.roleMessage = null, 5000);
+  // ================= FILTER =================
+  filterRoles() {
+    const term = this.searchRoleTerm.toLowerCase();
+
+    this.filteredRoles = this.roles.filter(r =>
+      r.name?.toLowerCase().includes(term) ||
+      r.description?.toLowerCase().includes(term)
+    );
+
+    this.updatePagination();
   }
 
+  updatePagination() {
+    this.totalPages = Math.max(1, Math.ceil(this.filteredRoles.length / this.pageSize));
+  }
+
+  get paginatedRoles() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    return this.filteredRoles.slice(start, start + this.pageSize);
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
 }

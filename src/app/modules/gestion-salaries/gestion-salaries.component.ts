@@ -322,33 +322,40 @@ export class GestionSalariesComponent implements OnInit {
       });
     }
   }
+deleteSalarie(id: number): void {
+  Swal.fire({
+    title: 'Êtes-vous sûr ?',
+    text: 'Cette action est irréversible !',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Oui, supprimer !',
+    cancelButtonText: 'Annuler',
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.salarieService.deleteSalarie(id).subscribe({
+        next: () => {
+          this.loadSalaries();
+          Swal.fire('Supprimé !', 'Le salarié a été supprimé.', 'success');
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error(err);
 
-  deleteSalarie(id: number): void {
-    Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: 'Cette action est irréversible !',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler',
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.salarieService.deleteSalarie(id).subscribe({
-          next: () => {
-            this.loadSalaries();
-            Swal.fire('Supprimé !', 'Le salarié a été supprimé.', 'success');
-            this.closeModal();
-          },
-          error: (err) => {
-            console.error(err);
-            Swal.fire('Erreur !', 'Une erreur est survenue.', 'error');
+          let message = 'Une erreur est survenue.';
+
+          // ✅ récupérer message backend
+          if (err.error?.detail) {
+            message = err.error.detail;
           }
-        });
-      }
-    });
-  }
+
+          Swal.fire('Erreur !', message, 'error');
+        }
+      });
+    }
+  });
+}
 
   getAvatarClass(salarie: Salarie): string {
     if (!salarie || !salarie.username) return 'avatar-default';

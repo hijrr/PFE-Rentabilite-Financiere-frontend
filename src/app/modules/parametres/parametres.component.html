@@ -1,4 +1,6 @@
 <div class="param-page">
+
+  <!-- EN-TÊTE -->
   <div class="param-header">
     <div class="header-title">
       <div class="header-icon">
@@ -6,9 +8,58 @@
       </div>
       <h1>Paramètres</h1>
     </div>
-    <!-- Optionnel : header-actions -->
   </div>
 
+  <!-- ==================== SECTION CONFIGURATION DOLIBARR ==================== -->
+  <div class="config-container">
+    <div class="config-header">
+      <div class="header-icon">
+        <i class="fas fa-plug"></i>
+      </div>
+      <div class="header-title">
+        <h2>Configuration Dolibarr</h2>
+        <p>Définissez l’URL et la clé API pour la connexion à Dolibarr</p>
+      </div>
+    </div>
+
+    <div class="config-card">
+      <div class="form-group">
+        <label for="dolibarrUrl">Base URL Dolibarr</label>
+        <input type="text" id="dolibarrUrl" [(ngModel)]="dolibarrUrl"
+               placeholder="https://mon-dolibarr.com/api/index.php"
+               class="form-control">
+        <small>Exemple : https://alwafa-conseil.com/dolibarr/api/index.php</small>
+      </div>
+
+      <div class="form-group">
+        <label for="apiKey">Clé API Dolibarr</label>
+        <div class="password-wrapper">
+          <input [type]="showApiKey ? 'text' : 'password'" id="apiKey"
+                 [(ngModel)]="dolibarrApiKey"
+                 placeholder="Votre clé API"
+                 class="form-control">
+          <button type="button" class="toggle-password" (click)="showApiKey = !showApiKey">
+            <i class="fas" [ngClass]="showApiKey ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </button>
+        </div>
+        <small>Clé d’authentification Dolibarr</small>
+      </div>
+
+      <div class="config-actions">
+        <button class="btn-primary" (click)="saveConfig()" [disabled]="isConfigLoading">
+          <i class="fas" [ngClass]="isConfigLoading ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+          {{ isConfigLoading ? 'Sauvegarde...' : 'Enregistrer la configuration' }}
+        </button>
+      </div>
+
+      <div *ngIf="message" class="alert" [ngClass]="{'alert-success': message.type === 'success', 'alert-error': message.type === 'error'}">
+        <i [ngClass]="{'fa-check-circle': message.type === 'success', 'fa-exclamation-circle': message.type === 'error'}"></i>
+        {{ message.text }}
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECTION SYNCHRONISATION ==================== -->
   <div class="sync-container">
     <div class="sync-header">
       <div class="header-icon">
@@ -16,29 +67,31 @@
       </div>
       <div class="header-title">
         <h2>Synchronisation Dolibarr</h2>
-        <p>Récupérer les données depuis Dolibarr vers la base locale.</p>
+        <p>Récupérer les données depuis Dolibarr vers la base locale</p>
       </div>
     </div>
 
+    <div class="sync-actions">
+      <button class="btn-primary" (click)="syncAll()" [disabled]="isLoading">
+        <i class="fas" [ngClass]="{
+          'fa-cloud-upload-alt': !isLoading,
+          'fa-spinner fa-pulse': isLoading
+        }"></i>
+        {{ isLoading ? 'Synchronisation en cours...' : 'Synchroniser clients & factures' }}
+      </button>
 
-    <div class="actions">
-  <button class="btn-primary" (click)="syncAll()" [disabled]="isLoading">
-    <i class="fas"
-       [ngClass]="{
-         'fa-cloud-upload-alt': !isLoading,
-         'fa-spinner fa-pulse': isLoading
-       }"></i>
-
-    {{ isLoading ? 'Synchronisation en cours...' : 'Synchroniser clients & factures' }}
-  </button>
-</div>
-
-      <div *ngIf="message" class="alert" [ngClass]="{'alert-success': message.type === 'success', 'alert-error': message.type === 'error'}">
-        <i [ngClass]="{'fa-check-circle': message.type === 'success', 'fa-exclamation-circle': message.type === 'error'}"></i>
-        {{ message.text }}
-      </div>
+      <button class="btn-danger" (click)="resetDatabase()">
+        <i class="fas fa-trash-alt"></i> Vider la base locale
+      </button>
     </div>
-    <!-- Nouvelle section : Gestion des rôles -->
+
+    <div *ngIf="syncMessage" class="alert" [ngClass]="{'alert-success': syncMessage.type === 'success', 'alert-error': syncMessage.type === 'error'}">
+      <i [ngClass]="{'fa-check-circle': syncMessage.type === 'success', 'fa-exclamation-circle': syncMessage.type === 'error'}"></i>
+      {{ syncMessage.text }}
+    </div>
+  </div>
+
+  <!-- ==================== SECTION GESTION DES RÔLES ==================== -->
   <div class="roles-container">
     <div class="roles-header">
       <div class="header-icon">
@@ -46,7 +99,7 @@
       </div>
       <div class="header-title">
         <h2>Gestion des rôles</h2>
-        <p>Ajouter, modifier ou supprimer les rôles utilisateurs.</p>
+        <p>Ajouter, modifier ou supprimer les rôles utilisateurs</p>
       </div>
     </div>
 
@@ -57,47 +110,59 @@
           <label for="roleName">Nom du rôle</label>
           <input type="text" id="roleName" [(ngModel)]="currentRoleName" class="form-control" placeholder="Ex: Administrateur">
         </div>
-         <div class="form-group">
-    <label for="roleDescription">Description</label>
-    <textarea id="roleDescription" [(ngModel)]="currentRoleDescription" class="form-control" rows="3" placeholder="Description du rôle (ex: Gère les utilisateurs et les paramètres)"></textarea>
-  </div>
+        <div class="form-group">
+          <label for="roleDescription">Description</label>
+          <textarea id="roleDescription" [(ngModel)]="currentRoleDescription" class="form-control" rows="3" placeholder="Description du rôle (ex: Gère les utilisateurs et les paramètres)"></textarea>
+        </div>
         <div class="form-actions">
           <button class="btn-primary" (click)="saveRole()" [disabled]="!currentRoleName">
-            <i class="fas fa-save"></i>
-            {{ editingRoleId ? 'Mettre à jour' : 'Enregistrer' }}
+            <i class="fas fa-save"></i> {{ editingRoleId ? 'Mettre à jour' : 'Enregistrer' }}
           </button>
           <button *ngIf="editingRoleId" class="btn-secondary" (click)="cancelEdit()">Annuler</button>
         </div>
       </div>
 
-      <!-- Liste des rôles existants -->
+      <!-- Barre de recherche -->
+      <div class="search-role">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Rechercher un rôle..." [(ngModel)]="searchRoleTerm" (input)="filterRoles()">
+      </div>
+
+      <!-- Liste des rôles -->
       <div class="roles-list">
         <h3>Rôles existants</h3>
         <div *ngIf="rolesLoading" class="loading-spinner">
           <i class="fas fa-spinner fa-pulse"></i> Chargement...
         </div>
-        <div *ngIf="!rolesLoading && roles.length === 0" class="no-data">
-          Aucun rôle trouvé.
-        </div>
-        <div *ngFor="let role of roles" class="role-item">
+        <div *ngIf="!rolesLoading && roles.length === 0" class="no-data">Aucun rôle trouvé.</div>
+        <div *ngFor="let role of paginatedRoles" class="role-item">
           <div class="role-info">
             <span class="role-name">{{ role.name }}</span>
             <span class="role-id">ID: {{ role.id }}</span>
+            <p *ngIf="role.description" class="role-description">{{ role.description }}</p>
           </div>
           <div class="role-actions">
-            <button class="btn-icon edit" (click)="editRole(role)" title="Modifier">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn-icon delete" (click)="deleteRole(role.id)" title="Supprimer">
-              <i class="fas fa-trash-alt"></i>
-            </button>
+            <button class="btn-icon edit" (click)="editRole(role)" title="Modifier"><i class="fas fa-edit"></i></button>
+            <button class="btn-icon delete" (click)="deleteRole(role.id)" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
       </div>
-<div *ngIf="roleMessage" class="alert" [ngClass]="{'alert-success': roleMessage.type === 'success', 'alert-error': roleMessage.type === 'error'}">
+
+      <!-- Pagination -->
+      <div class="pagination-roles" *ngIf="filteredRoles.length > pageSize">
+        <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
+        <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div *ngIf="roleMessage" class="alert" [ngClass]="{'alert-success': roleMessage.type === 'success', 'alert-error': roleMessage.type === 'error'}">
         <i [ngClass]="{'fa-check-circle': roleMessage.type === 'success', 'fa-exclamation-circle': roleMessage.type === 'error'}"></i>
         {{ roleMessage.text }}
       </div>
     </div>
-     </div>
   </div>
+</div>

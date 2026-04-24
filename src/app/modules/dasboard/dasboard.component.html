@@ -1,9 +1,10 @@
 <aside class="elzei-sidebar" [class.collapsed]="isCollapsed">
 
+  <!-- LOGO & TOGGLE -->
   <div class="sidebar-logo">
     <div class="logo">
-     <img src="assets/logo.webp" alt="Elzei Consulting" class="logo-img" />
-      <span class="logo-text" [class.hidden]="isCollapsed">elzei consulting</span>
+      <img src="assets/logo.webp" alt="Elzei Consulting" class="logo-img" />
+      <span class="logo-text">elzei consulting</span>
     </div>
     <button class="toggle-btn" (click)="toggleMenu()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -12,10 +13,10 @@
     </button>
   </div>
 
-
+  <!-- PROFIL UTILISATEUR -->
   <div class="sidebar-profile">
     <div class="profile-avatar">
-     <span>{{ getInitial(user?.username ?? '') }}</span>
+      <span>{{ getInitial(user?.username ?? '') }}</span>
     </div>
     <div class="profile-info">
       <span class="profile-name">{{ user?.username }}</span>
@@ -23,156 +24,123 @@
     </div>
   </div>
 
-
+  <!-- NAVIGATION PAR CATÉGORIES -->
   <nav class="sidebar-nav">
-   <ul class="nav-list">
-    <li class="nav-item"
-      [class.active]="activeItem === 'accueil'">
 
-      <a class="nav-link"
-         (click)="setActive('accueil')"routerLink="Accueil" >
+    <!-- ACCUEIL -->
+    <ul class="nav-list">
+      <li class="nav-item" [class.active]="activeItem === 'accueil'">
+        <a class="nav-link" (click)="setActive('accueil')" routerLink="Accueil">
+          <i class="nav-icon fa-solid fa-house"></i>
+          <span class="nav-label">Accueil</span>
+        </a>
+      </li>
+    </ul>
 
-        <i class="nav-icon fa-solid fa-house"></i>
+    <!-- SECTION GESTION -->
+    <div class="nav-section">
+      <div class="section-title">
+        <span class="section-label">Gestion</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item" [class.active]="activeItem === 'salaries'">
+          <a class="nav-link" (click)="setActive('salaries')" routerLink="Salaries">
+            <i class="fa-solid fa-people-group"></i>
+            <span class="nav-label">Salariés</span>
+          </a>
+        </li>
+        <li class="nav-item" [class.active]="activeItem === 'Clients'">
+          <a class="nav-link" (click)="setActive('Clients')" routerLink="Clients">
+            <i class="nav-icon fa-solid fa-users"></i>
+            <span class="nav-label">Clients</span>
+          </a>
+        </li>
+        <li class="nav-item" [class.active]="activeItem === 'projets'">
+          <a class="nav-link" (click)="setActive('projets')" routerLink="Projets">
+            <i class="fa-solid fa-folder"></i>
+            <span class="nav-label">Projets</span>
+          </a>
+        </li>
+        <li class="nav-item" [class.active]="activeItem === 'Facturation'">
+          <a class="nav-link" (click)="setActive('Facturation')" routerLink="Facturation">
+            <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
+            <span class="nav-label">Facturation</span>
+          </a>
+        </li>
+        <li class="nav-item" [class.active]="activeItem === 'historique'">
+          <a class="nav-link" (click)="setActive('historique')" routerLink="Historique">
+            <i class="fa fa-history"></i>
+            <span class="nav-label">Historique Salarié</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-        <span class="nav-label">Accueil</span>
+    <!-- SECTION CALCULS -->
+    <div class="nav-section">
+      <div class="section-title">
+        <span class="section-label">Calculs</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item" [class.active]="activeItem === 'calcul'">
+          <a class="nav-link" (click)="setActive('calcul')" routerLink="Calcul">
+            <i class="nav-icon fa-solid fa-chart-column"></i>
+            <span class="nav-label">Rentabilité mensuelle</span>
+          </a>
+        </li>
+        <li class="nav-item" [class.active]="activeItem === 'calculparsalaire'">
+          <a class="nav-link" (click)="setActive('calculparsalaire')" routerLink="CalculParSalaire">
+            <i class="fas fa-user-tie"></i>
+            <span class="nav-label">Rentabilité par salarié</span>
+          </a>
+        </li>
+        <li class="nav-item" [class.active]="activeItem === 'calculParGroupe'">
+          <a class="nav-link" (click)="setActive('calculParGroupe')" routerLink="CalculParGroupe">
+            <i class="fas fa-user-friends"></i>
+            <span class="nav-label">Rentabilité par groupe</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-      </a>
-    </li>
-  </ul>
-  <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'salaries'">
+    <!-- SECTION IA -->
+    <div class="nav-section">
+      <div class="section-title">
+        <span class="section-label">Intelligence Artificielle</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item" [class.active]="activeItem === 'prediction'">
+          <a class="nav-link" (click)="setActive('prediction')" routerLink="prediction">
+            <i class="fas fa-robot"></i>
+            <span class="nav-label">Prédiction IA</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-      <a class="nav-link"
-         (click)="setActive('salaries')" routerLink="Salaries">
+    <!-- SECTION PARAMÈTRES -->
+    <div class="nav-section">
+      <div class="section-title">
+        <span class="section-label">Configuration</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item" [class.active]="activeItem === 'parametres'">
+          <a class="nav-link" (click)="setActive('parametres')" routerLink="Parametres">
+            <i class="fa-solid fa-gear"></i>
+            <span class="nav-label">Paramètres</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    <i class="fa-solid fa-people-group"></i>
-
-        <span class="nav-label">salariés</span>
-
-      </a>
-    </li>
-  </ul>
-   <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'Clients'">
-
-      <a class="nav-link"
-         (click)="setActive('Clients')" routerLink="Clients">
-
-        <i class="nav-icon fa-solid fa-users"></i>
-
-        <span class="nav-label"> Clients</span>
-
-      </a>
-    </li>
-  </ul>
-   <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'projets'">
-
-      <a class="nav-link"
-         (click)="setActive('projets')" routerLink="Projets">
-
-        <i class="fa-solid fa-folder"></i>
-
-        <span class="nav-label"> Projets</span>
-
-      </a>
-    </li>
-  </ul>
-<ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'calcul'">
-
-      <a class="nav-link"
-         (click)="setActive('calcul')" routerLink="Calcul">
-
-        <i class="nav-icon fa-solid fa-chart-column"></i>
-
-        <span class="nav-label">Calcul rentabilité mensuelle</span>
-
-      </a>
-    </li>
-  </ul>
-  <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'historique'">
-
-      <a class="nav-link"
-         (click)="setActive('historique')" routerLink="Historique">
-
-      <i class="fa fa-history"></i>
-
-        <span class="nav-label">Historique Salarié</span>
-
-      </a>
-    </li>
-  </ul>
-  <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'calculparsalaire'">
-
-      <a class="nav-link"
-         (click)="setActive('calculparsalaire')" routerLink="CalculParSalaire">
-
-      <i class="fas fa-user-tie"></i>
-
-        <span class="nav-label">Calcul rentabilité par salarié</span>
-
-      </a>
-    </li>
-  </ul>
-
-  <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'Facturation'">
-
-      <a class="nav-link"
-         (click)="setActive('Facturation')" routerLink="Facturation">
-
-        <i class="nav-icon fa-solid fa-file-invoice-dollar"></i>
-
-        <span class="nav-label">Facturation</span>
-
-      </a>
-    </li>
-  </ul>
-     <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem ==='calculParGroupe'">
-
-      <a class="nav-link"
-         (click)="setActive('calculParGroupe')" routerLink="CalculParGroupe">
-
-<i class="fas fa-user-friends"></i>
-
-        <span class="nav-label">Calcul rentabilité par groupe</span>
-
-      </a>
-    </li>
-  </ul>
   </nav>
 
-
+  <!-- DÉCONNEXION -->
   <div class="sidebar-footer">
-    <ul class="nav-list">
-    <li class="nav-item"
-        [class.active]="activeItem === 'parametres'">
-
-      <a class="nav-link"
-         (click)="setActive('parametres')" routerLink="Parametres">
-
-        <i class="fa-solid fa-gear"></i>
-
-        <span class="nav-label">Paramétres</span>
-
-      </a>
-    </li>
-  </ul>
     <button class="logout-btn" (click)="authService.logout()">
-       <i class="fa-solid fa-right-from-bracket"></i>
+      <i class="fa-solid fa-right-from-bracket"></i>
       <span class="logout-label">Déconnexion</span>
     </button>
   </div>
+
 </aside>

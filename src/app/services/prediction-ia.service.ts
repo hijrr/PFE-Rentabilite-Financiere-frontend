@@ -11,4 +11,9 @@ export class PredictionIAService {
    getPrevisionMarge(projetId: number): Observable<any> {
     return this.http.get(`http://localhost:8000/prevision-marge/projet/${projetId}`);
   }
+   getDashboardIA(mois: number = 6): Observable<any> {
+    return this.http.get(
+      `http://localhost:8000/dashboard-ai?mois=${mois}`
+    );
+  }
 }
