@@ -1,0 +1,141 @@
+<div class="np-root">
+
+  <!-- Header -->
+  <div class="np-header">
+    <div class="np-header__left">
+      <div class="np-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Notifications</h1>
+        <p>{{ nonLuesCount }} non lue{{ nonLuesCount > 1 ? 's' : '' }} · {{ all.length }} au total</p>
+      </div>
+    </div>
+    <div class="np-header__actions">
+      <button class="np-btn np-btn--ghost" (click)="checkNow()" [disabled]="checking">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        {{ checking ? 'Analyse…' : 'Analyser maintenant' }}
+      </button>
+      <button class="np-btn np-btn--ghost" (click)="markAllRead()" *ngIf="nonLuesCount > 0">Tout marquer lu</button>
+      <button class="np-btn np-btn--danger" (click)="clearRead()">Supprimer les lues</button>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="np-filters">
+    <div class="np-filter-group">
+      <label>Type</label>
+      <div class="np-pills">
+        <button class="np-pill" [class.np-pill--active]="filterType==='tous'"          (click)="setFilter('filterType','tous')">Tous</button>
+        <button class="np-pill" [class.np-pill--active]="filterType==='alerte'"        (click)="setFilter('filterType','alerte')">Alertes</button>
+        <button class="np-pill" [class.np-pill--active]="filterType==='recommandation'" (click)="setFilter('filterType','recommandation')">Recommandations IA</button>
+      </div>
+    </div>
+    <div class="np-filter-group">
+      <label>Niveau</label>
+      <div class="np-pills">
+        <button class="np-pill"                  [class.np-pill--active]="filterNiveau==='tous'"    (click)="setFilter('filterNiveau','tous')">Tous</button>
+        <button class="np-pill np-pill--danger"  [class.np-pill--active]="filterNiveau==='danger'"  (click)="setFilter('filterNiveau','danger')">Danger</button>
+        <button class="np-pill np-pill--warning" [class.np-pill--active]="filterNiveau==='warning'" (click)="setFilter('filterNiveau','warning')">Avertissement</button>
+        <button class="np-pill np-pill--info"    [class.np-pill--active]="filterNiveau==='info'"    (click)="setFilter('filterNiveau','info')">Info</button>
+      </div>
+    </div>
+    <div class="np-filter-group">
+      <label>Statut</label>
+      <div class="np-pills">
+        <button class="np-pill" [class.np-pill--active]="filterLu==='tous'"   (click)="setFilter('filterLu','tous')">Tous</button>
+        <button class="np-pill" [class.np-pill--active]="filterLu==='non-lu'" (click)="setFilter('filterLu','non-lu')">Non lus</button>
+        <button class="np-pill" [class.np-pill--active]="filterLu==='lu'"     (click)="setFilter('filterLu','lu')">Lus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste -->
+  <div class="np-list">
+
+    <div *ngIf="filtered.length === 0" class="np-empty">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <p>Aucune notification pour ces filtres</p>
+    </div>
+
+    <div *ngFor="let n of filtered"
+         class="np-card"
+         [class.np-card--unread]="!n.lu"
+         [class.np-card--danger]="n.niveau==='danger'"
+         [class.np-card--warning]="n.niveau==='warning'"
+         [class.np-card--expanded]="expandedId === n.id">
+
+      <div class="np-card__main" (click)="toggleExpand(n.id)">
+
+        <!-- Icône -->
+        <div class="np-card__icon" [class.np-card__icon--danger]="n.niveau==='danger'" [class.np-card__icon--warning]="n.niveau==='warning'" [class.np-card__icon--info]="n.niveau==='info'">
+          <svg *ngIf="n.niveau==='danger'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <svg *ngIf="n.niveau==='warning'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <svg *ngIf="n.niveau==='info'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12z"/>
+          </svg>
+        </div>
+
+        <!-- Contenu -->
+        <div class="np-card__body">
+          <div class="np-card__top">
+            <span class="np-card__titre">{{ n.titre }}</span>
+            <div class="np-card__badges">
+              <span class="np-badge" [class.np-badge--danger]="n.niveau==='danger'" [class.np-badge--warning]="n.niveau==='warning'" [class.np-badge--info]="n.niveau==='info'">
+                {{ n.niveau }}
+              </span>
+              <span class="np-badge np-badge--ia" *ngIf="n.type==='recommandation'">IA</span>
+              <span class="np-badge np-badge--unread" *ngIf="!n.lu">Nouveau</span>
+            </div>
+          </div>
+          <div class="np-card__msg">{{ n.message }}</div>
+          <div class="np-card__meta">
+            <span class="np-card__projet" *ngIf="n.projet_nom">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              {{ n.projet_nom }}
+            </span>
+            <span class="np-card__date">{{ n.date | date:'d MMMM yyyy · HH:mm' }}</span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="np-card__actions">
+          <button class="np-card__btn" (click)="markRead(n.id); $event.stopPropagation()" *ngIf="!n.lu" title="Marquer comme lu">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="np-card__btn np-card__btn--chevron" title="Voir l'analyse">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 [style.transform]="expandedId===n.id ? 'rotate(90deg)' : ''">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recommandation IA dépliée -->
+      <div class="np-card__ia" *ngIf="expandedId === n.id && n.recommandation">
+        <div class="np-card__ia-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12z"/>
+          </svg>
+          Analyse IA · Groq LLaMA
+        </div>
+        <div class="np-card__ia-body" [innerHTML]="n.recommandation"></div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -61,7 +61,7 @@
   <button class="btn-reset-filters" (click)="resetFilters()" *ngIf="hasActiveFilters()">
     <i class="fa-solid fa-rotate-left"></i> Réinitialiser
   </button>
-      <button class="btn-add" (click)="openAddModal()">
+      <button class="btn-add" (click)="openAddModal()" *ngIf="authService.isAdmin()">
         <i class="fa-solid fa-plus"></i>
         Ajouter un projet
       </button>
@@ -86,7 +86,7 @@
           <th>TJM</th>
           <th>Marge Cible</th>
           <th>Statut paiement</th>
-          <th>Actions</th>
+          <th *ngIf="authService.isAdmin()">Actions</th>
         </tr>
       </thead>
 
@@ -119,7 +119,7 @@
             </span>
           </td>
 
-          <td class="actions-cell">
+          <td class="actions-cell" *ngIf="authService.isAdmin()">
 
             <button
               class="action-btn view"

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject, Observable } from 'rxjs';
 export interface UserOut {
   id: number;
@@ -30,5 +31,16 @@ export class AuthService {
   this.loggedIn.next(false);              // notifie tous les abonnés
 
    this.router.navigate(['/login']);
+}
+getRole(): string | null {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  const decoded: any = jwtDecode(token);
+  return decoded?.role;
+}
+
+isAdmin(): boolean {
+  return this.getRole() === 'admin';
 }
 }

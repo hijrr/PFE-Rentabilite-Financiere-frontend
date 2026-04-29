@@ -1,279 +1,398 @@
-<div class="historique-container">
-  <!-- En-tête -->
-  <div class="histo-header">
-    <div class="header-title">
-      <div class="header-icon">
-        <i class="fa fa-chart-line"></i>
+<div class="hs-root">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="hs-sidebar">
+    <div class="hs-sidebar__head">
+      <div class="hs-sidebar__logo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
-      <div>
-        <h1>Suivi financier des salariés</h1>
-        <p>Consultez l'historique des fiches de paie, notes de frais et projections IA</p>
+      <span class="hs-sidebar__title">Salariés</span>
+      <span class="hs-badge">{{ filteredSalaries.length }}</span>
+    </div>
+
+    <div class="hs-search">
+      <svg class="hs-search__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="hs-search__input" type="text" [(ngModel)]="searchTerm" placeholder="Rechercher…" (input)="currentPage = 1" />
+    </div>
+
+    <div class="hs-emp-list">
+      <div *ngIf="isLoading" class="hs-loader">
+        <div class="hs-loader__spin"></div>
+        <span>Chargement…</span>
+      </div>
+      <div *ngIf="!isLoading && filteredSalaries.length === 0" class="hs-empty-small">Aucun résultat</div>
+
+      <div *ngFor="let s of paginatedSalaries"
+           class="hs-emp-card"
+           [class.hs-emp-card--active]="selectedSalarie?.id === s.id"
+           (click)="selectSalarie(s)">
+        <div class="hs-avatar" [class]="'hs-avatar--' + (s.username?.charAt(0)?.toLowerCase() || 'z')">
+          {{ (s.username | slice:0:1) }}{{ s.username.split(' ')[1]?.[0] || '' }}
+        </div>
+        <div class="hs-emp-info">
+          <div class="hs-emp-name">{{ s.username }}</div>
+          <div class="hs-emp-role">{{ s.role }}</div>
+        </div>
+        <div class="hs-emp-arrow">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Barre de recherche salarié -->
-  <div class="search-wrapper">
-    <i class="fas fa-search search-icon"></i>
-    <input type="text" [(ngModel)]="searchTerm" placeholder="Rechercher un salarié (nom, email)..." class="search-input" (input)="currentPage = 1" />
-  </div>
+    <div class="hs-pagination" *ngIf="filteredSalaries.length > pageSize">
+      <button class="hs-page-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="hs-page-info">{{ currentPage }} / {{ totalPages }}</span>
+      <button class="hs-page-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </aside>
 
-  <div class="content-split">
-    <!-- Colonne gauche : liste des salariés -->
-    <div class="employees-panel">
-      <div class="panel-header">
-        <h2><i class="fas fa-users"></i> Salariés</h2>
-        <span class="badge">{{ filteredSalaries.length }}</span>
-      </div>
-      <div class="employees-list">
-        <div *ngIf="isLoading" class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Chargement...</div>
-        <div *ngIf="!isLoading && filteredSalaries.length === 0" class="no-data">Aucun salarié trouvé.</div>
-        <div *ngFor="let s of paginatedSalaries" class="employee-card" [class.selected]="selectedSalarie?.id === s.id" (click)="selectSalarie(s)">
-          <div class="avatar" [class]="'avatar-' + (s.username?.charAt(0)?.toLowerCase() || 'default')">
-            {{ (s.username | slice:0:1) + (s.username.split(' ')[1]?.[0] || '') }}
-          </div>
-          <div class="employee-info">
-            <div class="employee-name">{{ s.username }}</div>
-            <div class="employee-role">{{ s.role }}</div>
-            <div class="employee-email">{{ s.email }}</div>
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="hs-main" *ngIf="selectedSalarie; else noSel">
+
+    <!-- Header -->
+    <div class="hs-main__header">
+      <div class="hs-main__identity">
+        <div class="hs-avatar hs-avatar--lg" [class]="'hs-avatar--' + (selectedSalarie.username?.charAt(0)?.toLowerCase() || 'z')">
+          {{ (selectedSalarie.username | slice:0:1) }}{{ selectedSalarie.username.split(' ')[1]?.[0] || '' }}
+        </div>
+        <div>
+          <div class="hs-main__name">{{ selectedSalarie.username }}</div>
+          <div class="hs-main__sub">
+            <span *ngIf="selectedProjetObj">{{ selectedProjetObj.nom }}</span>
+            <span *ngIf="!selectedProjetObj">{{ selectedSalarie.role }}</span>
+            <span *ngIf="selectedProjetObj" class="hs-dot-sep">·</span>
+            <span *ngIf="selectedProjetObj">TJM {{ selectedProjetObj.tjm }} €</span>
           </div>
         </div>
       </div>
-      <div class="pagination-bar" *ngIf="filteredSalaries.length > pageSize">
-        <button class="pagination-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1"><i class="fas fa-chevron-left"></i></button>
-        <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
-        <button class="pagination-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===totalPages"><i class="fas fa-chevron-right"></i></button>
-      </div>
-    </div>
-
-    <!-- Colonne droite : détails -->
-    <div class="history-panel" *ngIf="selectedSalarie; else noSelection">
-      <!-- Onglets -->
-      <div class="tabs">
-        <button class="tab-btn" [class.active]="activeTab === 'historique'" (click)="setActiveTab('historique')">
-          <i class="fas fa-history"></i> Historique
+      <div class="hs-tab-group">
+        <button class="hs-tab" [class.hs-tab--active]="activeTab === 'historique'" (click)="setActiveTab('historique')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Historique
         </button>
-        <button class="tab-btn" [class.active]="activeTab === 'previsions'" (click)="setActiveTab('previsions')">
-          <i class="fas fa-chart-line"></i> Prévisions IA
+        <button class="hs-tab" [class.hs-tab--active]="activeTab === 'previsions'" (click)="setActiveTab('previsions')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Prévisions IA
         </button>
       </div>
+    </div>
 
-      <!-- ==================== CONTENU HISTORIQUE ==================== -->
-      <div *ngIf="activeTab === 'historique'">
-        <!-- En-tête statistiques -->
-        <div class="stats-header">
-          <div class="stats-row">
-            <div class="stat-item"><i class="fas fa-calendar-alt"></i> {{ totalRecords }} enregistrement(s)</div>
-            <div class="stat-item"><i class="fas fa-euro-sign"></i> Salaire total : {{ totalSalary | currency:'EUR' }}</div>
-            <div class="stat-item"><i class="fas fa-chart-line"></i> Facture totale : {{ totalFacture | currency:'EUR' }}</div>
-            <div class="stat-item" [class.positive]="totalRentabilite>=0" [class.negative]="totalRentabilite<0">
-              <i class="fas fa-chart-simple"></i> Rentabilité : {{ totalRentabilite | currency:'EUR' }}
+    <!-- KPI Strip -->
+    <div class="hs-kpi-strip">
+      <div class="hs-kpi">
+        <span class="hs-kpi__label">Enregistrements</span>
+        <span class="hs-kpi__val">{{ totalRecords }}</span>
+      </div>
+      <div class="hs-kpi">
+        <span class="hs-kpi__label">Coût total</span>
+        <span class="hs-kpi__val">{{ totalSalary | currency:'EUR':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="hs-kpi">
+        <span class="hs-kpi__label">Total facturé</span>
+        <span class="hs-kpi__val">{{ totalFacture | currency:'EUR':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="hs-kpi">
+        <span class="hs-kpi__label">Rentabilité</span>
+        <span class="hs-kpi__val" [class.hs-kpi__val--pos]="totalRentabilite>=0" [class.hs-kpi__val--neg]="totalRentabilite<0">
+          {{ totalRentabilite | currency:'EUR':'symbol':'1.0-0' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ══════ HISTORIQUE ══════ -->
+    <div class="hs-body" *ngIf="activeTab === 'historique'">
+
+      <!-- Projet search -->
+      <div class="hs-section">
+        <div class="hs-section__label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Projet
+        </div>
+        <div class="hs-proj-search">
+          <input class="hs-proj-input" type="text" [(ngModel)]="projetSearchTerm"
+                 (input)="onProjetSearch()" placeholder="Rechercher un projet…" autocomplete="off"/>
+          <div *ngIf="filteredProjets.length > 0 && projetSearchTerm" class="hs-autocomplete">
+            <div *ngFor="let p of filteredProjets" class="hs-autocomplete__item" (click)="selectProjet(p)">
+              <span class="hs-autocomplete__name">{{ p.nom }}</span>
+              <span class="hs-autocomplete__meta">{{ p.client }}<span *ngIf="p.tjm"> · {{ p.tjm }} €/j</span></span>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Recherche projet -->
-        <div class="projet-search-section">
-          <label><i class="fas fa-project-diagram"></i> Projet</label>
-          <div class="search-wrapper small">
-            <input type="text" [(ngModel)]="projetSearchTerm" (input)="onProjetSearch()" placeholder="Nom, client ou TJM..." class="search-input" autocomplete="off"/>
-            <div *ngIf="filteredProjets.length>0 && projetSearchTerm" class="autocomplete-list">
-              <div *ngFor="let p of filteredProjets" class="autocomplete-item" (click)="selectProjet(p)">
-                <div class="projet-name">{{ p.nom }}</div>
-                <div class="projet-details"><span>{{ p.client }}</span> <span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
+      <!-- Selected project -->
+      <div *ngIf="selectedProjetObj" class="hs-proj-selected">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span><strong>{{ selectedProjetObj.nom }}</strong> · {{ selectedProjetObj.client }} · TJM {{ selectedProjetObj.tjm }} €</span>
+        <div class="hs-proj-selected__actions">
+          <button class="hs-btn-export" (click)="exportToCSV()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+          <button class="hs-btn-clear" (click)="clearProjetSelection()">✕</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div *ngIf="selectedProjetObj && allYearsForProject.length" class="hs-filters">
+        <div class="hs-filter-group">
+          <label class="hs-filter-label">Année</label>
+          <select class="hs-filter-select" [(ngModel)]="selectedYearFilter" (change)="onYearFilterChange()">
+            <option value="">Toutes</option>
+            <option *ngFor="let y of allYearsForProject" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+        <div class="hs-filter-group" *ngIf="availableMonthsForYear.length">
+          <label class="hs-filter-label">Mois</label>
+          <select class="hs-filter-select" [(ngModel)]="selectedMonthFilter" (change)="applyPreciseFilter()">
+            <option value="">Tous</option>
+            <option *ngFor="let m of availableMonthsForYear" [value]="m.value">{{ m.name }}</option>
+          </select>
+        </div>
+        <button *ngIf="selectedYearFilter || selectedMonthFilter" class="hs-btn-reset" (click)="clearFilters()">Réinitialiser</button>
+      </div>
+
+      <!-- Hierarchy -->
+      <div *ngIf="selectedProjetObj && filteredHierarchy.length" class="hs-hierarchy">
+        <div *ngFor="let yearData of filteredHierarchy" class="hs-year-block">
+          <div class="hs-year-title" (click)="toggleYear(yearData.year)">
+            <svg class="hs-chevron" [class.hs-chevron--open]="yearData.expanded" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            {{ yearData.year }}
+          </div>
+          <div *ngIf="yearData.expanded" class="hs-months">
+            <div *ngFor="let monthData of yearData.months" class="hs-month-block">
+              <div class="hs-month-title" (click)="toggleMonth(yearData.year, monthData.month)">
+                <svg class="hs-chevron" [class.hs-chevron--open]="monthData.expanded" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                {{ monthData.monthName }}
+                <span class="hs-count-pill">{{ monthData.records.length }}</span>
               </div>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="selectedProjetObj" class="selected-projet-info">
-          <i class="fas fa-check-circle"></i> Projet : {{ selectedProjetObj.nom }} (TJM: {{ selectedProjetObj.tjm }} € - Client: {{ selectedProjetObj.client }})
-          <div class="selected-actions">
-            <button class="btn-export" (click)="exportToCSV()"><i class="fas fa-file-csv"></i> Exporter CSV</button>
-            <button class="clear-projet" (click)="clearProjetSelection()">✖</button>
-          </div>
-        </div>
-
-        <!-- Filtres année/mois -->
-        <div *ngIf="selectedProjetObj && allYearsForProject.length" class="filters-section">
-          <div class="filter-group">
-            <label>Année</label>
-            <select [(ngModel)]="selectedYearFilter" (change)="onYearFilterChange()" class="filter-select">
-              <option value="">Toutes</option>
-              <option *ngFor="let y of allYearsForProject" [value]="y">{{ y }}</option>
-            </select>
-          </div>
-          <div class="filter-group" *ngIf="availableMonthsForYear.length">
-            <label>Mois</label>
-            <select [(ngModel)]="selectedMonthFilter" (change)="applyPreciseFilter()" class="filter-select">
-              <option value="">Tous</option>
-              <option *ngFor="let m of availableMonthsForYear" [value]="m.value">{{ m.name }}</option>
-            </select>
-          </div>
-          <button *ngIf="selectedYearFilter || selectedMonthFilter" class="clear-filters" (click)="clearFilters()">Réinitialiser</button>
-        </div>
-
-        <!-- Affichage hiérarchique -->
-        <div *ngIf="selectedProjetObj && filteredHierarchy.length" class="hierarchy-view">
-          <div *ngFor="let yearData of filteredHierarchy" class="year-block">
-            <div class="year-title" (click)="toggleYear(yearData.year)">
-              <i class="fas" [class.fa-chevron-down]="yearData.expanded" [class.fa-chevron-right]="!yearData.expanded"></i> {{ yearData.year }}
-            </div>
-            <div *ngIf="yearData.expanded" class="months-container">
-              <div *ngFor="let monthData of yearData.months" class="month-block">
-                <div class="month-title" (click)="toggleMonth(yearData.year, monthData.month)">
-                  <i class="fas" [class.fa-chevron-down]="monthData.expanded" [class.fa-chevron-right]="!monthData.expanded"></i> {{ monthData.monthName }} ({{ monthData.records.length }})
-                </div>
-                <div *ngIf="monthData.expanded" class="records-list">
-                  <div *ngFor="let record of monthData.paginatedRecords" class="record-card" (click)="openRecordModal(record)">
-                    <div class="record-date">{{ record.date }}</div>
-                    <div class="record-summary">
-                      <span>Salaire brut: {{ record.salaireBrut | currency:'EUR' }}</span>
-                      <span>Net: {{ record.netPayer | currency:'EUR' }}</span>
-                      <span [class.positive]="record.rentabilite>=0" [class.negative]="record.rentabilite<0">Rentabilité: {{ record.rentabilite | currency:'EUR' }}</span>
-                    </div>
+              <div *ngIf="monthData.expanded" class="hs-records">
+                <div *ngFor="let record of monthData.paginatedRecords" class="hs-record" (click)="openRecordModal(record)">
+                  <div class="hs-record__date">{{ record.date }}</div>
+                  <div class="hs-record__row">
+                    <span class="hs-record__item">Brut <strong>{{ record.salaireBrut | currency:'EUR':'symbol':'1.0-0' }}</strong></span>
+                    <span class="hs-record__item">Net <strong>{{ record.netPayer | currency:'EUR':'symbol':'1.0-0' }}</strong></span>
+                    <span class="hs-record__item">Facture <strong>{{ record.facture | currency:'EUR':'symbol':'1.0-0' }}</strong></span>
+                    <span class="hs-record__rent" [class.hs-record__rent--pos]="record.rentabilite>=0" [class.hs-record__rent--neg]="record.rentabilite<0">
+                      {{ record.rentabilite | currency:'EUR':'symbol':'1.0-0' }}
+                    </span>
                   </div>
-                  <div *ngIf="monthData.records.length > recordsPerPage" class="pagination-records">
-                    <button (click)="changeMonthPage(yearData.year, monthData.month, monthData.currentPage-1)" [disabled]="monthData.currentPage===1">Précédent</button>
-                    <span>Page {{ monthData.currentPage }} / {{ monthData.totalPages }}</span>
-                    <button (click)="changeMonthPage(yearData.year, monthData.month, monthData.currentPage+1)" [disabled]="monthData.currentPage===monthData.totalPages">Suivant</button>
-                  </div>
+                </div>
+                <div *ngIf="monthData.records.length > recordsPerPage" class="hs-rec-pager">
+                  <button (click)="changeMonthPage(yearData.year, monthData.month, monthData.currentPage-1)" [disabled]="monthData.currentPage===1">←</button>
+                  <span>{{ monthData.currentPage }} / {{ monthData.totalPages }}</span>
+                  <button (click)="changeMonthPage(yearData.year, monthData.month, monthData.currentPage+1)" [disabled]="monthData.currentPage===monthData.totalPages">→</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div *ngIf="selectedProjetObj && !filteredHierarchy.length" class="no-data">Aucun enregistrement pour ce projet avec ces filtres.</div>
-        <div *ngIf="!selectedProjetObj && filteredHistoriques.length===0" class="no-data">Aucun historique pour ce salarié.</div>
       </div>
 
-      <!-- ==================== CONTENU PRÉVISIONS IA ==================== -->
-      <div *ngIf="activeTab === 'previsions'">
-        <div class="previsions-container" *ngIf="selectedProjetObj; else noProjet">
-          <!-- Loading -->
-          <div *ngIf="loadingPrevision" class="loading-spinner">
-            <i class="fas fa-spinner fa-pulse"></i> Chargement des prévisions...
+      <div *ngIf="selectedProjetObj && !filteredHierarchy.length" class="hs-empty">Aucun enregistrement pour ce filtre.</div>
+      <div *ngIf="!selectedProjetObj" class="hs-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <p>Sélectionnez un projet ci-dessus</p>
+      </div>
+    </div>
+
+    <!-- ══════ PRÉVISIONS IA ══════ -->
+    <div class="hs-body" *ngIf="activeTab === 'previsions'">
+      <ng-container *ngIf="selectedProjetObj; else noProjetPrev">
+
+        <!-- Loading -->
+        <div *ngIf="loadingPrevision" class="hs-loader hs-loader--center">
+          <div class="hs-loader__spin"></div>
+          <span>Calcul des prévisions…</span>
+        </div>
+
+        <ng-container *ngIf="!loadingPrevision && previsionData">
+
+          <!-- Alert -->
+          <div *ngIf="previsionData.alerte_globale" class="hs-alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Des marges négatives sont prévues sur les prochains mois.
           </div>
 
-          <!-- Données chargées -->
-          <div *ngIf="!loadingPrevision && previsionData">
-            <!-- Alerte animée -->
-            <div *ngIf="previsionData.alerte_globale" class="global-alert pulse-animation">
-              <i class="fas fa-exclamation-triangle"></i> Attention : des marges négatives sont prévues dans les prochains mois.
-            </div>
-
-            <!-- KPIs -->
-            <div class="prevision-kpis">
-              <div class="kpi-card">
-                <i class="fas fa-euro-sign"></i>
-                <div class="kpi-info">
-                  <span class="kpi-label">Marge moyenne (si payé)</span>
-                  <span class="kpi-value" [class.positive]="getAvgMargePaye() >= 0" [class.negative]="getAvgMargePaye() < 0">
-                    {{ getAvgMargePaye() | currency:'EUR' }}
-                  </span>
-                </div>
+          <!-- KPI cards IA -->
+          <div class="hs-ia-kpis">
+            <div class="hs-ia-kpi">
+              <div class="hs-ia-kpi__icon hs-ia-kpi__icon--teal">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
               </div>
-              <div class="kpi-card">
-                <i class="fas fa-chart-simple"></i>
-                <div class="kpi-info">
-                  <span class="kpi-label">Fiabilité du modèle</span>
-                  <span class="kpi-value">{{ previsionData.metriques.r2 }} / 1</span>
+              <div>
+                <div class="hs-ia-kpi__label">Marge probable moy.</div>
+                <div class="hs-ia-kpi__val" [class.hs-ia-kpi__val--pos]="avgMargeProbable>=0" [class.hs-ia-kpi__val--neg]="avgMargeProbable<0">
+                  {{ avgMargeProbable | currency:'EUR':'symbol':'1.0-0' }}
                 </div>
               </div>
             </div>
-
-            <!-- Graphique en lignes des prévisions -->
-            <h3>Prévisions sur les 3 prochains mois</h3>
-            <div class="chart-wrapper" style="height: 300px;">
-              <canvas baseChart
-                      [data]="lineChartData"
-                      [options]="lineChartOptions"
-                      type="line">
-              </canvas>
-            </div>
-
-            <!-- Métriques de fiabilité -->
-            <div class="prevision-metrics">
-              <div class="metric-card">
-                <span class="metric-label">MAE (erreur)</span>
-                <span class="metric-value">{{ previsionData.metriques.mae }} €</span>
+            <div class="hs-ia-kpi">
+              <div class="hs-ia-kpi__icon hs-ia-kpi__icon--blue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
               </div>
-              <div class="metric-card">
-                <span class="metric-label">Mois d'historique</span>
-                <span class="metric-value">{{ previsionData.nb_mois_historique }}</span>
+              <div>
+                <div class="hs-ia-kpi__label">Prob. paiement moy.</div>
+                <div class="hs-ia-kpi__val">{{ avgProbabilite | percent:'1.0-1' }}</div>
               </div>
             </div>
+            <div class="hs-ia-kpi">
+              <div class="hs-ia-kpi__icon hs-ia-kpi__icon--purple">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div>
+                <div class="hs-ia-kpi__label">Fiabilité R²</div>
+                <div class="hs-ia-kpi__val">{{ previsionData.metriques.r2 }}</div>
+              </div>
+            </div>
+            <div class="hs-ia-kpi">
+              <div class="hs-ia-kpi__icon hs-ia-kpi__icon--amber">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              </div>
+              <div>
+                <div class="hs-ia-kpi__label">Historique</div>
+                <div class="hs-ia-kpi__val">{{ previsionData.nb_mois_historique }} mois</div>
+              </div>
+            </div>
+          </div>
 
-            <!-- Détail de l'historique utilisé -->
-            <details class="historique-details">
-              <summary>Voir l'historique utilisé pour l'apprentissage</summary>
-              <div class="table-responsive">
-               <h3>Évolution historique de la rentabilité</h3>
-<div class="chart-wrapper" style="height: 250px;">
-  <canvas baseChart [data]="historyChartData" [options]="historyChartOptions" type="line"></canvas>
+          <!-- Chart -->
+          <div class="hs-section-label">Prévisions — 3 prochains mois</div>
+          <div class="hs-chart-wrap">
+            <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" type="line"></canvas>
+          </div>
+
+          <!-- Prediction cards -->
+          <div class="hs-pred-grid">
+            <div *ngFor="let p of previsionData.predictions; let i = index" class="hs-pred-card" [class.hs-pred-card--alert]="p.alerte">
+              <div class="hs-pred-card__header">
+                <span class="hs-pred-card__month">{{ p.mois }}</span>
+                <span class="hs-risk-badge"
+                      [class.hs-risk-badge--low]="p.prob_paiement >= 0.8"
+                      [class.hs-risk-badge--med]="p.prob_paiement >= 0.6 && p.prob_paiement < 0.8"
+                      [class.hs-risk-badge--high]="p.prob_paiement < 0.6">
+                  {{ p.prob_paiement >= 0.8 ? 'Faible' : p.prob_paiement >= 0.6 ? 'Moyen' : 'Élevé' }}
+                </span>
+              </div>
+              <div class="hs-pred-card__marge" [class.hs-pred-card__marge--pos]="p.marge_probable>=0" [class.hs-pred-card__marge--neg]="p.marge_probable<0">
+                {{ p.marge_probable | currency:'EUR':'symbol':'1.0-0' }}
+              </div>
+              <div class="hs-pred-card__prob-row">
+                <span class="hs-pred-card__prob-label">Prob. paiement</span>
+                <span class="hs-pred-card__prob-val">{{ p.prob_paiement | percent:'1.0-1' }}</span>
+              </div>
+              <div class="hs-prob-bar">
+                <div class="hs-prob-bar__fill" [style.width.%]="p.prob_paiement * 100"
+                     [class.hs-prob-bar__fill--ok]="p.prob_paiement >= 0.7"
+                     [class.hs-prob-bar__fill--warn]="p.prob_paiement < 0.7"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metrics -->
+          <div class="hs-metrics-row">
+            <div class="hs-metric">
+              <span class="hs-metric__label">MAE (erreur absolue)</span>
+              <span class="hs-metric__val">{{ previsionData.metriques.mae }} €</span>
+            </div>
+            <div class="hs-metric">
+              <span class="hs-metric__label">Taux paiement historique</span>
+              <span class="hs-metric__val">{{ previsionData.metriques.taux_paiement_historique | percent:'1.0-1' }}</span>
+            </div>
+            <div class="hs-metric">
+              <span class="hs-metric__label">Fiabilité modèle</span>
+              <span class="hs-metric__val" [class.hs-metric__val--warn]="previsionData.metriques.fiabilite === 'faible'">
+                {{ previsionData.metriques.fiabilite | titlecase }}
+              </span>
+            </div>
+          </div>
+
+          <!-- History chart accordion -->
+          <details class="hs-details">
+            <summary class="hs-details__summary">Voir l'historique d'apprentissage</summary>
+            <div class="hs-chart-wrap hs-chart-wrap--sm">
+              <canvas baseChart [data]="historyChartData" [options]="historyChartOptions" type="line"></canvas>
+            </div>
+          </details>
+
+          <!-- AI Interpretation -->
+          <div class="hs-ai-box" *ngIf="previsionData?.interpretation">
+            <div class="hs-ai-box__header">
+              <div class="hs-ai-box__icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                  <path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+                </svg>
+              </div>
+              <span class="hs-ai-box__title">Analyse intelligente</span>
+            </div>
+            <div class="hs-ai-box__body" [innerHTML]="formatInterpretation(previsionData.interpretation)"></div>
+          </div>
+
+        </ng-container>
+
+        <div *ngIf="!loadingPrevision && !previsionData" class="hs-empty">Aucune prévision disponible.</div>
+      </ng-container>
+
+      <ng-template #noProjetPrev>
+        <div class="hs-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <p>Sélectionnez un projet dans l'onglet Historique</p>
+        </div>
+      </ng-template>
+    </div>
+  </main>
+
+  <!-- No salarie selected -->
+  <ng-template #noSel>
+    <main class="hs-main hs-main--empty">
+      <div class="hs-welcome">
+        <div class="hs-welcome__icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <h3>Sélectionnez un salarié</h3>
+        <p>Choisissez un salarié dans la liste pour consulter son historique financier et ses prévisions IA.</p>
+      </div>
+    </main>
+  </ng-template>
 </div>
-              </div>
-            </details>
-          </div>
 
-          <!-- Aucune donnée -->
-          <div *ngIf="!loadingPrevision && !previsionData && selectedProjetObj" class="no-data">
-            Aucune prévision disponible.
-          </div>
-        </div>
-        <ng-template #noProjet>
-          <div class="empty-state">
-            <i class="fas fa-project-diagram"></i>
-            <h3>Aucun projet sélectionné</h3>
-            <p>Veuillez d'abord sélectionner un projet dans l'onglet Historique.</p>
-          </div>
-        </ng-template>
-      </div>
+<!-- ═══════════ MODAL ═══════════ -->
+<div class="hs-modal-overlay" *ngIf="showRecordModal" (click)="closeRecordModal()">
+  <div class="hs-modal" (click)="$event.stopPropagation()">
+    <div class="hs-modal__header">
+      <h2>Détail de l'enregistrement</h2>
+      <button class="hs-modal__close" (click)="closeRecordModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-
-    <ng-template #noSelection>
-      <div class="history-panel empty">
-        <div class="empty-state">
-          <i class="fas fa-users"></i>
-          <h3>Sélectionnez un salarié</h3>
-          <p>Choisissez un salarié dans la liste pour voir son historique financier.</p>
-        </div>
-      </div>
-    </ng-template>
-  </div>
-</div>
-
-<!-- Modal Détail enregistrement -->
-<div class="modal-overlay" *ngIf="showRecordModal" (click)="closeRecordModal()">
-  <div class="modal-container" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2><i class="fas fa-info-circle"></i> Détail de l'enregistrement</h2>
-      <button class="close-btn" (click)="closeRecordModal()">✖</button>
+    <div class="hs-modal__body" *ngIf="selectedRecord">
+      <table class="hs-detail-table">
+        <tbody>
+          <tr><td>Date</td><td>{{ selectedRecord.date }}</td></tr>
+          <tr><td>Salaire brut</td><td>{{ selectedRecord.salaireBrut | currency:'EUR' }}</td></tr>
+          <tr><td>Net à payer</td><td>{{ selectedRecord.netPayer | currency:'EUR' }}</td></tr>
+          <tr><td>Charges patronales</td><td>{{ selectedRecord.chargesPatronales | currency:'EUR' }}</td></tr>
+          <tr><td>Repas restaurant</td><td>{{ selectedRecord.repasRestaurant | currency:'EUR' }}</td></tr>
+          <tr><td>Total cotisations salariales</td><td>{{ selectedRecord.totalCotisationsSalariales | currency:'EUR' }}</td></tr>
+          <tr><td>Total notes de frais</td><td>{{ selectedRecord.totalNoteFrais | currency:'EUR' }}</td></tr>
+          <tr><td>Total notes kilométriques</td><td>{{ selectedRecord.totalNoteKilometrique | currency:'EUR' }}</td></tr>
+          <tr><td>TJM</td><td>{{ selectedRecord.tjm | currency:'EUR' }}</td></tr>
+          <tr><td>Jours travaillés</td><td>{{ selectedRecord.joursTravailles }}</td></tr>
+          <tr><td>Facture</td><td>{{ selectedRecord.facture | currency:'EUR' }}</td></tr>
+          <tr><td>Payé</td><td>{{ selectedRecord.paye }}</td></tr>
+          <tr><td>Total perçu</td><td>{{ selectedRecord.totalePercu | currency:'EUR' }}</td></tr>
+          <tr><td>Total facture</td><td>{{ selectedRecord.totaleFacture | currency:'EUR' }}</td></tr>
+          <tr class="hs-detail-table__highlight"><td>Rentabilité</td><td [style.color]="selectedRecord.rentabilite >= 0 ? '#059669' : '#DC2626'">{{ selectedRecord.rentabilite | currency:'EUR' }}</td></tr>
+        </tbody>
+      </table>
     </div>
-    <div class="modal-body" *ngIf="selectedRecord">
-      <div class="table-responsive">
-        <table class="detail-table">
-          <tbody>
-            <tr><td class="detail-label">Date</td><td>{{ selectedRecord.date }}</td></tr>
-            <tr><td class="detail-label">Salaire brut</td><td>{{ selectedRecord.salaireBrut | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Net payer</td><td>{{ selectedRecord.netPayer | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Charges patronales</td><td>{{ selectedRecord.chargesPatronales | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Repas restaurant</td><td>{{ selectedRecord.repasRestaurant | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Total cotisations salariales</td><td>{{ selectedRecord.totalCotisationsSalariales | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Total notes de frais</td><td>{{ selectedRecord.totalNoteFrais | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Total notes kilométriques</td><td>{{ selectedRecord.totalNoteKilometrique | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">TJM</td><td>{{ selectedRecord.tjm | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Jours travaillés</td><td>{{ selectedRecord.joursTravailles }}</td></tr>
-            <tr><td class="detail-label">Facture</td><td>{{ selectedRecord.facture | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Payé</td><td>{{ selectedRecord.paye }}</td></tr>
-            <tr><td class="detail-label">Total perçu</td><td>{{ selectedRecord.totalePercu | currency:'EUR' }}</td></tr>
-            <tr><td class="detail-label">Total facture</td><td>{{ selectedRecord.totaleFacture | currency:'EUR' }}</td></tr>
-            <tr class="highlight-row"><td class="detail-label">Rentabilité</td><td>{{ selectedRecord.rentabilite | currency:'EUR' }}</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeRecordModal()">Fermer</button>
+    <div class="hs-modal__footer">
+      <button class="hs-btn-secondary" (click)="closeRecordModal()">Fermer</button>
     </div>
   </div>
 </div>

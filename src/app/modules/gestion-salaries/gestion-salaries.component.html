@@ -16,7 +16,7 @@
       <h1>Gestion des Salariés</h1>
       <span class="salarie-count">{{ filteredSalaries.length }} salarié(s)</span>
     </div>
-    <div class="header-actions">
+    <div class="header-actions"*ngIf="authService.isAdmin()">
       <button class="btn-add" (click)="openAddModal()">
         <i class="fa-solid fa-plus"></i> Ajouter un salarié
       </button>
@@ -110,7 +110,7 @@
           <th>TJM Référence (€)</th>
           <th>Adresse</th>
           <th>Date d'Entrée</th>
-          <th>Actions</th>
+          <th *ngIf="authService.isAdmin()">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -133,7 +133,7 @@
           <td class="montant-cell">{{ s.tjm || 0 }} €</td>
           <td>{{ s.adresse }}</td>
           <td>{{ s.date_entree | date:'dd/MM/yyyy' }}</td>
-          <td class="actions-cell">
+          <td class="actions-cell" *ngIf="authService.isAdmin()">
             <button class="action-btn view" (click)="openDetailsModal(s)" title="Voir détails"><i class="fa-solid fa-eye"></i></button>
             <button class="action-btn edit" (click)="openEditModal(s)" title="Modifier"><i class="fa-solid fa-pen"></i></button>
             <button class="action-btn delete" (click)="deleteSalarie(s.id)" title="Supprimer"><i class="fa-solid fa-trash"></i></button>

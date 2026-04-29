@@ -20,6 +20,7 @@
     "@angular/router": "^14.2.0",
     "@ng-select/ng-select": "^9.1.0",
     "chart.js": "^3.9.1",
+    "jwt-decode": "^4.0.0",
     "ng2-charts": "^4.0.0",
     "rxjs": "~7.5.0",
     "sweetalert2": "^11.26.24",

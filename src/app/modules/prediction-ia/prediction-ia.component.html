@@ -1,85 +1,257 @@
-<div class="prediction-container">
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-diagram-project"></i>
+<div class="dai-root">
+
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <div class="dai-header">
+    <div class="dai-header__left">
+      <div class="dai-header__icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+          <path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+        </svg>
       </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Projets</span>
-        <span class="kpi-value">{{ data?.kpis?.nb_projets }}</span>
+      <div>
+        <h1 class="dai-header__title">Dashboard IA Global</h1>
+        <p class="dai-header__sub">Analyse consolidée · Tous les projets</p>
       </div>
     </div>
 
-    <div class="kpi-card danger">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Projets en risque</span>
-        <span class="kpi-value">{{ data?.kpis?.projets_en_risque }}</span>
-      </div>
-    </div>
-
-    <div class="kpi-card success">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-chart-line"></i>
-      </div>
-      <div class="kpi-content">
-        <span class="kpi-label">Marge globale</span>
-        <span class="kpi-value">{{ data?.kpis?.marge_globale_moyenne | number:'1.0-2' }} €</span>
+    <div class="dai-header__right">
+      <div class="dai-period-group">
+        <button class="dai-period-btn" [class.dai-period-btn--active]="mois === 3" (click)="changeMois(3)">3 mois</button>
+        <button class="dai-period-btn" [class.dai-period-btn--active]="mois === 6" (click)="changeMois(6)">6 mois</button>
       </div>
     </div>
   </div>
 
-  <!-- Boutons de période -->
-  <div class="period-buttons">
-    <button class="btn-period" [class.active]="mois === 3" (click)="changeMois(3)">3 mois</button>
-    <button class="btn-period" [class.active]="mois === 6" (click)="changeMois(6)">6 mois</button>
+  <!-- ═══════════════ LOADER ═══════════════ -->
+  <div *ngIf="loading" class="dai-loader">
+    <div class="dai-loader__ring"></div>
+    <span>Calcul en cours…</span>
   </div>
 
-  <!-- Graphique -->
-  <div class="chart-card">
-    <h3><i class="fa-solid fa-chart-line"></i> Évolution financière</h3>
-    <div class="chart-wrapper">
-      <canvas baseChart
-        [data]="{
-          labels: chartLabels,
-          datasets: [
-            { data: margeData, label: 'Marge (€)', borderColor: '#6FCF97', backgroundColor: 'rgba(111, 207, 151, 0.1)', fill: true, tension: 0.4 },
-            { data: coutData, label: 'Coût (€)', borderColor: '#F59E0B', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.4 },
-            { data: factureData, label: 'Facture (€)', borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.4 }
-          ]
-        }"
-        [type]="'line'"
-        [options]="chartOptions">
-      </canvas>
+  <ng-container *ngIf="!loading && data">
+
+    <!-- ═══════════════ ALERTE ═══════════════ -->
+    <div *ngIf="hasAlert" class="dai-alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span><strong>{{ kpis.projets_en_risque }}</strong> projet{{ kpis.projets_en_risque > 1 ? 's' : '' }} présentent des marges négatives prévues.</span>
     </div>
-  </div>
 
-  <!-- Liste des projets -->
-  <div class="projects-section">
-    <h2><i class="fa-solid fa-list"></i> Analyse par projet</h2>
-    <div class="projects-grid">
-      <div *ngFor="let p of data?.projets" class="project-card" [class.danger]="isDanger(p)">
-        <div class="project-header">
-          <i class="fa-solid fa-folder-open"></i>
-          <span class="project-name">{{ p.nom }}</span>
-          <span *ngIf="isDanger(p)" class="alert-badge">
-            <i class="fa-solid fa-exclamation-triangle"></i> Risque
-          </span>
+    <!-- ═══════════════ KPI STRIP ═══════════════ -->
+    <div class="dai-kpis">
+
+      <div class="dai-kpi">
+        <div class="dai-kpi__icon dai-kpi__icon--indigo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+          </svg>
         </div>
-        <div class="project-details">
-          <div class="detail-item">
-            <span class="detail-label">Marge moyenne</span>
-            <span class="detail-value">{{ p.marge_moyenne | number:'1.0-2' }} €</span>
+        <div class="dai-kpi__body">
+          <span class="dai-kpi__label">Projets analysés</span>
+          <span class="dai-kpi__val">{{ kpis.nb_projets }}</span>
+        </div>
+      </div>
+
+      <div class="dai-kpi" [class.dai-kpi--danger]="(kpis.projets_en_risque ?? 0) > 0">
+        <div class="dai-kpi__icon dai-kpi__icon--rose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+          </svg>
+        </div>
+        <div class="dai-kpi__body">
+          <span class="dai-kpi__label">En risque</span>
+          <span class="dai-kpi__val">{{ kpis.projets_en_risque }}</span>
+        </div>
+      </div>
+
+      <div class="dai-kpi" [class.dai-kpi--success]="(kpis.marge_totale ?? 0) >= 0" [class.dai-kpi--danger]="(kpis.marge_totale ?? 0) < 0">
+        <div class="dai-kpi__icon dai-kpi__icon--emerald">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <div class="dai-kpi__body">
+          <span class="dai-kpi__label">Marge totale projetée</span>
+          <span class="dai-kpi__val">{{ formatEur(kpis.marge_totale) }}</span>
+        </div>
+      </div>
+
+      <div class="dai-kpi">
+        <div class="dai-kpi__icon dai-kpi__icon--amber">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+          </svg>
+        </div>
+        <div class="dai-kpi__body">
+          <span class="dai-kpi__label">Coût total projeté</span>
+          <span class="dai-kpi__val">{{ formatEur(kpis.cout_total) }}</span>
+        </div>
+      </div>
+
+      <div class="dai-kpi" [class.dai-kpi--success]="(kpis.ratio ?? 0) >= 0.2">
+        <div class="dai-kpi__icon dai-kpi__icon--violet">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="dai-kpi__body">
+          <span class="dai-kpi__label">Ratio marge/coût</span>
+          <span class="dai-kpi__val">{{ (kpis.ratio * 100) | number:'1.0-1' }} %</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════ BODY GRID ═══════════════ -->
+    <div class="dai-body">
+
+      <!-- ── Colonne gauche : chart + analyse ── -->
+      <div class="dai-col-main">
+
+        <!-- Analyse stats pills -->
+        <div class="dai-stat-pills" *ngIf="analyseCourbe.tendance">
+          <div class="dai-pill" [class]="'dai-pill--' + tendanceClass">
+            <span class="dai-pill__icon">{{ tendanceIcon }}</span>
+            <span>{{ analyseCourbe.tendance | titlecase }}</span>
+            <span class="dai-pill__sub">{{ analyseCourbe.variation_pct > 0 ? '+' : '' }}{{ analyseCourbe.variation_pct }}%</span>
+          </div>
+          <div class="dai-pill dai-pill--slate">
+            <span>Volatilité</span>
+            <span class="dai-pill__sub">{{ formatEur(analyseCourbe.volatilite) }}</span>
+          </div>
+          <div class="dai-pill dai-pill--slate">
+            <span>Momentum</span>
+            <span class="dai-pill__sub" [class.text-pos]="analyseCourbe.momentum >= 0" [class.text-neg]="analyseCourbe.momentum < 0">
+              {{ analyseCourbe.acceleration }}
+            </span>
+          </div>
+          <div class="dai-pill" [class]="'dai-pill--' + riskClass">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            <span>Risque {{ analyseCourbe.risk_level }}</span>
+          </div>
+          <div class="dai-pill dai-pill--slate" *ngIf="analyseCourbe.inflexion">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+            <span>Inflexion {{ analyseCourbe.inflexion }}</span>
           </div>
         </div>
+
+        <!-- Chart card -->
+        <div class="dai-chart-card">
+          <div class="dai-chart-card__header">
+            <div class="dai-chart-card__title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Évolution financière consolidée
+            </div>
+            <span class="dai-chart-card__period">{{ mois }} mois · Tous projets</span>
+          </div>
+          <div class="dai-chart-wrap">
+            <canvas baseChart
+              [data]="lineChartData"
+              [options]="lineChartOptions"
+              type="line">
+            </canvas>
+          </div>
+        </div>
+
+        <!-- ═══ ANALYSE IA GLOBALE ═══ -->
+        <div class="dai-ai-card" *ngIf="analyseIA">
+          <div class="dai-ai-card__header">
+            <div class="dai-ai-card__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                <path d="M18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="dai-ai-card__title">Analyse de courbe globale</div>
+              <div class="dai-ai-card__sub">Tous projets consolidés · Groq LLaMA</div>
+            </div>
+            <span class="dai-ai-badge">IA</span>
+          </div>
+          <div class="dai-ai-card__body" [innerHTML]="analyseIA"></div>
+        </div>
+
       </div>
-      <div *ngIf="data?.projets?.length === 0" class="no-data">
-        <i class="fa-solid fa-folder-open"></i>
-        <p>Aucun projet trouvé</p>
+
+      <!-- ── Colonne droite : projets ── -->
+      <div class="dai-col-side">
+
+        <div class="dai-side-header">
+          <span class="dai-side-title">Projets</span>
+          <span class="dai-side-count">{{ projets.length }}</span>
+        </div>
+
+        <!-- Projets en risque -->
+        <div *ngIf="projetsDanger.length" class="dai-proj-group">
+          <div class="dai-proj-group__label dai-proj-group__label--danger">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+            En risque
+          </div>
+          <div class="dai-proj-card dai-proj-card--danger" *ngFor="let p of projetsDanger">
+            <div class="dai-proj-card__top">
+              <div class="dai-proj-card__avatar dai-proj-card__avatar--danger">
+                {{ p.nom.charAt(0) }}
+              </div>
+              <div class="dai-proj-card__info">
+                <div class="dai-proj-card__name">{{ p.nom }}</div>
+                <div class="dai-proj-card__meta">
+                  Fiabilité : {{ p.fiabilite }}
+                  · Taux paiement : {{ (p.taux_paiement * 100) | number:'1.0-0' }}%
+                </div>
+              </div>
+              <span class="dai-proj-badge dai-proj-badge--danger">Risque</span>
+            </div>
+            <div class="dai-proj-card__marge dai-proj-card__marge--neg">{{ formatEur(p.marge_moyenne) }}/mois</div>
+            <div class="dai-proj-bar">
+              <div class="dai-proj-bar__fill dai-proj-bar__fill--danger" [style.width.%]="barWidth(p.marge_moyenne)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projets sains -->
+        <div *ngIf="projetsSains.length" class="dai-proj-group">
+          <div class="dai-proj-group__label dai-proj-group__label--ok">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Sains
+          </div>
+          <div class="dai-proj-card" *ngFor="let p of projetsSains">
+            <div class="dai-proj-card__top">
+              <div class="dai-proj-card__avatar">{{ p.nom.charAt(0) }}</div>
+              <div class="dai-proj-card__info">
+                <div class="dai-proj-card__name">{{ p.nom }}</div>
+                <div class="dai-proj-card__meta">
+                  Fiabilité : {{ p.fiabilite }}
+                  · Taux paiement : {{ (p.taux_paiement * 100) | number:'1.0-0' }}%
+                </div>
+              </div>
+            </div>
+            <div class="dai-proj-card__marge dai-proj-card__marge--pos">{{ formatEur(p.marge_moyenne) }}/mois</div>
+            <div class="dai-proj-bar">
+              <div class="dai-proj-bar__fill" [style.width.%]="barWidth(p.marge_moyenne)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!projets.length" class="dai-empty">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          <p>Aucun projet trouvé</p>
+        </div>
+
       </div>
     </div>
+
+  </ng-container>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !data" class="dai-empty dai-empty--full">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <p>Aucune donnée disponible</p>
   </div>
+
 </div>

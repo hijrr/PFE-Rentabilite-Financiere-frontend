@@ -26,6 +26,8 @@ import { NgChartsModule } from 'ng2-charts';
 import { ChatbotComponent } from './modules/chatbot/chatbot.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PredictionIAComponent } from './modules/prediction-ia/prediction-ia.component';
+import { NotificationComponent } from './modules/notification/notification.component';
+import { NotificationBellComponent } from './modules/notification-bell/notification-bell.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -47,6 +49,8 @@ import { PredictionIAComponent } from './modules/prediction-ia/prediction-ia.com
     GestionParSalariesComponent,
     ChatbotComponent,
     PredictionIAComponent,
+    NotificationComponent,
+    NotificationBellComponent,
   ],
   imports: [
     BrowserModule,

@@ -4,6 +4,7 @@ import { Form, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import Swal from 'sweetalert2';
 
 
 interface LoginResponse {
@@ -49,20 +50,36 @@ rotateWord() {
 
 
 
-  loginUser(){
-    const formData = this.loginForm.value;
-     this.http.post<LoginResponse>('http://localhost:8000/login', formData)
+  loginUser() {
+  const formData = this.loginForm.value;
+
+  this.http.post<LoginResponse>('http://localhost:8000/login', formData)
     .subscribe({
       next: (response) => {
-        console.log("Connexion réussie", response);
-         this.authService.login(response.access_token);
-         this.router.navigate(['/Accueil']);
-      },      error: (err) => {
+        this.authService.login(response.access_token);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Connexion réussie',
+          text: 'Bienvenue 👋',
+          timer: 1500,
+          showConfirmButton: false
+        });
+
+        this.router.navigate(['/Accueil']);
+      },
+
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur de connexion',
+          text: 'Username ou mot de passe incorrect'
+        });
+
         console.log("Erreur de connexion", err);
       }
     });
-    console.log(this.loginForm.value);
-  }
+}
   get username(){
     return this.loginForm.get('username');
   }

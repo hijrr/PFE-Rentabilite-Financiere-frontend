@@ -1,3 +1,4 @@
+import { AuthService } from 'src/app/services/auth.service';
 import { ExtractionService } from 'src/app/services/extraction.service';
 import { Salarie, SalarieServiceService } from './../../services/salarie-service.service';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
@@ -49,6 +50,7 @@ export class GestionSalariesComponent implements OnInit {
   });
 
   constructor(
+    public authService:AuthService,
     private salarieService: SalarieServiceService,
     private clientService: ClientService,
     private extractionService: ExtractionService

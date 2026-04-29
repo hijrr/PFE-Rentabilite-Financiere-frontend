@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChartConfiguration } from 'chart.js';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
 import { PredictionIAService } from 'src/app/services/prediction-ia.service';
@@ -35,14 +36,10 @@ export class HistoriqueSalarieComponent implements OnInit {
   allYearsForProject: string[] = [];
   availableMonthsForYear: { name: string; value: string }[] = [];
 
-  // Structure hiérarchique brute et filtrée
+  // Structure hiérarchique
   rawHierarchy: Array<{
     year: string;
-    months: Array<{
-      month: number;
-      monthName: string;
-      records: any[];
-    }>;
+    months: Array<{ month: number; monthName: string; records: any[] }>;
   }> = [];
   filteredHierarchy: Array<{
     year: string;
@@ -60,8 +57,6 @@ export class HistoriqueSalarieComponent implements OnInit {
   }> = [];
 
   recordsPerPage = 3;
-
-  // Modals
   showRecordModal = false;
   selectedRecord: any = null;
 
@@ -74,22 +69,61 @@ export class HistoriqueSalarieComponent implements OnInit {
 
   // Prévisions IA
   previsionData: any = null;
-  loadingPrevision: boolean = false;
+  loadingPrevision = false;
+
+  // Configuration graphique
   lineChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
-lineChartOptions: any = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: (ctx: any) => ctx.raw + ' €' } } },
-  scales: { y: { ticks: { callback: (val: number) => val + ' €' } } }
-};
-historyChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
-historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } };
+  lineChartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const index = context.dataIndex;
+            const pred = this.previsionData?.predictions[index];
+            if (pred) {
+              if (context.dataset.label === '🔒 Probabilité de paiement') {
+                return `Probabilité: ${(pred.prob_paiement * 100).toFixed(1)}%`;
+              } else {
+                return `${context.dataset.label}: ${context.raw.toFixed(2)} €`;
+              }
+            }
+            return `${context.raw} €`;
+          }
+        }
+      }
+    },
+    scales: {
+      y: {
+        ticks: { callback: (val: number) => val + ' €' },
+        title: { display: true, text: 'Marge (€)' }
+      },
+      y1: {
+        position: 'right',
+        title: { display: true, text: 'Probabilité' },
+        min: 0,
+        max: 1,
+        grid: { drawOnChartArea: false },
+        ticks: { callback: (val: number) => (val * 100) + '%' }
+      }
+    }
+  };
+
+  historyChartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
+  historyChartOptions: any = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } }
+  };
 
   constructor(
     private salarieService: SalarieServiceService,
     private financeDataService: FinanceDataService,
     private projetService: ProjetService,
-    private predictionIAService: PredictionIAService
+    private predictionIAService: PredictionIAService,
+     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -111,7 +145,7 @@ historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugi
         this.allHistoriques = data || [];
         if (this.selectedSalarie) this.filterHistoriquesBySalarie(this.selectedSalarie);
       },
-      error: (err) => console.error('Erreur chargement historiques', err)
+      error: (err) => console.error(err)
     });
   }
 
@@ -127,19 +161,18 @@ historyChartOptions: any = { responsive: true, maintainAspectRatio: false, plugi
     this.currentPage = 1;
   }
 
-loadProjetsForSalarie(salarieId: number): void {
-  this.projetService.getProjetsById(salarieId).subscribe({
-    next: (projets) => {
-      const enAttente = (projets || []).filter(p =>
-        (p.status_paiement || '').toString().trim().toLowerCase() === 'en_attente'
-      );
+  loadProjetsForSalarie(salarieId: number): void {
+    this.projetService.getProjetsById(salarieId).subscribe({
+      next: (projets) => {
+        const enAttente = (projets || []).filter(p =>
+          (p.status_paiement || '').toString().trim().toLowerCase() === 'en_attente'
+        );
+        this.projetsSalarie = enAttente;
+      },
+      error: (err) => console.error(err)
+    });
+  }
 
-      this.projetsSalarie = enAttente;
-    },
-    error: (err) => console.error(err)
-  });
-}
-  // Recherche projet
   onProjetSearch(): void {
     const term = this.projetSearchTerm.toLowerCase().trim();
     if (!term) { this.filteredProjets = []; return; }
@@ -160,8 +193,6 @@ loadProjetsForSalarie(salarieId: number): void {
     this.buildRawHierarchy();
     this.initFiltersFromData();
     this.applyPreciseFilter();
-
-    // Charger les prévisions si l'onglet actif est 'previsions'
     if (this.activeTab === 'previsions') {
       this.loadPrevision(projet.id);
     }
@@ -182,10 +213,9 @@ loadProjetsForSalarie(salarieId: number): void {
     } else if (this.selectedSalarie) this.filterHistoriquesBySalarie(this.selectedSalarie);
     this.rawHierarchy = [];
     this.filteredHierarchy = [];
-    this.previsionData = null; // reset prévisions
+    this.previsionData = null;
   }
 
-  // Construction de la hiérarchie brute (année -> mois -> enregistrements)
   buildRawHierarchy(): void {
     const map = new Map<string, Map<number, any[]>>();
     for (const record of this.filteredHistoriques) {
@@ -201,11 +231,11 @@ loadProjetsForSalarie(salarieId: number): void {
     this.rawHierarchy = [];
     for (const year of years) {
       const monthMap = map.get(year)!;
-      const months = Array.from(monthMap.keys()).sort((a,b) => b - a);
+      const months = Array.from(monthMap.keys()).sort((a, b) => b - a);
       const monthsData = months.map(month => ({
         month,
-        monthName: new Date(2000, month-1, 1).toLocaleString('fr-FR', { month: 'long' }),
-        records: monthMap.get(month)!.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        monthName: new Date(2000, month - 1, 1).toLocaleString('fr-FR', { month: 'long' }),
+        records: monthMap.get(month)!.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       }));
       this.rawHierarchy.push({ year, months: monthsData });
     }
@@ -298,215 +328,146 @@ loadProjetsForSalarie(salarieId: number): void {
     }
   }
 
-  // Getters
   get filteredSalaries(): any[] {
     if (!this.searchTerm) return this.salaries;
     const term = this.searchTerm.toLowerCase();
-    return this.salaries.filter(s => {
-      const username = s.username ? s.username.toLowerCase() : '';
-      const email = s.email ? s.email.toLowerCase() : '';
-      return username.includes(term) || email.includes(term) ;
-    });
+    return this.salaries.filter(s =>
+      (s.username?.toLowerCase().includes(term) || s.email?.toLowerCase().includes(term))
+    );
   }
+
   get paginatedSalaries(): any[] {
     const start = (this.currentPage - 1) * this.pageSize;
     return this.filteredSalaries.slice(start, start + this.pageSize);
   }
+
   get totalPages(): number { return Math.ceil(this.filteredSalaries.length / this.pageSize); }
-  changePage(page: number): void { if (page>=1 && page<=this.totalPages) this.currentPage = page; }
+  changePage(page: number): void { if (page >= 1 && page <= this.totalPages) this.currentPage = page; }
 
   get totalRecords(): number { return this.filteredHistoriques.length; }
-  get totalSalary(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.salaireBrut||0),0); }
-  get totalFacture(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.facture||0),0); }
-  get totalRentabilite(): number { return this.filteredHistoriques.reduce((s,r)=> s+(r.rentabilite||0),0); }
+  get totalSalary(): number { return this.filteredHistoriques.reduce((s, r) => s + (r.salaireBrut || 0), 0); }
+  get totalFacture(): number { return this.filteredHistoriques.reduce((s, r) => s + (r.facture || 0), 0); }
+  get totalRentabilite(): number { return this.filteredHistoriques.reduce((s, r) => s + (r.rentabilite || 0), 0); }
 
-  // Modals
   openRecordModal(record: any): void { this.selectedRecord = record; this.showRecordModal = true; }
   closeRecordModal(): void { this.showRecordModal = false; this.selectedRecord = null; }
 
-  private parseYearMonth(dateStr: string): number {
-  if (!dateStr) return 0;
-  return new Date(dateStr + '-01').getTime();
-}
-
-// Export CSV
-exportToCSV(): void {
-  if (!this.selectedProjetObj) return;
-
-  let recordsToExport = [...this.filteredHistoriques];
-
-  if (recordsToExport.length === 0) {
-    alert('Aucun enregistrement à exporter pour ce projet.');
-    return;
+  exportToCSV(): void {
+    if (!this.selectedProjetObj) return;
+    let recordsToExport = [...this.filteredHistoriques];
+    if (recordsToExport.length === 0) { alert('Aucun enregistrement à exporter'); return; }
+    recordsToExport.sort((a, b) => new Date(a.date + '-01').getTime() - new Date(b.date + '-01').getTime());
+    const columns = ['date', 'salaireBrut', 'netAvantImpot', 'netPayer', 'chargesPatronales', 'repasRestaurant',
+      'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique', 'tjm', 'joursTravailles',
+      'facture', 'paye', 'totalePercu', 'salaireNetHorsRepas', 'totaleFacture', 'rentabilite'];
+    const headers = ['Date', 'Salaire brut', 'Net avant impôt', 'Net payer', 'Charges patronales', 'Repas restaurant',
+      'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques', 'TJM', 'Jours travaillés',
+      'Facture', 'Payé', 'Total perçu', 'Salaire net hors repas', 'Total facture', 'Rentabilité'];
+    const rows = recordsToExport.map(record => columns.map(col => record[col] !== undefined && record[col] !== null ? record[col] : '').join(','));
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
-  // (optionnel) tri par date ancien → récent
-  recordsToExport.sort((a, b) => {
-    return new Date(a.date + '-01').getTime() - new Date(b.date + '-01').getTime();
-  });
+  loadPrevision(projetId: number): void {
+    this.loadingPrevision = true;
+    this.predictionIAService.getPrevisionMarge(projetId).subscribe({
+      next: (data) => {
+        this.previsionData = data;
+        const predictions = data.predictions;
 
-  // ✅ date en PREMIÈRE colonne
-  const columns = [
-    'date',
-    'salaireBrut','netAvantImpot', 'netPayer', 'chargesPatronales', 'repasRestaurant',
-    'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique',
-    'tjm', 'joursTravailles', 'facture', 'paye', 'totalePercu','salaireNetHorsRepas',
-    'totaleFacture', 'rentabilite'
-  ];
+        this.lineChartData = {
+          labels: predictions.map((p: any) => p.mois),
+          datasets: [
+            {
+              label: ' Marge probable (€)',
+              data: predictions.map((p: any) => p.marge_probable),
+              borderColor: '#FF5722',
+              backgroundColor: 'rgba(255, 87, 34, 0.1)',
+              borderWidth: 3,
+              tension: 0.4,
+              pointRadius: 5,
+              pointBackgroundColor: '#BF360C',
+              fill: true,
+              yAxisID: 'y'
+            },
+            {
+              label: ' Probabilité de paiement',
+              data: predictions.map((p: any) => p.prob_paiement),
+              borderColor: '#FFC107',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              tension: 0.2,
+              pointRadius: 4,
+              pointBackgroundColor: '#FF9800',
+              yAxisID: 'y1'
+            }
+          ]
+        };
 
-  const headers = [
-    'Date',
-    'Salaire brut', 'Net avant impôt', 'Net payer', 'Charges patronales', 'Repas restaurant',
-    'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques',
-    'TJM', 'Jours travaillés', 'Facture', 'Payé', 'Total perçu','Salaire net hors repas',
-    'Total facture', 'Rentabilité'
-  ];
+        const historique = data.historique;
+        this.historyChartData = {
+          labels: historique.map((h: any) => h.date),
+          datasets: [
+            {
+              label: 'Rentabilité réelle (€)',
+              data: historique.map((h: any) => h.rentabilite),
+              borderColor: '#6FCF97',
+              backgroundColor: 'rgba(111, 207, 151, 0.1)',
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#27AE60'
+            },
+            {
+              label: 'Coût réel (€)',
+              data: historique.map((h: any) => h.cout),
+              borderColor: '#EB5757',
+              backgroundColor: 'rgba(235, 87, 87, 0.08)',
+              fill: false,
+              tension: 0.4,
+              pointBackgroundColor: '#C0392B'
+            }
+          ]
+        };
+        this.loadingPrevision = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.loadingPrevision = false;
+      }
+    });
+  }
 
-  const rows = recordsToExport.map(record =>
-    columns.map(col =>
-      record[col] !== undefined && record[col] !== null ? record[col] : ''
-    ).join(',')
-  );
-
-  const csvContent = [headers.join(','), ...rows].join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-
-  const fileName = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
-  link.download = fileName;
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  URL.revokeObjectURL(url);
-}
-  // Prévisions IA
-
-loadPrevision(projetId: number) {
-  this.loadingPrevision = true;
-  this.predictionIAService.getPrevisionMarge(projetId).subscribe({
-    next: (data) => {
-      this.previsionData = data;
-      const predictions = data.predictions;
-
-      // ── Graphique des prévisions avec intervalles de confiance Prophet ──
-      this.lineChartData = {
-        labels: predictions.map((p: any) => p.mois),
-        datasets: [
-          // Bande de confiance haute (marge_upper)
-          {
-            label: 'Borne haute (€)',
-            data: predictions.map((p: any) => p.marge_upper),
-            borderColor: 'transparent',
-            backgroundColor: 'rgba(111, 207, 151, 0.15)',
-            fill: '+1',   // remplit jusqu'au dataset suivant
-            pointRadius: 0,
-            tension: 0.4,
-          },
-          // Marge centrale si payé
-          {
-            label: 'Marge si payé (€)',
-            data: predictions.map((p: any) => p.marge_si_paye),
-            borderColor: '#6FCF97',
-            backgroundColor: 'rgba(111, 207, 151, 0.1)',
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#27AE60',
-            pointRadius: 5,
-          },
-          // Bande de confiance basse (marge_lower)
-          {
-            label: 'Borne basse (€)',
-            data: predictions.map((p: any) => p.marge_lower),
-            borderColor: 'transparent',
-            backgroundColor: 'rgba(111, 207, 151, 0.15)',
-            fill: '-1',   // remplit vers le dataset précédent
-            pointRadius: 0,
-            tension: 0.4,
-          },
-          // Marge probable (pondérée par taux_paiement)
-          {
-            label: 'Marge probable (€)',
-            data: predictions.map((p: any) => p.marge_probable),
-            borderColor: '#F2994A',
-            backgroundColor: 'rgba(242, 153, 74, 0.08)',
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#E2711D',
-            pointRadius: 4,
-            borderDash: [5, 4],
-          },
-          // Marge si non payé
-          {
-            label: 'Marge si non payé (€)',
-            data: predictions.map((p: any) => p.marge_si_non_paye),
-            borderColor: '#FF9800',
-            backgroundColor: 'rgba(255, 152, 0, 0.08)',
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#F57C00',
-            pointRadius: 4,
-          }
-        ]
-      };
-
-      // ── Historique ────────────────────────────────────────────────────
-      const historique = data.historique;
-      this.historyChartData = {
-        labels: historique.map((h: any) => h.date),
-        datasets: [
-          {
-            label: 'Rentabilité réelle (€)',
-            data: historique.map((h: any) => h.rentabilite),
-            borderColor: '#6FCF97',
-            backgroundColor: 'rgba(111, 207, 151, 0.1)',
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#27AE60'
-          },
-          {
-            label: 'Coût réel (€)',
-            data: historique.map((h: any) => h.cout),
-            borderColor: '#EB5757',
-            backgroundColor: 'rgba(235, 87, 87, 0.08)',
-            fill: false,
-            tension: 0.4,
-            pointBackgroundColor: '#C0392B'
-          }
-        ]
-      };
-
-      this.loadingPrevision = false;
-    },
-    error: (err) => {
-      console.error('Erreur chargement prévisions', err);
-      this.loadingPrevision = false;
-    }
-  });
-}
-  // Changement d'onglet
-  setActiveTab(tab: 'historique' | 'previsions') {
+  setActiveTab(tab: 'historique' | 'previsions'): void {
     this.activeTab = tab;
     if (tab === 'previsions' && this.selectedProjetObj && !this.previsionData) {
       this.loadPrevision(this.selectedProjetObj.id);
     }
   }
 
-  // Calculs pour les KPIs
-  getAvgCaEstime(): number {
+  get avgProbabilite(): number {
     if (!this.previsionData?.predictions) return 0;
-    const sum = this.previsionData.predictions.reduce((acc: number, p: any) => acc + (p.ca_estime || 0), 0);
+    const sum = this.previsionData.predictions.reduce((acc: number, p: any) => acc + p.prob_paiement, 0);
     return sum / this.previsionData.predictions.length;
   }
 
-  getAvgMargePaye(): number {
+  get avgMargeProbable(): number {
     if (!this.previsionData?.predictions) return 0;
-    const sum = this.previsionData.predictions.reduce((acc: number, p: any) => acc + (p.marge_si_paye || 0), 0);
+    const sum = this.previsionData.predictions.reduce((acc: number, p: any) => acc + p.marge_probable, 0);
     return sum / this.previsionData.predictions.length;
   }
+
+  formatInterpretation(text: string): SafeHtml {
+  if (!text) return '';
+  // Optionnel : ajouter des classes supplémentaires aux balises existantes
+  return this.sanitizer.bypassSecurityTrustHtml(text);
+}
 }

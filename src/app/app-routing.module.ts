@@ -15,6 +15,7 @@ import { ParametresComponent } from './modules/parametres/parametres.component';
 import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gestion-par-salaries.component';
 import { ChatbotComponent } from './modules/chatbot/chatbot.component';
 import { PredictionIAComponent } from './modules/prediction-ia/prediction-ia.component';
+import { NotificationComponent } from './modules/notification/notification.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
@@ -25,11 +26,12 @@ const routes: Routes = [
   {path:'Clients',component:GestionClientComponent,canActivate: [AuthGuard]},
   {path:'Projets',component: GestionProjetComponent,canActivate: [AuthGuard]},
   {path:'Historique',component: HistoriqueSalarieComponent,canActivate: [AuthGuard]},
-  {path:'Parametres',component: ParametresComponent,canActivate: [AuthGuard]},
+  {path:'Parametres',component: ParametresComponent,canActivate: [AuthGuard],data: { role: 'admin' }},
   {path:'CalculParSalaire',component: GestionParPeriodeComponent,canActivate: [AuthGuard]},
   {path:'CalculParGroupe',component: GestionParSalariesComponent,canActivate: [AuthGuard]},
   {path:'Chatbot',component: ChatbotComponent,canActivate: [AuthGuard]},
   {path:'prediction',component: PredictionIAComponent,canActivate: [AuthGuard]},
+  {path:'notifications',component:NotificationComponent,canActivate: [AuthGuard]},
   { path: '**', redirectTo: localStorage.getItem('token') ? 'Accueil' : 'login'  }
 ];
 

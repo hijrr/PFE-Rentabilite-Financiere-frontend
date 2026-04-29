@@ -1,0 +1,71 @@
+<!-- notification-bell.component.html -->
+<div class="nb-wrapper" (click)="$event.stopPropagation()">
+
+  <!-- ── Cloche ── -->
+  <button class="nb-bell" (click)="toggle()" [class.nb-bell--active]="open">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </svg>
+    <span class="nb-badge" *ngIf="nonLues > 0">{{ nonLues > 99 ? '99+' : nonLues }}</span>
+  </button>
+
+  <!-- ── Dropdown ── -->
+  <div class="nb-dropdown" *ngIf="open">
+    <div class="nb-dropdown__header">
+      <span class="nb-dropdown__title">Notifications</span>
+      <button class="nb-dropdown__all-read" (click)="markAllRead()" *ngIf="nonLues > 0">
+        Tout marquer lu
+      </button>
+    </div>
+
+    <div class="nb-dropdown__list">
+      <div *ngIf="preview.length === 0" class="nb-empty">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".4">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span>Aucune notification</span>
+      </div>
+
+      <div *ngFor="let n of preview"
+           class="nb-item"
+           [class.nb-item--unread]="!n.lu"
+           [class.nb-item--danger]="n.niveau === 'danger'"
+           [class.nb-item--warning]="n.niveau === 'warning'"
+           (click)="markRead(n.id, $event)">
+
+        <!-- Icône -->
+        <div class="nb-item__icon" [class.nb-item__icon--danger]="n.niveau === 'danger'" [class.nb-item__icon--warning]="n.niveau === 'warning'">
+          <svg *ngIf="n.niveau === 'danger'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <svg *ngIf="n.niveau === 'warning'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <svg *ngIf="n.niveau === 'info'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12z"/>
+          </svg>
+        </div>
+
+        <!-- Contenu -->
+        <div class="nb-item__body">
+          <div class="nb-item__titre">{{ n.titre }}</div>
+          <div class="nb-item__msg">{{ n.message }}</div>
+          <div class="nb-item__meta">
+            <span *ngIf="n.projet_nom" class="nb-item__projet">{{ n.projet_nom }}</span>
+            <span class="nb-item__date">{{ n.date | date:'d MMM, HH:mm' }}</span>
+          </div>
+        </div>
+
+        <!-- Point non-lu -->
+        <div class="nb-item__dot" *ngIf="!n.lu"></div>
+      </div>
+    </div>
+
+    <button class="nb-dropdown__footer" (click)="goToAll()">
+      Voir toutes les notifications →
+    </button>
+  </div>
+</div>

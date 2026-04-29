@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ClientService } from 'src/app/services/client.service';
 import { Projet, ProjetService } from 'src/app/services/projet.service';
 import Swal from 'sweetalert2';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-gestion-projet',
@@ -55,6 +56,7 @@ export class GestionProjetComponent implements OnInit {
   });
 
   constructor(
+    public authService:AuthService,
     private projetservice: ProjetService,
     private clientService: ClientService,
     private SalarieServiceService: SalarieServiceService
