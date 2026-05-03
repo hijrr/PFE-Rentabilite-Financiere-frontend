@@ -9,7 +9,7 @@ import { SalarieServiceService } from 'src/app/services/salarie-service.service'
 @Component({
   selector: 'app-gestion-par-salaries',
   templateUrl: './gestion-par-salaries.component.html',
-  styleUrls: ['./gestion-par-salaries.component.css']
+  styleUrls: ['./gestion-par-salaries.component.css'],
 })
 export class GestionParSalariesComponent implements OnInit {
   clients: any[] = [];

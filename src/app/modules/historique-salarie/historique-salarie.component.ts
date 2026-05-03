@@ -5,7 +5,7 @@ import { FinanceDataService } from 'src/app/services/finance-data.service';
 import { PredictionIAService } from 'src/app/services/prediction-ia.service';
 import { ProjetService } from 'src/app/services/projet.service';
 import { SalarieServiceService } from 'src/app/services/salarie-service.service';
-
+import * as XLSX from 'xlsx-js-style';
 @Component({
   selector: 'app-historique-salarie',
   templateUrl: './historique-salarie.component.html',
@@ -352,30 +352,97 @@ export class HistoriqueSalarieComponent implements OnInit {
   openRecordModal(record: any): void { this.selectedRecord = record; this.showRecordModal = true; }
   closeRecordModal(): void { this.showRecordModal = false; this.selectedRecord = null; }
 
-  exportToCSV(): void {
-    if (!this.selectedProjetObj) return;
-    let recordsToExport = [...this.filteredHistoriques];
-    if (recordsToExport.length === 0) { alert('Aucun enregistrement à exporter'); return; }
-    recordsToExport.sort((a, b) => new Date(a.date + '-01').getTime() - new Date(b.date + '-01').getTime());
-    const columns = ['date', 'salaireBrut', 'netAvantImpot', 'netPayer', 'chargesPatronales', 'repasRestaurant',
-      'totalCotisationsSalariales', 'totalNoteFrais', 'totalNoteKilometrique', 'tjm', 'joursTravailles',
-      'facture', 'paye', 'totalePercu', 'salaireNetHorsRepas', 'totaleFacture', 'rentabilite'];
-    const headers = ['Date', 'Salaire brut', 'Net avant impôt', 'Net payer', 'Charges patronales', 'Repas restaurant',
-      'Total cotisations salariales', 'Total notes de frais', 'Total notes kilométriques', 'TJM', 'Jours travaillés',
-      'Facture', 'Payé', 'Total perçu', 'Salaire net hors repas', 'Total facture', 'Rentabilité'];
-    const rows = recordsToExport.map(record => columns.map(col => record[col] !== undefined && record[col] !== null ? record[col] : '').join(','));
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `historique_projet_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 19)}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+ exportToCSV(): void {
+  if (!this.selectedProjetObj) return;
+  const records = [...this.filteredHistoriques];
+  if (records.length === 0) { alert('Aucun enregistrement à exporter'); return; }
+  records.sort((a, b) => new Date(a.date + '-01').getTime() - new Date(b.date + '-01').getTime());
+
+  const headers = [
+    'Fact', 'TJM', 'Jours', 'Facture', 'Payé', 'Total Facturé',
+    'Salaire Brut', 'Salaire net FP après PAS', 'Salaire net FP avant PAS',
+    'Salaire Net hors repas', 'Frais Repas', 'Frais Kilo', 'Autre Frais',
+    'Total Perçu', 'Charges Patronales', 'Charges Salariales', 'Rentabilité'
+  ];
+
+  const wsData: any[][] = [
+    [],
+    headers,
+    ...records.map(r => [
+      r.date, r.tjm || 0, r.joursTravailles || 0, r.facture || 0,
+      r.paye || 0, r.totaleFacture || 0, r.salaireBrut || 0,
+      r.netPayer || 0, r.netAvantImpot || 0, r.salaireNetHorsRepas || 0,
+      r.repasRestaurant || 0, r.totalNoteKilometrique || 0, r.totalNoteFrais || 0,
+      r.totalePercu || 0, r.chargesPatronales || 0, r.totalCotisationsSalariales || 0, r.rentabilite || 0
+    ])
+  ];
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  const totalPercuCol = 13;
+  const rentabiliteCol = 16;
+  const specialCols = [totalPercuCol, rentabiliteCol];
+
+  const thickBorder = {
+    top: { style: 'medium', color: { rgb: '000000' } },
+    bottom: { style: 'medium', color: { rgb: '000000' } },
+    left: { style: 'medium', color: { rgb: '000000' } },
+    right: { style: 'medium', color: { rgb: '000000' } }
+  };
+
+  const thinBorder = {
+    top: { style: 'thin', color: { rgb: '000000' } },
+    bottom: { style: 'thin', color: { rgb: '000000' } },
+    left: { style: 'thin', color: { rgb: '000000' } },
+    right: { style: 'thin', color: { rgb: '000000' } }
+  };
+
+  // Style headers
+  for (let c = 0; c < headers.length; c++) {
+    const cellRef = XLSX.utils.encode_cell({ r: 1, c });
+    if (!ws[cellRef]) continue;
+    const isSpecial = specialCols.includes(c);
+    ws[cellRef].s = {
+      font: { bold: true, sz: 10 },
+      fill: { patternType: 'solid', fgColor: { rgb: isSpecial ? '70AD47' : 'D9D9D9' } },
+      alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+      border: thickBorder
+    };
   }
 
+  // Style données
+  for (let r = 2; r < wsData.length; r++) {
+    for (let c = 0; c < headers.length; c++) {
+      const cellRef = XLSX.utils.encode_cell({ r, c });
+      if (!ws[cellRef]) continue;
+      const isSpecial = specialCols.includes(c);
+      ws[cellRef].s = {
+        font: { sz: 10 },
+        fill: isSpecial
+          ? { patternType: 'solid', fgColor: { rgb: 'E2EFDA' } }
+          : { patternType: 'none' },
+        alignment: { horizontal: c === 0 ? 'left' : 'right' },
+        border: thinBorder
+      };
+    }
+  }
+
+  ws['!cols'] = [
+    { wch: 9 }, { wch: 6 }, { wch: 6 }, { wch: 10 },
+    { wch: 6 }, { wch: 10 }, { wch: 11 }, { wch: 16 },
+    { wch: 16 }, { wch: 16 }, { wch: 10 }, { wch: 10 },
+    { wch: 10 }, { wch: 11 }, { wch: 14 }, { wch: 14 }, { wch: 14 }
+  ];
+
+  ws['!rows'] = [
+    { hpt: 15 },
+    { hpt: 40 },
+    ...records.map(() => ({ hpt: 18 }))
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Feuil1');
+  XLSX.writeFile(wb, `historique_${this.selectedProjetObj.nom}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
   loadPrevision(projetId: number): void {
     this.loadingPrevision = true;
     this.predictionIAService.getPrevisionMarge(projetId).subscribe({

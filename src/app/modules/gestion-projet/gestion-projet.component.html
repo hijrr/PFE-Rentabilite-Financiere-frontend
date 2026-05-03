@@ -258,10 +258,11 @@
       class="form-control"
       [(ngModel)]="searchSalarieTerm"
       [ngModelOptions]="{standalone: true}"
-      (input)="onSalarieSearch()"
+      (input)="onSalarieSearch(); updateNomProjet()"
       (focus)="showSalarieList = true"
       (blur)="hideSalarieListWithDelay()"
       placeholder="Rechercher un salarié..."
+      [class.is-invalid]="isFieldInvalid('salarie_id')"
       autocomplete="off"
     >
     <div class="autocomplete-list" *ngIf="showSalarieList && filteredSalaries.length > 0">

@@ -110,6 +110,7 @@ export class GestionSalariesComponent implements OnInit {
   hideRoleListWithDelay() {
     this.roleHideTimeout = setTimeout(() => {
       this.showRoleList = false;
+      this.salarieForm.get('role_id')?.markAsTouched();
     }, 200);
   }
 
@@ -128,6 +129,7 @@ export class GestionSalariesComponent implements OnInit {
 
   hideRoleListModalWithDelay() {
     this.roleHideTimeoutModal = setTimeout(() => {
+       this.salarieForm.get('role_id')?.markAsTouched();
       this.showRoleListModal = false;
     }, 200);
   }
@@ -212,7 +214,12 @@ export class GestionSalariesComponent implements OnInit {
   onRoleChange(): void {
     this.filterSalaries();
   }
-
+onRoleInputChange() {
+  if (!this.roleSearchTextModal) {
+    this.salarieForm.patchValue({ role_id: null });
+    this.salarieForm.get('role_id')?.markAsTouched();
+  }
+}
   openAddModal(): void {
     this.modalMode = 'add';
     this.selectedSalarie = null;
@@ -260,10 +267,10 @@ export class GestionSalariesComponent implements OnInit {
     document.body.style.overflow = 'auto';
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.salarieForm.get(fieldName);
-    return field ? field.invalid && field.touched : false;
-  }
+isFieldInvalid(fieldName: string): boolean {
+  const field = this.salarieForm.get(fieldName);
+  return field ? (field.invalid && (field.touched || field.dirty)) : false;
+}
 
   onSubmit(): void {
     if (!this.salarieForm.valid) {

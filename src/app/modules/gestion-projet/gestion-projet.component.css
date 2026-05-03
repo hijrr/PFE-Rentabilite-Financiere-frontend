@@ -1248,3 +1248,7 @@
   color: red !important;
   border: 1px solid var(--elzei-border) !important;
 }
+:host-context(body.dark-theme) .required {
+  color: #DC2626;
+  margin-left: 0.2rem;
+}

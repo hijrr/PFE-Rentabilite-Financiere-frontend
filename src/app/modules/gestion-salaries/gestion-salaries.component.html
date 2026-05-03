@@ -189,6 +189,7 @@
                 [(ngModel)]="roleSearchTextModal"
                 [ngModelOptions]="{standalone: true}"
                 (focus)="showRoleListModal = true"
+                  (input)="onRoleInputChange()"
                 (blur)="hideRoleListModalWithDelay()"
                 [class.is-invalid]="isFieldInvalid('role_id')"
                 autocomplete="off"

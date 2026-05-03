@@ -180,3 +180,102 @@
   color: var(--elzei-gray-light, #9ca3af);
   font-size: .82rem;
 }
+/* ============================================
+   DARK MODE – Notification Bell
+   ============================================ */
+
+:host-context(body.dark-theme) .nb-bell {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+:host-context(body.dark-theme) .nb-bell:hover,
+:host-context(body.dark-theme) .nb-bell--active {
+  background: #2d3a4e;
+  border-color: #6FCF97;
+  color: #6FCF97;
+}
+
+:host-context(body.dark-theme) .nb-badge {
+  background: #ef4444;
+  border-color: #1e293b;
+}
+
+:host-context(body.dark-theme) .nb-dropdown {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+:host-context(body.dark-theme) .nb-dropdown__header {
+  border-bottom-color: #334155;
+}
+:host-context(body.dark-theme) .nb-dropdown__title {
+  color: #f1f5f9;
+}
+:host-context(body.dark-theme) .nb-dropdown__all-read {
+  color: #6FCF97;
+}
+
+:host-context(body.dark-theme) .nb-item {
+  border-bottom-color: #334155;
+}
+:host-context(body.dark-theme) .nb-item:hover {
+  background: #0f172a;
+}
+:host-context(body.dark-theme) .nb-item--unread {
+  background: rgba(111, 207, 151, 0.08);
+}
+:host-context(body.dark-theme) .nb-item--danger {
+  border-left-color: #ef4444;
+}
+:host-context(body.dark-theme) .nb-item--warning {
+  border-left-color: #f59e0b;
+}
+
+:host-context(body.dark-theme) .nb-item__icon {
+  background: #0f172a;
+  color: #94a3b8;
+}
+:host-context(body.dark-theme) .nb-item__icon--danger {
+  background: #7f1a1a;
+  color: #fca5a5;
+}
+:host-context(body.dark-theme) .nb-item__icon--warning {
+  background: #78350f;
+  color: #fbbf24;
+}
+
+:host-context(body.dark-theme) .nb-item__titre {
+  color: #f1f5f9;
+}
+:host-context(body.dark-theme) .nb-item__msg {
+  color: #cbd5e1;
+}
+:host-context(body.dark-theme) .nb-item__projet {
+  background: rgba(111, 207, 151, 0.2);
+  color: #6FCF97;
+}
+:host-context(body.dark-theme) .nb-item__date {
+  color: #64748b;
+}
+
+:host-context(body.dark-theme) .nb-item__dot {
+  background: #6FCF97;
+}
+
+:host-context(body.dark-theme) .nb-dropdown__footer {
+  background: #0f172a;
+  border-top-color: #334155;
+  color: #6FCF97;
+}
+:host-context(body.dark-theme) .nb-dropdown__footer:hover {
+  background: #1e293b;
+}
+
+:host-context(body.dark-theme) .nb-empty {
+  color: #94a3b8;
+}
+:host-context(body.dark-theme) .nb-empty svg {
+  stroke: #475569;
+}

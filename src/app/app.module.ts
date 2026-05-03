@@ -28,6 +28,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { PredictionIAComponent } from './modules/prediction-ia/prediction-ia.component';
 import { NotificationComponent } from './modules/notification/notification.component';
 import { NotificationBellComponent } from './modules/notification-bell/notification-bell.component';
+import { SimulationComponent } from './modules/simulation/simulation.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -51,6 +52,7 @@ import { NotificationBellComponent } from './modules/notification-bell/notificat
     PredictionIAComponent,
     NotificationComponent,
     NotificationBellComponent,
+    SimulationComponent,
   ],
   imports: [
     BrowserModule,

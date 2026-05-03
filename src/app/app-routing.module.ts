@@ -16,6 +16,7 @@ import { GestionParSalariesComponent } from './modules/gestion-par-salaries/gest
 import { ChatbotComponent } from './modules/chatbot/chatbot.component';
 import { PredictionIAComponent } from './modules/prediction-ia/prediction-ia.component';
 import { NotificationComponent } from './modules/notification/notification.component';
+import { SimulationComponent } from './modules/simulation/simulation.component';
 
 const routes: Routes = [
   { path:'login', component:AuthComponent },
@@ -32,6 +33,7 @@ const routes: Routes = [
   {path:'Chatbot',component: ChatbotComponent,canActivate: [AuthGuard]},
   {path:'prediction',component: PredictionIAComponent,canActivate: [AuthGuard]},
   {path:'notifications',component:NotificationComponent,canActivate: [AuthGuard]},
+  { path: 'simulation', component: SimulationComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: localStorage.getItem('token') ? 'Accueil' : 'login'  }
 ];
 

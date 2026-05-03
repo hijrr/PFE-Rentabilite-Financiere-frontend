@@ -558,3 +558,12 @@
   border-color: #6FCF97 !important;
   color: #27AE60 !important;
 }
+.page-wrapper {
+  min-height: 100vh;
+  background: var(--elzei-bg);
+  padding: 2rem;
+}
+
+body.dark-theme .page-wrapper {
+  background: #0f172a;
+}

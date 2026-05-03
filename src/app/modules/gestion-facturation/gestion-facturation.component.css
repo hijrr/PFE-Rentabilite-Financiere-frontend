@@ -1412,16 +1412,7 @@
   background: linear-gradient(135deg, #27AE60 0%, #6FCF97 100%) !important;
 }
 
-:host-context(body.dark-theme) .btn-secondary {
-  background: white !important;
-  color: #4B5563 !important;
-  border: 1px solid #E5E7EB !important;
-}
-:host-context(body.dark-theme) .btn-secondary:hover {
-  background: #E8F8F0 !important;
-  border-color: #6FCF97 !important;
-  color: #27AE60 !important;
-}
+
 
 :host-context(body.dark-theme) .action-btn.view {
   background: var(--elzei-white);
@@ -1500,4 +1491,14 @@
   background: #F3F4F6 !important;
   color: #4B5563 !important;
   border: 1px solid #E5E7EB !important;
+}
+:host-context(body.dark-theme) .btn-secondary {
+  background: var(--elzei-white);
+  color: var(--elzei-gray);
+  border-color: var(--elzei-border);
+}
+:host-context(body.dark-theme) .btn-secondary:hover {
+  background: var(--elzei-green-light);
+  border-color: var(--elzei-green);
+  color: var(--elzei-green-dark);
 }

@@ -74,6 +74,7 @@ export class GestionProjetComponent implements OnInit {
     this.SalarieServiceService.getSalaries().subscribe({
       next: (data) => {
         this.salariesList = data || [];
+        this.refreshProjectNames();
         console.log('Salariés chargés:', this.salariesList);
       },
       error: (err) => console.error('Erreur chargement salariés:', err)
@@ -273,6 +274,8 @@ export class GestionProjetComponent implements OnInit {
   console.log('Recherche salarié:', term);
   if (!term) {
     this.filteredSalaries = [];
+     this.projetForm.patchValue({ salarie_id: null });
+    this.projetForm.get('salarie_id')?.markAsTouched();
     return;
   }
   this.filteredSalaries = this.salariesList.filter(s =>
@@ -281,11 +284,13 @@ export class GestionProjetComponent implements OnInit {
   );
   console.log('Résultats:', this.filteredSalaries);
   this.showSalarieList = true; // Force l'affichage
+   this.updateNomProjet();
 }
 
  hideSalarieListWithDelay(): void {
   setTimeout(() => {
     this.showSalarieList = false;
+    this.projetForm.get('salarie_id')?.markAsTouched();
   }, 300);
 }
 
@@ -297,15 +302,43 @@ export class GestionProjetComponent implements OnInit {
     this.updateNomProjet();
   }
 
- updateNomProjet(): void {
+updateNomProjet(): void {
   const clientName = this.projetForm.get('client')?.value || '';
-  const salarieId = this.projetForm.get('salarie_id')?.value;
-  const salarieName = this.salariesList.find(s => s.id == salarieId)?.username || '';
 
-  if (clientName && salarieName) {
-    const generatedNom = `${clientName} - ${salarieName}`;
-    this.projetForm.get('nom')?.setValue(generatedNom);
+  const salarieId = this.projetForm.get('salarie_id')?.value;
+
+  // 🔥 Priorité au salarié sélectionné
+  let salarieName = this.salariesList.find(s => s.id == salarieId)?.username;
+
+  // 🔥 Si pas sélectionné → utiliser texte tapé
+  if (!salarieName) {
+    salarieName = this.searchSalarieTerm || '';
   }
+
+  // 🔥 Construction intelligente
+  if (clientName && salarieName) {
+    this.projetForm.get('nom')?.setValue(`${clientName} - ${salarieName}`, { emitEvent: false });
+  } else if (clientName) {
+    this.projetForm.get('nom')?.setValue(clientName, { emitEvent: false });
+  } else {
+    this.projetForm.get('nom')?.setValue('', { emitEvent: false });
+  }
+}
+refreshProjectNames(): void {
+  this.projets = this.projets.map(p => {
+    const salarie = this.salariesList.find(s => s.id == p.salarie_id);
+
+    if (p.client && salarie) {
+      return {
+        ...p,
+        nom: `${p.client} - ${salarie.username}`
+      };
+    }
+
+    return p;
+  });
+
+  this.filteredProjets = [...this.projets];
 }
 
   openAddModal(): void {

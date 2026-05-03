@@ -379,10 +379,4 @@ getCATtcImpayee(): number {
     document.body.style.overflow = 'auto';
   }
 
-  downloadInvoice(invoice: any): void {
-    console.log('Téléchargement facture:', invoice.ref);
-    if (invoice.online_payment_url) {
-      window.open(invoice.online_payment_url, '_blank');
-    }
-  }
 }

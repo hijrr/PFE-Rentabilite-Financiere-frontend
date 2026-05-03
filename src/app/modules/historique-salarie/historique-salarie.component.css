@@ -819,3 +819,17 @@
   font-weight: 600;
 }
 
+:host-context(body.dark-theme) .hs-risk-badge--low {
+  background: #1e3a2a;
+  color: #7ee2a8;
+}
+
+:host-context(body.dark-theme) .hs-risk-badge--med {
+  background: #3a2f1a;
+  color: #ffd08a;
+}
+
+:host-context(body.dark-theme) .hs-risk-badge--high {
+  background: #3a1e1e;
+  color: #ff8a8a;
+}

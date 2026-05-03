@@ -35,6 +35,7 @@ export class DasboardComponent implements OnInit {
       case 'calculpargroupe': return 'calculParGroupe';
       case'calculparsalaire': return 'calculparsalaire';
       case'prediction': return 'prediction';
+      case'simulation':return'simulation';
       default: return 'accueil';
     }
   }

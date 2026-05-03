@@ -72,3 +72,203 @@
 .np-card__ia-body :deep(.chip-num) { background:#e0e7ff;color:#6366f1;padding:0 4px;border-radius:4px;font-weight:600;font-size:.8rem; }
 
 .np-empty { display:flex;flex-direction:column;align-items:center;gap:12px;padding:60px 20px;color:var(--elzei-gray-light,#9ca3af);font-size:.85rem;text-align:center; }
+/* ============================================
+   DARK THEME – NOTIFICATIONS
+   ============================================ */
+
+:host-context(body.dark-theme) {
+  .np-root {
+    background: var(--elzei-bg, #0f172a);
+  }
+
+  .np-header__icon {
+    background: #1e293b;
+    color: #6FCF97;
+  }
+
+  .np-header h1,
+  .np-header p,
+  .np-card__titre,
+  .np-card__msg,
+  .np-card__date,
+  .np-card__ia-body,
+  .np-card__top,
+  .np-card__meta,
+  .np-empty p {
+    color: var(--elzei-gray-dark, #e2e8f0) !important;
+  }
+
+  .np-header p,
+  .np-card__date,
+  .np-empty p {
+    color: var(--elzei-gray-light, #94a3b8) !important;
+  }
+
+  .np-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+  .np-btn:hover {
+    background: #2d3a4e;
+    border-color: #6FCF97;
+    color: #6FCF97;
+  }
+  .np-btn--danger {
+    background: #7f1a1a;
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
+  .np-btn--danger:hover {
+    background: #ef4444;
+    color: white;
+  }
+  .np-btn--ghost {
+    background: transparent;
+  }
+
+  .np-filters {
+    background: #1e293b;
+    border-color: #334155;
+  }
+  .np-filter-group label {
+    color: #94a3b8;
+  }
+  .np-pill {
+    border-color: #334155;
+    color: #cbd5e1;
+    background: transparent;
+  }
+  .np-pill:hover {
+    border-color: #6FCF97;
+    color: #6FCF97;
+  }
+  .np-pill--active {
+    background: #2d3a4e;
+    border-color: #6FCF97;
+    color: #6FCF97;
+  }
+  .np-pill--danger.np-pill--active {
+    background: #7f1a1a;
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
+  .np-pill--warning.np-pill--active {
+    background: #78350f;
+    border-color: #f59e0b;
+    color: #fbbf24;
+  }
+  .np-pill--info.np-pill--active {
+    background: #1e3a5f;
+    border-color: #3b82f6;
+    color: #93c5fd;
+  }
+
+  .np-card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+  .np-card--unread {
+    background: rgba(111, 207, 151, 0.05);
+  }
+  .np-card--danger {
+    border-left-color: #ef4444;
+  }
+  .np-card--warning {
+    border-left-color: #f59e0b;
+  }
+
+  .np-card__icon--danger {
+    background: #7f1a1a;
+    color: #fca5a5;
+  }
+  .np-card__icon--warning {
+    background: #78350f;
+    color: #fbbf24;
+  }
+  .np-card__icon--info {
+    background: #1e3a5f;
+    color: #93c5fd;
+  }
+
+  .np-badge {
+    background: #334155;
+    color: #cbd5e1;
+  }
+  .np-badge--danger {
+    background: #7f1a1a;
+    color: #fca5a5;
+  }
+  .np-badge--warning {
+    background: #78350f;
+    color: #fbbf24;
+  }
+  .np-badge--info {
+    background: #1e3a5f;
+    color: #93c5fd;
+  }
+  .np-badge--ia {
+    background: #2e1065;
+    color: #c4b5fd;
+  }
+  .np-badge--unread {
+    background: #064e3b;
+    color: #34d399;
+  }
+
+  .np-card__projet {
+    color: #6FCF97 !important;
+  }
+
+  .np-card__btn {
+    background: #0f172a;
+    border-color: #334155;
+    color: #94a3b8;
+  }
+  .np-card__btn:hover {
+    background: #2d3a4e;
+    border-color: #6FCF97;
+    color: #6FCF97;
+  }
+
+  .np-card__ia {
+    border-top-color: #334155;
+    background: linear-gradient(135deg, rgba(111, 207, 151, 0.04) 0%, rgba(111, 207, 151, 0.01) 100%);
+  }
+  .np-card__ia-header {
+    color: #6FCF97;
+  }
+  .np-card__ia-body :deep(.ia-section) {
+    border-left-color: #334155;
+    background: #0f172a;
+  }
+  .np-card__ia-body :deep(.chip-pos) {
+    color: #34d399;
+    font-weight: 600;
+  }
+  .np-card__ia-body :deep(.chip-neg) {
+    color: #f87171;
+    font-weight: 600;
+  }
+  .np-card__ia-body :deep(.chip-num) {
+    background: #1e293b;
+    color: #6FCF97;
+  }
+
+  .np-empty svg {
+    stroke: #475569;
+  }
+  .np-empty p {
+    color: #64748b;
+  }
+}
+.page-wrapper {
+  min-height: 100vh;
+  background: var(--elzei-bg);
+  padding: 2rem;
+}
+
+body.dark-theme .page-wrapper {
+  background: #0f172a;
+}
+

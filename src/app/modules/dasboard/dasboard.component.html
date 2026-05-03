@@ -116,7 +116,16 @@
           </a>
         </li>
       </ul>
+      <ul class="nav-list">
+        <li class="nav-item" [class.active]="activeItem === 'simulation'">
+          <a class="nav-link" (click)="setActive('simulation')" routerLink="/simulation">
+            <i class="fas fa-flask"></i>
+            <span class="nav-label">Simulation</span>
+          </a>
+        </li>
+      </ul>
     </div>
+
 
     <!-- SECTION PARAMÈTRES -->
     <div class="nav-section"*ngIf="authService.isAdmin()">

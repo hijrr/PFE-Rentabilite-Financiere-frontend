@@ -562,3 +562,8 @@
 .clear-btn:hover {
   color: #DC2626;
 }
+:host-context(body.dark-theme) .error-message {
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border-color: rgba(220, 38, 38, 0.3);
+}

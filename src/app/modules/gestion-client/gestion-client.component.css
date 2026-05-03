@@ -1200,3 +1200,23 @@
   color: var(--elzei-gray) !important;
   border: 1px solid var(--elzei-border) !important;
 }
+:host-context(body.dark-theme) .close-btn {
+  background: rgb(85, 17, 17) !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+}
+:host-context(body.dark-theme) .close-btn:hover {
+  background: #522424 !important;
+  color: #DC2626 !important;
+  border-color: #FECACA !important;
+}
+:host-context(body.dark-theme) .btn-secondary {
+  background: var(--elzei-white);
+  color: var(--elzei-gray);
+  border-color: var(--elzei-border);
+}
+:host-context(body.dark-theme) .btn-secondary:hover {
+  background: var(--elzei-green-light);
+  border-color: var(--elzei-green);
+  color: var(--elzei-green-dark);
+}
