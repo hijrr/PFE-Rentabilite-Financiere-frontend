@@ -29,4 +29,7 @@ private DolibarData = new BehaviorSubject<any>(null);
   getHistoriques(): Observable<any[]> {
     return this.http.get<any[]>(`http://localhost:8000/historiques`);
   }
+  updateHistorique(id: number, data: any): Observable<any> {
+  return this.http.put(`http://localhost:8000/historique/${id}`, data);
+}
 }

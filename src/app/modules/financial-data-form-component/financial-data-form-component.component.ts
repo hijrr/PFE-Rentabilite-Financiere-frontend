@@ -86,18 +86,16 @@ this.financeForm.get('joursTravailles')?.valueChanges.subscribe(() => this.updat
 }
 
 updateKPI() {
+  const repas = Number(this.financeForm.get('repasRestaurant')?.value || 0);
+const nf = Number(this.financeForm.get('totalNoteFrais')?.value || 0);
+const nk = Number(this.financeForm.get('totalNoteKilometrique')?.value || 0);
+const netAvantImpot = Number(this.financeForm.get('netAvantImpot')?.value || 0);
   const netHorsRepas = Math.round(
-  (Number(this.financeForm.get('netAvantImpot')?.value || 0) -
-   Number(this.financeForm.get('repasRestaurant')?.value || 0)) * 100
+  (netAvantImpot - repas) * 100
 ) / 100;
 
 const totalPercu = Math.round(
-  (
-    netHorsRepas +
-    Number(this.financeForm.get('repasRestaurant')?.value || 0) +
-    Number(this.financeForm.get('totalNoteFrais')?.value || 0) +
-    Number(this.financeForm.get('totalNoteKilometrique')?.value || 0)
-  ) * 100
+  (netAvantImpot + nf + nk) * 100
 ) / 100;
   const factureTotale = (this.financeForm.get('paye')?.value ? 1 : 0) *
                         (this.financeForm.get('facture')?.value || 0);
@@ -123,31 +121,95 @@ resetForm(){
 
 onSubmit() {
   if (this.financeForm.valid) {
+
     const financeData = this.financeForm.getRawValue();
     const kpiData = this.kpiForm.getRawValue();
-   // Fusionner les deux objets pour envoyer au service
+
     const dataToSend = {
       date: this.dolibarData.date || null,
-        salarie_id: this.dolibarData.salarie_id || null,
-        projet_id: this.dolibarData.projet_id || null,
+      salarie_id: this.dolibarData.salarie_id || null,
+      projet_id: this.dolibarData.projet_id || null,
       ...financeData,
       ...kpiData
     };
+
     console.log('Données à envoyer :', dataToSend);
-     this.financeDataService.createHistorique(dataToSend).subscribe({
-      next: (res) => {
-        Swal.fire({
-  icon: 'success',
-  title: 'Succès',
-  text: 'Les données ont été enregistrées avec succès !',
-  confirmButtonColor: '#28a745',
-  timer: 2500,
-  showConfirmButton: false
-});
-        console.log('Historique créé avec succès :', res);
+
+    // 🔎 1. chercher si existe déjà
+    this.financeDataService.getHistoriques().subscribe({
+      next: (historiques) => {
+
+        const existing = historiques.find(h =>
+          h.date === dataToSend.date &&
+          h.salarie_id === dataToSend.salarie_id &&
+          h.projet_id === dataToSend.projet_id
+        );
+
+        // ─────────────────────────────
+        // 🔁 UPDATE si existe
+        // ─────────────────────────────
+        if (existing) {
+
+          this.financeDataService.updateHistorique(existing.id, dataToSend)
+            .subscribe({
+              next: (res) => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Mis à jour',
+                  text: 'Historique modifié avec succès !',
+                  timer: 2500,
+                  showConfirmButton: false
+                });
+
+                console.log('Updated:', res);
+              },
+              error: (err) => {
+                console.error('Erreur update:', err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Erreur',
+                  text: 'Erreur lors de la mise à jour de l\'historique',
+                  confirmButtonColor: '#dc3545'
+                });
+              }
+            });
+
+        }
+
+        // ─────────────────────────────
+        // ➕ CREATE si n'existe pas
+        // ─────────────────────────────
+        else {
+
+          this.financeDataService.createHistorique(dataToSend)
+            .subscribe({
+              next: (res) => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Succès',
+                  text: 'Les données ont été enregistrées avec succès !',
+                  timer: 2500,
+                  showConfirmButton: false
+                });
+
+                console.log('Created:', res);
+              },
+              error: (err) => {
+                console.error('Erreur create:', err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Erreur',
+                  text: 'Erreur lors de la création de l\'historique',
+                  confirmButtonColor: '#dc3545'
+                });
+              }
+            });
+
+        }
       },
+
       error: (err) => {
-        console.error('Erreur lors de la création de l\'historique :', err);
+        console.error('Erreur getHistoriques:', err);
       }
     });
 

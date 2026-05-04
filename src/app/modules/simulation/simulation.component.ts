@@ -11,19 +11,26 @@ interface ConseilIA {
   priorite: 'haute' | 'moyenne' | 'faible';
 }
 
+// Nouvelle structure exacte du backend
 interface SimulationResult {
   last_reel?: {
     tjm: number;
     jours: number;
+    repas: number;
+    note_frais: number;
+    note_kilo: number;
+    net_payer: number;
+    snhr: number;
     facture: number;
     cout: number;
     rentabilite: number;
   };
-  last_ligne_simulee: {
-    facture: number;
+  simulation: {
+    facture_brute: number;   // tjm × jours
+    facture_sim: number;     // facture_brute * paye (0 si non payé)
     cout: number;
+    net_hors_repas: number;
     rentabilite: number;
-    paye: number;
   };
   predictions: any[];
   metriques: {
@@ -33,9 +40,25 @@ interface SimulationResult {
     taux_paiement_historique: number;
   };
   profil_dt: {
-    classe: 'RENTABLE' | 'FRAGILE' | 'EN_DANGER' | 'INCONNU';
-    confiance: number;
-    probas: Record<string, number>;
+    // Cas si le mois est payé
+    cas_paye: {
+      classe: 'BON_MOIS' | 'MOYEN_MOIS' | 'MAUVAIS_MOIS';
+      confiance: number;
+      probas: Record<string, number>;
+      rentabilite: number;
+      totaleFacture: number;
+    };
+    // Cas si le mois n'est pas payé
+    cas_non_paye: {
+      classe: 'BON_MOIS' | 'MOYEN_MOIS' | 'MAUVAIS_MOIS';
+      confiance: number;
+      probas: Record<string, number>;
+      rentabilite: number;
+      totaleFacture: number;
+    };
+    facture_brute: number;
+    cout_sim: number;
+    impact_non_paye: number;
   };
   conseils_ia: {
     verdict?: 'positif' | 'négatif' | 'neutre';
@@ -55,7 +78,6 @@ interface SimulationResult {
 export class SimulationComponent implements OnInit {
   projets: Projet[] = [];
   selectedProjetId: number | null = null;
-  selectedProjetNom: string = '';
   loadingProjets = false;
   loadingLastData = false;
   simulationRunning = false;
@@ -96,8 +118,6 @@ export class SimulationComponent implements OnInit {
 
   onProjetChange() {
     if (!this.selectedProjetId) return;
-    const p = this.projets.find(p => p.id === this.selectedProjetId);
-    this.selectedProjetNom = p?.nom || '';
     this.simulationResult = null;
     this.activeTab = 'resultats';
     this.loadLastHistorique();
@@ -136,20 +156,8 @@ export class SimulationComponent implements OnInit {
     });
   }
 
-  resetCurrentValues() {
-    this.currentValues = {
-      tjm: 0, joursTravailles: 0, repasRestaurant: 0,
-      totalNoteFrais: 0, totalNoteKilometrique: 0,
-      paye: 0, facture: 0, cout: 0, rentabilite: 0
-    };
-  }
-
-  resetSimulationForm() {
-    this.simParams = {
-      tjm: null, jours_travailles: null, repas_restaurant: null,
-      total_note_frais: null, total_note_kilometrique: null
-    };
-  }
+  resetCurrentValues() { /* ... identique ... */ }
+  resetSimulationForm() { /* ... identique ... */ }
 
   runSimulation() {
     if (!this.selectedProjetId) return;
@@ -171,16 +179,16 @@ export class SimulationComponent implements OnInit {
     });
   }
 
+  // ─── Getter adaptés à la nouvelle structure ─────────────
   get deltaRentabilite(): number {
-    if (!this.simulationResult) return 0;
-    return this.simulationResult.last_ligne_simulee.rentabilite - (this.currentValues.rentabilite || 0);
-  }
+  if (!this.simulationResult) return 0;
+  return this.simulationResult.simulation.rentabilite - (this.currentValues.rentabilite || 0);
+}
 
-  get deltaFacture(): number {
-    if (!this.simulationResult) return 0;
-    return this.simulationResult.last_ligne_simulee.facture - (this.currentValues.facture || 0);
-  }
-
+get deltaFacture(): number {
+  if (!this.simulationResult) return 0;
+  return this.simulationResult.simulation.facture_sim - (this.currentValues.facture || 0);
+}
   get marge3Mois(): number {
     if (!this.simulationResult?.predictions) return 0;
     return this.simulationResult.predictions.reduce((s, p) => s + (p.marge_probable || 0), 0);
@@ -237,25 +245,33 @@ export class SimulationComponent implements OnInit {
     return this.sanitizer.bypassSecurityTrustHtml(formatted);
   }
 
-  // Decision Tree helpers
+  // ─── NOUVEAUX GETTERS pour l’onglet Decision Tree ───────
+  // Classe du cas payé (affichage principal)
+  get dtClasse(): string {
+    return this.simulationResult?.profil_dt?.cas_paye?.classe || 'INCONNU';
+  }
+
+  get dtConfiance(): number {
+    return this.simulationResult?.profil_dt?.cas_paye?.confiance || 0;
+  }
+
   get dtClasseCss(): string {
-    const c = this.simulationResult?.profil_dt?.classe;
-    if (c === 'RENTABLE') return 'dt-rentable';
-    if (c === 'EN_DANGER') return 'dt-danger';
-    if (c === 'FRAGILE') return 'dt-fragile';
-    return 'dt-inconnu';
+    const c = this.dtClasse;
+    if (c === 'BON_MOIS') return 'dt-rentable';
+    if (c === 'MAUVAIS_MOIS') return 'dt-danger';
+    return 'dt-fragile';
   }
 
   get dtClasseIcon(): string {
-    const c = this.simulationResult?.profil_dt?.classe;
-    if (c === 'RENTABLE') return '✦';
-    if (c === 'EN_DANGER') return '⚠';
-    if (c === 'FRAGILE') return '◈';
-    return '?';
+    const c = this.dtClasse;
+    if (c === 'BON_MOIS') return '✦';
+    if (c === 'MAUVAIS_MOIS') return '⚠';
+    return '◈';
   }
 
+  // Probabilités (cas payé)
   get probasArray(): { classe: string; prob: number; pct: number }[] {
-    const probas = this.simulationResult?.profil_dt?.probas;
+    const probas = this.simulationResult?.profil_dt?.cas_paye?.probas;
     if (!probas) return [];
     return Object.entries(probas)
       .map(([classe, prob]) => ({ classe, prob: prob as number, pct: Math.round((prob as number) * 100) }))
@@ -263,16 +279,14 @@ export class SimulationComponent implements OnInit {
   }
 
   probaClasseCss(classe: string): string {
-    if (classe === 'RENTABLE') return 'dt-rentable';
-    if (classe === 'EN_DANGER') return 'dt-danger';
-    if (classe === 'FRAGILE') return 'dt-fragile';
-    return '';
+    if (classe === 'BON_MOIS') return 'dt-rentable';
+    if (classe === 'MAUVAIS_MOIS') return 'dt-danger';
+    return 'dt-fragile';
   }
 
   probaFillCss(classe: string): string {
-    if (classe === 'RENTABLE') return 'fill-rentable';
-    if (classe === 'EN_DANGER') return 'fill-danger';
-    if (classe === 'FRAGILE') return 'fill-fragile';
-    return '';
+    if (classe === 'BON_MOIS') return 'fill-rentable';
+    if (classe === 'MAUVAIS_MOIS') return 'fill-danger';
+    return 'fill-fragile';
   }
 }

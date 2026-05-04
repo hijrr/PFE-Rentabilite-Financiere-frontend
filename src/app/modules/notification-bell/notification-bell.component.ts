@@ -23,13 +23,11 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-
     this.subs.add(
       this.notifService.nonLues$.subscribe(n => {
         this.nonLues = n;
       })
     );
-
     this.subs.add(
       this.notifService.notifications$.subscribe(list => {
         this.preview = (list || []).slice(0, 5);
@@ -58,7 +56,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.notifService.markRead(id);
   }
 
-  markAllRead(): void {
+  markAllRead(event: MouseEvent): void {
+    event.stopPropagation();
     this.notifService.markAllRead();
   }
 

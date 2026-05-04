@@ -5,6 +5,7 @@ import { ExtractionService } from 'src/app/services/extraction.service';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
 import { ProjetService } from 'src/app/services/projet.service';
 import { SalarieServiceService } from 'src/app/services/salarie-service.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-gestion-par-salaries',
@@ -343,10 +344,17 @@ export class GestionParSalariesComponent implements OnInit {
     const totalNoteKilometrique = Number(period.km?.total_en_euro || 0);
     const facture = Number(period.factureAssociee.total_ht);
     const paye = Number(period.factureAssociee.paye);
-    const netHorsRepas = netAvantImpot - repasRestaurant;
-    const totalPercu = netHorsRepas + repasRestaurant + totalNoteFrais + totalNoteKilometrique;
-    const factureTotale = (paye ? 1 : 0) * facture;
-    const rentabilite = factureTotale - totalPercu;
+     const netHorsRepas =
+    Math.round((netAvantImpot - repasRestaurant) * 100) / 100;
+
+  const totalPercu =
+    Math.round((netAvantImpot + totalNoteFrais + totalNoteKilometrique) * 100) / 100;
+
+  const factureTotale =
+    Math.round((paye * facture) * 100) / 100;
+
+  const rentabilite =
+    Number((factureTotale - totalPercu).toFixed(2));
     const dataToSave = {
       salarie_id:period.selectedProjet.salarie_id,
       date: this.convertPeriodToYYYYMM(period.periodName),
@@ -369,11 +377,70 @@ export class GestionParSalariesComponent implements OnInit {
       rentabilite: rentabilite
     };
     console.log("✅ Données envoyées :", dataToSave);
-    this.financeDataService.createHistorique(dataToSave).subscribe({
-      next: (res) => console.log('Historique créé avec succès :', res),
-      error: (err) => console.error('Erreur lors de la création de l\'historique :', err)
-    });
-    alert(`Données sauvegardées pour ${period.periodName}`);
+   this.financeDataService.getHistoriques().subscribe({
+    next: (historiques) => {
+
+      const existing = historiques.find(h =>
+        h.date === dataToSave.date &&
+        h.salarie_id === dataToSave.salarie_id &&
+        h.projet_id === dataToSave.projet_id
+      );
+
+      // ─────────────────────────────
+      // 🔁 UPDATE
+      // ─────────────────────────────
+      if (existing) {
+
+        this.financeDataService.updateHistorique(existing.id, dataToSave)
+          .subscribe({
+            next: (res) => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Mis à jour',
+                text: 'Données mises à jour avec succès',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (err) => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Erreur lors de la mise à jour'
+              });
+            }
+          });
+
+      }
+
+      // ─────────────────────────────
+      // ➕ CREATE
+      // ─────────────────────────────
+      else {
+
+        this.financeDataService.createHistorique(dataToSave)
+          .subscribe({
+            next: (res) => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Succès',
+                text: 'Données enregistrées',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (err) => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Erreur lors de l’enregistrement'
+              });
+            }
+          });
+
+      }
+    }
+  });
   }
 
   get areAllFilesUploaded(): boolean {

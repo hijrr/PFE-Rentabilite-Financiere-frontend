@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
 export interface Notification {
   id: string;
   type: 'alerte' | 'recommandation' | 'info';
@@ -13,149 +14,103 @@ export interface Notification {
   lu: boolean;
   date: string;
 }
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class NotificationService {
-  private _notifications$ = new BehaviorSubject<Notification[]>([]);
-  private _nonLues$ = new BehaviorSubject<number>(0);
-  private _newToast$ = new Subject<Notification>();
 
-  readonly notifications$ = this._notifications$.asObservable();
-  readonly nonLues$ = this._nonLues$.asObservable();
-  readonly newToast$ = this._newToast$.asObservable();
+  private API = 'http://localhost:8000/notifications';
 
-  private ws?: WebSocket;
-  private wsReconnectTimer: any;
+  private _notifications = new BehaviorSubject<Notification[]>([]);
+  notifications$ = this._notifications.asObservable();
+
+  private _nonLues = new BehaviorSubject<number>(0);
+  nonLues$ = this._nonLues.asObservable();
+
+  private socket?: WebSocket;
 
   constructor(private http: HttpClient) {
-     this.loadAll();
-    this.connectWS();
-   }
-   // ─────────────────────────────────────────────
-  // GET ALL
-  // ─────────────────────────────────────────────
-  loadAll(): void {
-    this.http.get<any>('http://localhost:8000/notifications')
-      .subscribe({
-        next: (res) => {
-          this._notifications$.next(res.items || []);
-          this._nonLues$.next(res.non_lues || 0);
-        },
-        error: (err) => console.error('loadAll error', err)
-      });
+    this.loadInitial();
+    this.connectWebSocket();
   }
 
-  // ─────────────────────────────────────────────
-  // WEBSOCKET
-  // ─────────────────────────────────────────────
-  private connectWS(): void {
-
-    this.ws = new WebSocket('ws://localhost:8000/notifications/ws');
-
-    this.ws.onopen = () => console.log('WS connected');
-
-    this.ws.onmessage = (event) => {
-      const payload = JSON.parse(event.data);
-
-      if (payload.type === 'init') {
-
-        const existing = this._notifications$.value;
-        const ids = new Set(existing.map(n => n.id));
-
-        const merged = [
-          ...payload.notifications.filter((n: Notification) => !ids.has(n.id)),
-          ...existing
-        ];
-
-        this._notifications$.next(merged);
-        this._nonLues$.next(merged.filter(n => !n.lu).length);
-
-      } else {
-
-        const notif = payload as Notification;
-
-        this._notifications$.next([notif, ...this._notifications$.value]);
-        this._nonLues$.next(this._notifications$.value.filter(n => !n.lu).length);
-        this._newToast$.next(notif);
-      }
-    };
-
-    this.ws.onclose = () => {
-      this.wsReconnectTimer = setTimeout(() => this.connectWS(), 5000);
-    };
-
-    this.ws.onerror = () => this.ws?.close();
+  loadInitial() {
+    this.http.get<any>(this.API).subscribe(res => {
+      const items = res.items ?? [];
+      this._notifications.next(items);
+      this.updateCount(items);
+    });
   }
 
-  // ─────────────────────────────────────────────
-  // CHECK NOW
-  // ─────────────────────────────────────────────
-  checkNow(): Observable<any> {
-    return this.http.post('http://localhost:8000/notifications/check', {});
+  connectWebSocket() {
+    try {
+      this.socket = new WebSocket('ws://localhost:8000/notifications/ws');
+
+      this.socket.onmessage = (event) => {
+        try {
+          const notif: Notification = JSON.parse(event.data);
+          const current = this._notifications.value;
+          if (!current.some(n => n.id === notif.id)) {
+            const updated = [notif, ...current];
+            this._notifications.next(updated);
+            this.updateCount(updated);
+          }
+        } catch (e) {
+          console.error('WS parse error', e);
+        }
+      };
+
+      this.socket.onclose = () => {
+        setTimeout(() => this.connectWebSocket(), 3000);
+      };
+
+    } catch (e) {
+      console.error('WS error', e);
+    }
   }
 
-  // ─────────────────────────────────────────────
-  // MARK READ
-  // ─────────────────────────────────────────────
-  markRead(id: string): void {
-    this.http.patch(`http://localhost:8000/notifications/${id}/read`, {})
-      .subscribe(() => {
-
-        const updated = this._notifications$.value.map(n =>
-          n.id === id ? { ...n, lu: true } : n
-        );
-
-        this._notifications$.next(updated);
-        this._nonLues$.next(updated.filter(n => !n.lu).length);
-      });
+  updateCount(list: Notification[]) {
+    this._nonLues.next(list.filter(n => !n.lu).length);
   }
 
-  // ─────────────────────────────────────────────
-  // MARK ALL READ
-  // ─────────────────────────────────────────────
-  markAllRead(): void {
-    this.http.patch('http://localhost:8000/notifications/read-all', {})
-      .subscribe(() => {
-
-        const updated = this._notifications$.value.map(n => ({
-          ...n,
-          lu: true
-        }));
-
-        this._notifications$.next(updated);
-        this._nonLues$.next(0);
-      });
+  markRead(id: string) {
+    this.http.patch(`${this.API}/${id}/read`, {}).subscribe(() => {
+      const updated = this._notifications.value.map(n =>
+        n.id === id ? { ...n, lu: true } : n
+      );
+      this._notifications.next(updated);
+      this.updateCount(updated);
+    });
   }
 
-  // ─────────────────────────────────────────────
-  // CLEAR READ
-  // ─────────────────────────────────────────────
-  clearRead(): void {
-    this.http.delete('http://localhost:8000/notifications/clear')
-      .subscribe(() => {
-        const updated = this._notifications$.value.filter(n => !n.lu);
-        this._notifications$.next(updated);
-      });
+  // ✅ Correction : marquer toutes les notifications non lues sur le serveur
+  markAllRead() {
+    const nonLues = this._notifications.value.filter(n => !n.lu);
+    if (nonLues.length === 0) return;
+
+    // Envoyer une requête pour chaque notification non lue
+    // Note : on pourrait aussi créer un endpoint dédié, mais c'est acceptable
+    const promises = nonLues.map(n =>
+      firstValueFrom(this.http.patch(`${this.API}/${n.id}/read`, {}))
+    );
+
+    Promise.all(promises).then(() => {
+      const updated = this._notifications.value.map(n => ({ ...n, lu: true }));
+      this._notifications.next(updated);
+      this.updateCount(updated);
+    }).catch(err => console.error('Erreur markAllRead', err));
   }
 
-  // ─────────────────────────────────────────────
-  // HELPERS
-  // ─────────────────────────────────────────────
-  getByProjet(projetId: number): Notification[] {
-    return this._notifications$.value.filter(n => n.projet_id === projetId);
+  clearRead() {
+    this.http.delete(`${this.API}/clear`).subscribe(() => {
+      const updated = this._notifications.value.filter(n => !n.lu);
+      this._notifications.next(updated);
+      this.updateCount(updated);
+    });
   }
 
-  getNonLues(): Notification[] {
-    return this._notifications$.value.filter(n => !n.lu);
-  }
-
-  // ─────────────────────────────────────────────
-  // CLEANUP
-  // ─────────────────────────────────────────────
-  ngOnDestroy(): void {
-    this.ws?.close();
-    clearTimeout(this.wsReconnectTimer);
+  checkNow() {
+    return this.http.post(`${this.API}/check`, {});
   }
 }

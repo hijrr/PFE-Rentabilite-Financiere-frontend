@@ -1020,3 +1020,29 @@
     background: #6FCF97 !important;
   }
 }
+.dt-compare-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.dt-compare-card {
+  flex: 1;
+  background: var(--elzei-white);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid var(--elzei-border);
+}
+.dt-paye { border-top: 3px solid #10B981; }
+.dt-non-paye { border-top: 3px solid #EF4444; }
+.dt-compare-header {
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.dt-compare-line {
+  font-size: 0.85rem;
+  margin: 0.3rem 0;
+  display: flex;
+  justify-content: space-between;
+}
+.ia-verdict-icon { font-size: 2rem; }
+.metric-chip strong { margin-left: 0.3rem; }

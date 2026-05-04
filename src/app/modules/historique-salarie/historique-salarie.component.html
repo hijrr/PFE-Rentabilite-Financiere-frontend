@@ -376,9 +376,11 @@
           <tr><td>Date</td><td>{{ selectedRecord.date }}</td></tr>
           <tr><td>Salaire brut</td><td>{{ selectedRecord.salaireBrut | currency:'EUR' }}</td></tr>
           <tr><td>Net à payer</td><td>{{ selectedRecord.netPayer | currency:'EUR' }}</td></tr>
+          <tr><td>Net avant impôt</td><td>{{ selectedRecord.netAvantImpot | currency:'EUR' }}</td></tr>
           <tr><td>Charges patronales</td><td>{{ selectedRecord.chargesPatronales | currency:'EUR' }}</td></tr>
+          <tr><td>Salaire hors repas</td><td>{{ selectedRecord.salaireNetHorsRepas| currency:'EUR' }}</td></tr>
           <tr><td>Repas restaurant</td><td>{{ selectedRecord.repasRestaurant | currency:'EUR' }}</td></tr>
-          <tr><td>Total cotisations salariales</td><td>{{ selectedRecord.totalCotisationsSalariales | currency:'EUR' }}</td></tr>
+          <tr><td>Charges salariales</td><td>{{ selectedRecord.totalCotisationsSalariales | currency:'EUR' }}</td></tr>
           <tr><td>Total notes de frais</td><td>{{ selectedRecord.totalNoteFrais | currency:'EUR' }}</td></tr>
           <tr><td>Total notes kilométriques</td><td>{{ selectedRecord.totalNoteKilometrique | currency:'EUR' }}</td></tr>
           <tr><td>TJM</td><td>{{ selectedRecord.tjm | currency:'EUR' }}</td></tr>

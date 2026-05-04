@@ -1,19 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { NotificationService } from 'src/app/services/notification.service';
-
-interface Notification {
-  id: string;
-  type: 'alerte' | 'recommandation' | 'info';
-  niveau: 'danger' | 'warning' | 'info';
-  titre: string;
-  message: string;
-  recommandation?: string;
-  projet_id?: number;
-  projet_nom?: string;
-  lu: boolean;
-  date: string;
-}
+import { NotificationService, Notification } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-notification',
@@ -25,21 +12,21 @@ export class NotificationComponent implements OnInit, OnDestroy {
   all: Notification[] = [];
   filtered: Notification[] = [];
 
-  filterType: string = 'tous';
-  filterNiveau: string = 'tous';
-  filterLu: string = 'tous';
+  filterType = 'tous';
+  filterNiveau = 'tous';
+  filterLu = 'tous';
 
   expandedId: string | null = null;
-  checking = false;
 
-  private subs = new Subscription();
+  private subscription = new Subscription();
 
   constructor(public notifService: NotificationService) {}
 
   ngOnInit(): void {
-    this.subs.add(
+    // S'abonner aux notifications du service
+    this.subscription.add(
       this.notifService.notifications$.subscribe(list => {
-        this.all = list;
+        this.all = list ?? [];
         this.applyFilters();
       })
     );
@@ -47,16 +34,19 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
   applyFilters(): void {
     this.filtered = this.all.filter(n => {
+      // Filtre par type
       if (this.filterType !== 'tous' && n.type !== this.filterType) return false;
+      // Filtre par niveau
       if (this.filterNiveau !== 'tous' && n.niveau !== this.filterNiveau) return false;
-      if (this.filterLu === 'non-lu' && n.lu) return false;
+      // Filtre par statut (lu / non lu)
       if (this.filterLu === 'lu' && !n.lu) return false;
+      if (this.filterLu === 'non-lu' && n.lu) return false;
       return true;
     });
   }
 
-  setFilter(field: string, val: string): void {
-    (this as any)[field] = val;
+  setFilter(field: 'filterType' | 'filterNiveau' | 'filterLu', value: string): void {
+    this[field] = value;
     this.applyFilters();
   }
 
@@ -80,15 +70,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
     this.expandedId = this.expandedId === id ? null : id;
   }
 
-  checkNow(): void {
-    this.checking = true;
-    this.notifService.checkNow().subscribe({
-      next: () => this.checking = false,
-      error: () => this.checking = false
-    });
-  }
-
   ngOnDestroy(): void {
-    this.subs.unsubscribe();
+    this.subscription.unsubscribe();
   }
 }

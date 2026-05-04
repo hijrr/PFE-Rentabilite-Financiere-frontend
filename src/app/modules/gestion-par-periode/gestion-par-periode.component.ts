@@ -4,6 +4,7 @@ import { ExtractionService } from 'src/app/services/extraction.service';
 import { FinanceDataService } from 'src/app/services/finance-data.service';
 import { ProjetService } from 'src/app/services/projet.service';
 import { SalarieServiceService } from 'src/app/services/salarie-service.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-gestion-par-periode',
@@ -377,17 +378,17 @@ removeFile(type: 'paie' | 'frais' | 'km'): void {
   const paye = Number(period.factureAssociee.paye );
 
   // 🔹 Calculs
-  const netHorsRepas = netAvantImpot - repasRestaurant;
+  const netHorsRepas =
+    Math.round((netAvantImpot - repasRestaurant) * 100) / 100;
 
   const totalPercu =
-    netHorsRepas +
-    repasRestaurant +
-    totalNoteFrais +
-    totalNoteKilometrique;
+    Math.round((netAvantImpot + totalNoteFrais + totalNoteKilometrique) * 100) / 100;
 
-  const factureTotale = (paye ? 1 : 0) * facture;
+  const factureTotale =
+    Math.round((paye * facture) * 100) / 100;
 
-  const rentabilite = factureTotale - totalPercu;
+  const rentabilite =
+    Number((factureTotale - totalPercu).toFixed(2));
 
   // 🔹 Construction objet backend
   const dataToSave = {
@@ -418,18 +419,78 @@ removeFile(type: 'paie' | 'frais' | 'km'): void {
     rentabilite: rentabilite
   };
 
-  console.log("✅ Données envoyées :", dataToSave);
+  this.financeDataService.getHistoriques().subscribe({
+    next: (historiques) => {
 
-  this.financeDataService.createHistorique(dataToSave).subscribe({
-      next: (res) => {
-        console.log('Historique créé avec succès :', res);
-      },
-      error: (err) => {
-        console.error('Erreur lors de la création de l\'historique :', err);
+      const existing = historiques.find(h =>
+        h.date === dataToSave.date &&
+        h.salarie_id === dataToSave.salarie_id &&
+        h.projet_id === dataToSave.projet_id
+      );
+
+      // ─────────────────────────────
+      // 🔁 UPDATE
+      // ─────────────────────────────
+      if (existing) {
+
+        this.financeDataService.updateHistorique(existing.id, dataToSave)
+          .subscribe({
+            next: (res) => {
+              console.log("✅ Historique mis à jour :", res);
+            Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: 'Les données ont été mis à jour avec succès',
+        confirmButtonColor: '#28a745',
+        timer: 2000,
+        showConfirmButton: false
+      });
+            },
+            error: (err) => {
+              console.error("Erreur update :", err);
+                Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors de l’enregistrement',
+        confirmButtonColor: '#dc3545'
+      });
+            }
+          });
+
       }
-    });
 
-  alert(`Données sauvegardées pour ${period.periodName}`);
+      // ─────────────────────────────
+      // ➕ CREATE
+      // ─────────────────────────────
+      else {
+
+        this.financeDataService.createHistorique(dataToSave)
+          .subscribe({
+            next: (res) => {
+              console.log("✅ Historique créé :", res);
+              Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: 'Les données ont été créées avec succès',
+        confirmButtonColor: '#28a745',
+        timer: 2000,
+        showConfirmButton: false
+      });
+            },
+            error: (err) => {
+              console.error("Erreur create :", err);
+              Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Erreur lors de l’enregistrement',
+        confirmButtonColor: '#dc3545'
+      });
+            }
+          });
+
+      }
+    }
+  });
 }
   get areAllFilesUploaded(): boolean {
   return this.selectedFiles.paie !== null &&
