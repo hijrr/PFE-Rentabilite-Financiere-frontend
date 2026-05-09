@@ -279,3 +279,18 @@
 :host-context(body.dark-theme) .nb-empty svg {
   stroke: #475569;
 }
+
+@media (max-width: 480px) {
+  .nb-dropdown {
+    position: fixed;
+    top: 8.5rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-height: calc(100vh - 9.5rem);
+  }
+
+  .nb-dropdown__list {
+    max-height: calc(100vh - 15rem);
+  }
+}

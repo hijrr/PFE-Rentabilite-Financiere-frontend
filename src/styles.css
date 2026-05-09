@@ -308,5 +308,520 @@ body.dark-theme .alert-error {
   border-color: rgba(255,255,255,0.12) ;
 }
 
+/* ===== Responsive foundation ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+img,
+svg,
+canvas,
+video {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  font: inherit;
+}
+
+app-root,
+app-page-main,
+app-gestion-facturation,
+app-gestion-client,
+app-gestion-projet,
+app-gestion-salaries,
+app-calcul-ren-main,
+app-gestion-par-periode,
+app-gestion-par-salaries,
+app-historique-salarie,
+app-parametres,
+app-prediction-ia,
+app-simulation,
+app-notification {
+  display: block;
+  min-width: 0;
+}
+
+.dashboard-wrapper,
+.factures-container,
+.client-container,
+.projet-container,
+.salarie-container,
+.periode-container,
+.historique-container,
+.param-page,
+.elzei-container,
+.sim-page,
+.dai-page,
+.np-root,
+.app-layout {
+  width: min(100%, 100%);
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dashboard-header,
+.factures-header,
+.client-header,
+.projet-header,
+.salarie-header,
+.periode-header,
+.panel-header,
+.modal-header,
+.modal-footer,
+.filters-bar,
+.filters-section,
+.header-actions,
+.pagination-section,
+.filter-bar,
+.tabs-row,
+.sim-hero,
+.sim-body,
+.compare-row,
+.dt-main-left {
+  min-width: 0;
+}
+
+.dashboard-header,
+.factures-header,
+.client-header,
+.projet-header,
+.salarie-header,
+.periode-header,
+.panel-header,
+.modal-header,
+.modal-footer,
+.filters-bar,
+.filters-section,
+.header-actions,
+.pagination-section,
+.filter-bar {
+  gap: clamp(0.625rem, 2vw, 1.25rem);
+}
+
+.kpi-section,
+.kpi-grid,
+.dai-kpis,
+.kpi-row,
+.charts-grid,
+.documents-grid,
+.detail-grid,
+.details-grid,
+.form-grid,
+.stats-grid,
+.sim-body,
+.ref-grid,
+.metrics-row,
+.prev-grid,
+.insights-grid,
+.decision-tree-grid,
+.employees-grid,
+.dai-body {
+  min-width: 0;
+}
+
+.kpi-section,
+.kpi-grid,
+.documents-grid,
+.details-grid,
+.detail-grid,
+.form-grid,
+.stats-grid,
+.metrics-row,
+.prev-grid,
+.insights-grid,
+.decision-tree-grid,
+.employees-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)) !important;
+}
+
+.charts-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)) !important;
+}
+
+.dai-kpis,
+.kpi-row {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)) !important;
+}
+
+.sim-body,
+.dai-body {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.sim-sidebar,
+.sim-main,
+.dai-col-main,
+.dai-col-side,
+.chart-card,
+.kpi-card,
+.document-card,
+.card,
+.component-card,
+.form-panel,
+.image-panel,
+.details-section,
+.compare-card,
+.dai-chart-card,
+.dai-ai-card {
+  min-width: 0;
+}
+
+.filters-bar,
+.filters-section,
+.header-actions,
+.filter-bar,
+.pagination-section,
+.modal-footer,
+.tabs-row,
+.salaries-badges,
+.dai-stat-pills,
+.compare-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group,
+.search-container,
+.search-wrapper,
+.custom-select-wrapper,
+.status-filter-wrapper,
+.form-group,
+.param-field,
+.ctrl-block,
+.select-wrap {
+  min-width: min(100%, 13rem);
+}
+
+.search-wrapper,
+.custom-select,
+.select-wrap {
+  width: 100%;
+}
+
+.search-input,
+.filter-input,
+.filter-select,
+.status-filter,
+.form-control,
+.sim-input,
+.sim-select,
+textarea,
+select,
+input {
+  width: 100%;
+}
+
+.table-wrapper,
+.hs-table-wrap,
+.modal-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  overflow-wrap: anywhere;
+}
+
+.table-wrapper table,
+.factures-table,
+.client-table,
+.projet-table,
+.salarie-table {
+  min-width: min(58rem, 220vw);
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
+.modal-overlay {
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+}
+
+.modal-container {
+  width: min(100%, 56rem) !important;
+  max-width: min(100%, 56rem) !important;
+  max-height: min(90vh, 54rem);
+}
+
+.modal-body {
+  overflow-x: hidden;
+}
+
+.chart-wrapper,
+.dai-chart-wrap,
+.hs-chart-wrap {
+  min-height: clamp(13rem, 34vw, 18rem);
+}
+
+.pagination-section {
+  justify-content: space-between;
+}
+
+.pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.page-btn,
+.action-btn,
+.btn-icon,
+.theme-toggle,
+.notification-btn {
+  flex: 0 0 auto;
+}
+
+.btn-add,
+.btn-primary,
+.btn-secondary,
+.btn-reset-all,
+.btn-reset-filter,
+.btn-reset-filters,
+.sim-btn-run,
+.tab-btn {
+  min-width: max-content;
+}
+
+.client-info,
+.client-info-with-logo,
+.projet-info,
+.salarie-info,
+.modal-title,
+.header-title,
+.kpi-card,
+.dai-proj-card__top,
+.hs-list-item,
+.np-item {
+  min-width: 0;
+}
+
+.client-name,
+.client-code,
+.projet-name,
+.salarie-name,
+.kpi-label,
+.kpi-value,
+.dai-proj-card__name,
+.dai-proj-card__meta,
+.header-title h1,
+.dashboard-header h1 {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 769px) {
+  .sim-body {
+    grid-template-columns: minmax(17rem, 0.35fr) minmax(0, 1fr) !important;
+  }
+
+  .dai-body {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem) !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .dashboard-header,
+  .factures-header,
+  .client-header,
+  .projet-header,
+  .salarie-header,
+  .sim-hero,
+  .pagination-section {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions,
+  .filters-bar,
+  .filters-section,
+  .filter-bar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .dashboard-wrapper,
+  .factures-container,
+  .client-container,
+  .projet-container,
+  .salarie-container,
+  .periode-container,
+  .historique-container,
+  .param-page,
+  .elzei-container,
+  .sim-page,
+  .dai-page,
+  .np-root {
+    padding: clamp(0.75rem, 3vw, 1rem) !important;
+  }
+
+  .kpi-section,
+  .kpi-grid,
+  .documents-grid,
+  .details-grid,
+  .detail-grid,
+  .form-grid,
+  .stats-grid,
+  .charts-grid,
+  .dai-kpis,
+  .kpi-row {
+    gap: 0.8rem !important;
+  }
+
+  .filter-group,
+  .search-container,
+  .search-wrapper,
+  .custom-select-wrapper,
+  .status-filter-wrapper,
+  .btn-add,
+  .btn-primary,
+  .btn-secondary,
+  .btn-reset-all,
+  .btn-reset-filter,
+  .btn-reset-filters,
+  .sim-btn-run,
+  .tab-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-title {
+    width: 100%;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .header-title h1,
+  .dashboard-header h1,
+  .sim-hero h1 {
+    font-size: clamp(1.35rem, 7vw, 2rem) !important;
+    line-height: 1.12;
+  }
+
+  .kpi-card,
+  .document-card,
+  .card,
+  .chart-card,
+  .component-card,
+  .details-section,
+  .compare-card,
+  .ctrl-block {
+    padding: clamp(0.85rem, 3.5vw, 1rem) !important;
+  }
+
+  .modal-overlay {
+    align-items: flex-start !important;
+  }
+
+  .modal-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100vh - 1.5rem);
+    border-radius: 0.875rem !important;
+  }
+
+  .modal-header,
+  .modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-title {
+    width: 100%;
+  }
+
+  .close-btn {
+    align-self: flex-end;
+  }
+
+  .pagination-controls {
+    width: 100%;
+  }
+
+  .page-btn {
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+  }
+
+  .compare-row,
+  .dt-main-left,
+  .dai-proj-card__top {
+    flex-wrap: wrap;
+  }
+
+  .bar-label,
+  .bar-val {
+    width: auto !important;
+    min-width: 3.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+
+  .dashboard-wrapper,
+  .factures-container,
+  .client-container,
+  .projet-container,
+  .salarie-container,
+  .periode-container,
+  .historique-container,
+  .param-page,
+  .elzei-container,
+  .sim-page,
+  .dai-page,
+  .np-root {
+    padding-inline: 0.6rem !important;
+  }
+
+  .table-wrapper table,
+  .factures-table,
+  .client-table,
+  .projet-table,
+  .salarie-table {
+    min-width: 44rem;
+  }
+
+  .kpi-card {
+    align-items: flex-start;
+  }
+
+  .tabs-row {
+    align-items: stretch;
+  }
+}
 
 

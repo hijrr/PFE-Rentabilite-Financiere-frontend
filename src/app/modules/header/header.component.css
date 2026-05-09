@@ -3,26 +3,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.8rem 2rem;
+  gap: 1rem;
+  padding: clamp(0.7rem, 1.6vw, 0.9rem) clamp(0.9rem, 2.4vw, 2rem);
   background: var(--elzei-white);
   border-bottom: 2px solid #E8F8F0;
   box-shadow: 0 2px 8px rgba(111, 207, 151, 0.08);
- margin-bottom: 10px;
+  margin-bottom: 0.75rem;
   z-index: 100;
   transition: background-color 0.3s ease, border-color 0.3s ease;
-
+  width: 100%;
+  min-width: 0;
 }
 
 /* Logo section */
 .logo-section {
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .logo-wrapper {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  min-width: 0;
 }
 
 .logo-wrapper svg {
@@ -39,7 +43,10 @@
   font-size: 1.4rem;
   font-weight: 500;
   color: #1F2937;
-  letter-spacing: -0.3px;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .logo-highlight {
@@ -52,7 +59,10 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: flex-end;
+  gap: clamp(0.5rem, 1.8vw, 1.5rem);
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 /* Bouton thème */
@@ -222,7 +232,8 @@
 /* Responsive */
 @media (max-width: 768px) {
   .main-header {
-    padding: 0.8rem 1rem;
+    align-items: center;
+    padding: 0.65rem 0.75rem;
   }
 
   .logo-text {
@@ -238,14 +249,33 @@
   }
 
   .notification-dropdown {
-    width: 280px;
+    width: min(280px, calc(100vw - 1.5rem));
     right: -50px;
   }
 }
 
 @media (max-width: 480px) {
+  .main-header {
+    gap: 0.5rem;
+  }
+
+  .header-actions {
+    gap: 0.45rem;
+  }
+
   .logo-text {
     display: none;
+  }
+
+  .theme-toggle,
+  .user-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+  }
+
+  .user-menu {
+    padding: 0.15rem;
   }
 }
 .logo-img {

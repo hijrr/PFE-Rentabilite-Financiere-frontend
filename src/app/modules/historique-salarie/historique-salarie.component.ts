@@ -5,6 +5,7 @@ import { FinanceDataService } from 'src/app/services/finance-data.service';
 import { PredictionIAService } from 'src/app/services/prediction-ia.service';
 import { ProjetService } from 'src/app/services/projet.service';
 import { SalarieServiceService } from 'src/app/services/salarie-service.service';
+import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx-js-style';
 @Component({
   selector: 'app-historique-salarie',
@@ -352,11 +353,20 @@ export class HistoriqueSalarieComponent implements OnInit {
   openRecordModal(record: any): void { this.selectedRecord = record; this.showRecordModal = true; }
   closeRecordModal(): void { this.showRecordModal = false; this.selectedRecord = null; }
 
- exportToCSV(): void {
+exportToCSV(): void {
   if (!this.selectedProjetObj) return;
   const records = [...this.filteredHistoriques];
-  if (records.length === 0) { alert('Aucun enregistrement à exporter'); return; }
+  if (records.length === 0) {  Swal.fire({
+        icon: 'warning',
+        title: 'Aucun enregistrement',
+        text: 'Il n’y a aucun enregistrement à exporter.',
+        confirmButtonText: 'OK'
+    });
+    return; }
   records.sort((a, b) => new Date(a.date + '-01').getTime() - new Date(b.date + '-01').getTime());
+
+  // Calcul du total des rentabilités
+  const totalRentabilite = records.reduce((sum, r) => sum + (r.rentabilite || 0), 0);
 
   const headers = [
     'Fact', 'TJM', 'Jours', 'Facture', 'Payé', 'Total Facturé',
@@ -365,17 +375,28 @@ export class HistoriqueSalarieComponent implements OnInit {
     'Total Perçu', 'Charges Patronales', 'Charges Salariales', 'Rentabilité'
   ];
 
+  // Construction des lignes de données + ligne de total
+  const dataRows = records.map(r => [
+    r.date, r.tjm || 0, r.joursTravailles || 0, r.facture || 0,
+    r.paye || 0, r.totaleFacture || 0, r.salaireBrut || 0,
+    r.netPayer || 0, r.netAvantImpot || 0, r.salaireNetHorsRepas || 0,
+    r.repasRestaurant || 0, r.totalNoteKilometrique || 0, r.totalNoteFrais || 0,
+    r.totalePercu || 0, r.chargesPatronales || 0, r.totalCotisationsSalariales || 0, r.rentabilite || 0
+  ]);
+
+  // Ligne de total (seule la colonne Rentabilité est remplie)
+  const totalRow = new Array(headers.length).fill('');
+  totalRow[0] = 'TOTAL';                     // première colonne
+  totalRow[headers.length - 1] = totalRentabilite; // dernière colonne (Rentabilité)
+
   const wsData: any[][] = [
-    [],
+    [],                                    // ligne vide en tête (optionnelle)
     headers,
-    ...records.map(r => [
-      r.date, r.tjm || 0, r.joursTravailles || 0, r.facture || 0,
-      r.paye || 0, r.totaleFacture || 0, r.salaireBrut || 0,
-      r.netPayer || 0, r.netAvantImpot || 0, r.salaireNetHorsRepas || 0,
-      r.repasRestaurant || 0, r.totalNoteKilometrique || 0, r.totalNoteFrais || 0,
-      r.totalePercu || 0, r.chargesPatronales || 0, r.totalCotisationsSalariales || 0, r.rentabilite || 0
-    ])
+    ...dataRows,
+    totalRow                               // ligne de total ajoutée à la fin
   ];
+
+  // ... (le reste du code : création de la feuille, styles, etc. inchangé)
 
   const ws = XLSX.utils.aoa_to_sheet(wsData);
   const totalPercuCol = 13;
@@ -396,7 +417,7 @@ export class HistoriqueSalarieComponent implements OnInit {
     right: { style: 'thin', color: { rgb: '000000' } }
   };
 
-  // Style headers
+  // Style des en-têtes (ligne 1)
   for (let c = 0; c < headers.length; c++) {
     const cellRef = XLSX.utils.encode_cell({ r: 1, c });
     if (!ws[cellRef]) continue;
@@ -409,8 +430,8 @@ export class HistoriqueSalarieComponent implements OnInit {
     };
   }
 
-  // Style données
-  for (let r = 2; r < wsData.length; r++) {
+  // Style des données (lignes 2 à N-1)
+  for (let r = 2; r < 2 + dataRows.length; r++) {
     for (let c = 0; c < headers.length; c++) {
       const cellRef = XLSX.utils.encode_cell({ r, c });
       if (!ws[cellRef]) continue;
@@ -426,6 +447,34 @@ export class HistoriqueSalarieComponent implements OnInit {
     }
   }
 
+  // Style de la ligne de total (dernière ligne)
+  const totalRowIndex = 2 + dataRows.length;
+  for (let c = 0; c < headers.length; c++) {
+    const cellRef = XLSX.utils.encode_cell({ r: totalRowIndex, c });
+    if (!ws[cellRef]) continue;
+    const isSpecial = specialCols.includes(c);
+    const cellStyle: any = {
+      font: { bold: true, sz: 10 },
+      fill: { patternType: 'solid', fgColor: { rgb: 'D9D9D9' } },
+      alignment: { horizontal: c === 0 ? 'left' : 'right' },
+      border: {
+        top: { style: 'medium', color: { rgb: '000000' } },
+        bottom: { style: 'medium', color: { rgb: '000000' } },
+        left: { style: 'thin', color: { rgb: '000000' } },
+        right: { style: 'thin', color: { rgb: '000000' } }
+      }
+    };
+    // Couleur pour la colonne rentabilité dans la ligne total
+    if (c === rentabiliteCol) {
+      const value = totalRentabilite;
+      if (value > 0) cellStyle.font.color = { rgb: '00B050' };
+      else if (value < 0) cellStyle.font.color = { rgb: 'FF0000' };
+    }
+    ws[cellRef].s = cellStyle;
+  }
+
+
+  // Largeurs des colonnes (inchangées)
   ws['!cols'] = [
     { wch: 9 }, { wch: 6 }, { wch: 6 }, { wch: 10 },
     { wch: 6 }, { wch: 10 }, { wch: 11 }, { wch: 16 },
@@ -436,7 +485,8 @@ export class HistoriqueSalarieComponent implements OnInit {
   ws['!rows'] = [
     { hpt: 15 },
     { hpt: 40 },
-    ...records.map(() => ({ hpt: 18 }))
+    ...records.map(() => ({ hpt: 18 })),
+    { hpt: 20 }   // hauteur de la ligne de total
   ];
 
   const wb = XLSX.utils.book_new();

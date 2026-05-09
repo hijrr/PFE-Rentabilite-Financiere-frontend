@@ -1,352 +1,253 @@
-<!-- simulation.component.html -->
-<div class="sim-page">
-
-  <!-- ══ HERO HEADER ══════════════════════════════════════ -->
-  <header class="sim-hero">
-    <div class="sim-hero__left">
-      <div class="sim-eyebrow">
-        <span class="dot"></span> Module analytique
-      </div>
-      <h1>Simulateur<br><span class="accent">de rentabilité</span></h1>
-      <p>Ajustez les paramètres et mesurez l'impact sur les prévisions à 3 mois.</p>
+<div class="simulation-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Simulation financière</p>
+      <h1>Dashboard de rentabilité</h1>
+      <p class="header-copy">Analysez le dernier mois réel, testez un scénario estimé, puis contrôlez la décision Gaussian NB.</p>
     </div>
-    <div class="sim-hero__right" *ngIf="simulationResult">
-      <div class="verdict-pill" [class]="verdictClass">
-        <span class="verdict-icon">{{ verdictIcon }}</span>
-        <span>{{ simulationResult.conseils_ia.verdict | titlecase }}</span>
-      </div>
-      <div class="hero-delta" [class.pos]="deltaRentabilite >= 0" [class.neg]="deltaRentabilite < 0">
+
+    <div class="header-summary" *ngIf="simulationResult">
+      <span class="status-badge" [ngClass]="verdictClass">{{ verdictLabel }}</span>
+      <strong [ngClass]="deltaRentabilite >= 0 ? 'text-good' : 'text-bad'">
         {{ deltaRentabilite | number:'+1.0-0' }} €
-        <small>impact rentabilité</small>
-      </div>
+      </strong>
+      <small>écart rentabilité</small>
     </div>
   </header>
 
-  <div class="sim-body">
+  <div class="dashboard-layout">
+    <aside class="control-panel">
+      <section class="panel-card">
+        <label class="field-label" for="projet">Projet</label>
+        <select id="projet" class="select-input" [(ngModel)]="selectedProjetId" (change)="onProjetChange()">
+          <option [ngValue]="null">Choisir un projet</option>
+          <option *ngFor="let projet of projets" [ngValue]="projet.id">{{ projet.nom }}</option>
+        </select>
+        <div class="mini-loader" *ngIf="loadingProjets"></div>
+      </section>
 
-    <!-- ══ SIDEBAR (contrôles) ═══════════════════════════════ -->
-    <aside class="sim-sidebar">
-
-      <div class="ctrl-block">
-        <label class="ctrl-label-top">Projet analysé</label>
-        <div class="select-wrap">
-          <select class="sim-select" [(ngModel)]="selectedProjetId" (change)="onProjetChange()">
-            <option [ngValue]="null">— Choisir un projet —</option>
-            <option *ngFor="let p of projets" [ngValue]="p.id">{{ p.nom }}</option>
-          </select>
-          <span class="select-icon">⌄</span>
+      <section class="panel-card" *ngIf="selectedProjetId">
+        <div class="panel-title-row">
+          <h2>Paramètres</h2>
+          <span class="soft-badge">modifiable</span>
         </div>
-        <div class="loading-bar" *ngIf="loadingProjets"><div class="loading-fill"></div></div>
-      </div>
 
-      <div class="ctrl-block ref-block" *ngIf="selectedProjetId && !loadingLastData">
-        <div class="ctrl-block-header">
-          <span class="ctrl-label-top">Référence · dernier mois</span>
-          <span class="badge-ref">réel</span>
+        <div class="loading-state compact" *ngIf="loadingLastData">
+          <span class="spinner"></span>
+          Chargement du dernier mois
         </div>
-        <div class="ref-grid">
-          <div class="ref-item"><span>TJM</span><strong>{{ currentValues.tjm }} €</strong></div>
-          <div class="ref-item"><span>Jours</span><strong>{{ currentValues.joursTravailles }} j</strong></div>
-          <div class="ref-item"><span>Facture</span><strong>{{ currentValues.facture | number:'1.0-0' }} €</strong></div>
-          <div class="ref-item"><span>Coût</span><strong>{{ currentValues.cout | number:'1.0-0' }} €</strong></div>
-          <div class="ref-item ref-item--full">
-            <span>Rentabilité</span>
-            <strong [class.pos]="currentValues.rentabilite >= 0" [class.neg]="currentValues.rentabilite < 0">
-              {{ currentValues.rentabilite | number:'1.0-0' }} €
-            </strong>
+
+        <ng-container *ngIf="!loadingLastData">
+          <div class="input-grid">
+            <label>
+              <span>TJM simulé</span>
+              <input type="number" class="number-input" [(ngModel)]="simParams.tjm" />
+            </label>
+
+            <label>
+              <span>Jours simulés</span>
+              <input type="number" class="number-input" [(ngModel)]="simParams.jours_travailles" />
+            </label>
+
+            <label>
+              <span>Repas restaurant</span>
+              <input type="number" class="number-input" [(ngModel)]="simParams.repas_restaurant" />
+            </label>
+
+            <label>
+              <span>Notes de frais</span>
+              <input type="number" class="number-input" [(ngModel)]="simParams.total_note_frais" />
+            </label>
+
+            <label class="wide">
+              <span>Notes kilométriques</span>
+              <input type="number" class="number-input" [(ngModel)]="simParams.total_note_kilometrique" />
+            </label>
           </div>
-        </div>
-      </div>
 
-      <div class="ctrl-block" *ngIf="selectedProjetId && !loadingLastData">
-        <div class="ctrl-block-header">
-          <span class="ctrl-label-top">Paramètres simulés</span>
-          <span class="badge-sim">modifiable</span>
-        </div>
-
-        <div class="param-field">
-          <div class="param-header"><label>TJM client</label><span class="param-unit">€ / jour</span></div>
-          <div class="param-input-row">
-            <input type="number" step="10" class="sim-input" [(ngModel)]="simParams.tjm" [placeholder]="currentValues.tjm" />
-            <span class="param-diff"
-                  [class.pos]="(simParams.tjm || 0) > currentValues.tjm"
-                  [class.neg]="(simParams.tjm || 0) < currentValues.tjm"
-                  *ngIf="simParams.tjm !== null">
-              {{ (simParams.tjm! - currentValues.tjm) | number:'+1.0-0' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="param-field">
-          <div class="param-header"><label>Jours travaillés</label><span class="param-unit">j / mois</span></div>
-          <div class="param-input-row">
-            <input type="number" step="1" class="sim-input" [(ngModel)]="simParams.jours_travailles" [placeholder]="currentValues.joursTravailles" />
-            <span class="param-diff"
-                  [class.pos]="(simParams.jours_travailles || 0) > currentValues.joursTravailles"
-                  [class.neg]="(simParams.jours_travailles || 0) < currentValues.joursTravailles"
-                  *ngIf="simParams.jours_travailles !== null">
-              {{ (simParams.jours_travailles! - currentValues.joursTravailles) | number:'+1.1-1' }}
-            </span>
-          </div>
-        </div>
-
-        <div class="param-sep"><span>Frais</span></div>
-
-        <div class="param-field">
-          <div class="param-header"><label>Repas restaurant</label><span class="param-unit">€</span></div>
-          <input type="number" step="5" class="sim-input" [(ngModel)]="simParams.repas_restaurant" [placeholder]="currentValues.repasRestaurant" />
-        </div>
-
-        <div class="param-field">
-          <div class="param-header"><label>Notes de frais</label><span class="param-unit">€</span></div>
-          <input type="number" step="10" class="sim-input" [(ngModel)]="simParams.total_note_frais" [placeholder]="currentValues.totalNoteFrais" />
-        </div>
-
-        <div class="param-field">
-          <div class="param-header"><label>Notes kilométriques</label><span class="param-unit">€</span></div>
-          <input type="number" step="10" class="sim-input" [(ngModel)]="simParams.total_note_kilometrique" [placeholder]="currentValues.totalNoteKilometrique" />
-        </div>
-
-        <div class="ctrl-fixed-note">
-          <span class="lock-icon">🔒</span> Salaire brut &amp; charges patronales fixes
-        </div>
-
-        <button class="sim-btn-run" [class.running]="simulationRunning"
-                [disabled]="simulationRunning || !selectedProjetId" (click)="runSimulation()">
-          <span class="btn-icon" *ngIf="!simulationRunning">▶</span>
-          <span class="btn-spinner" *ngIf="simulationRunning"></span>
-          {{ simulationRunning ? 'Calcul en cours…' : 'Lancer la simulation' }}
-        </button>
-      </div>
+          <button class="primary-button" [disabled]="simulationRunning || !selectedProjetId" (click)="runSimulation()">
+            <span class="spinner light" *ngIf="simulationRunning"></span>
+            {{ simulationRunning ? 'Simulation en cours' : 'Lancer la simulation' }}
+          </button>
+        </ng-container>
+      </section>
     </aside>
 
-    <!-- ══ MAIN (résultats, onglets) ═══════════════════════════ -->
-    <main class="sim-main">
+    <main class="content-panel">
+      <div class="error-state" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-      <!-- États vides / chargement -->
-      <div class="sim-empty" *ngIf="!simulationResult && !simulationRunning">
-        <div class="empty-icon">◈</div>
-        <p>Sélectionnez un projet et ajustez les paramètres<br>pour lancer une simulation.</p>
-      </div>
-      <div class="sim-empty" *ngIf="simulationRunning">
-        <div class="pulse-ring"></div>
-        <p>Analyse en cours…</p>
-      </div>
+      <section class="empty-state" *ngIf="!simulationResult && !simulationRunning">
+        <div class="empty-mark">NB</div>
+        <h2>Aucune simulation lancée</h2>
+        <p>Sélectionnez un projet, ajustez les paramètres, puis lancez le calcul.</p>
+      </section>
 
-      <!-- Simulation résultat -->
+      <section class="empty-state" *ngIf="simulationRunning">
+        <span class="spinner large"></span>
+        <h2>Analyse en cours</h2>
+        <p>Calcul financier, classification Gaussian NB et conseils IA.</p>
+      </section>
+
       <ng-container *ngIf="simulationResult && !simulationRunning">
+        <nav class="tabs" aria-label="Résultats de simulation">
+          <button type="button" [class.active]="activeTab === 'reel'" (click)="activeTab = 'reel'">Ce mois réel</button>
+          <button type="button" [class.active]="activeTab === 'simulation'" (click)="activeTab = 'simulation'">Simulation estimée</button>
+        </nav>
 
-        <!-- Tabs -->
-        <div class="tabs-row">
-          <button class="tab-btn" [class.active]="activeTab === 'resultats'" (click)="activeTab = 'resultats'">Résultats simulés</button>
-          <button class="tab-btn" [class.active]="activeTab === 'previsions'" (click)="activeTab = 'previsions'">Prévisions 3 mois</button>
-          <button class="tab-btn tab-btn--ia" [class.active]="activeTab === 'conseils'" (click)="activeTab = 'conseils'"><span class="ia-dot"></span> Conseils IA</button>
-          <button class="tab-btn tab-btn--dt" [class.active]="activeTab === 'decision_tree'" (click)="activeTab = 'decision_tree'"><span class="dt-dot"></span> Profil Risque</button>
-        </div>
-
-        <!-- ══ TAB 1 : RÉSULTATS ═══════════════════════════════ -->
-        <div *ngIf="activeTab === 'resultats'" class="tab-content">
-
-          <div class="kpi-row">
-            <div class="kpi-card" [class.kpi-pos]="deltaFacture > 0" [class.kpi-neg]="deltaFacture < 0">
-              <div class="kpi-label">Facture simulée</div>
-              <div class="kpi-value">{{ simulationResult.simulation.facture_sim | number:'1.0-0' }} €</div>
-              <div class="kpi-delta" [class.pos]="deltaFacture > 0" [class.neg]="deltaFacture < 0">
-                {{ deltaFacture | number:'+1.0-0' }} € vs réel
-              </div>
+        <section class="tab-surface" *ngIf="activeTab === 'reel'">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Données backend</p>
+              <h2>Ce mois réel</h2>
             </div>
-
-            <div class="kpi-card">
-              <div class="kpi-label">Coût simulé</div>
-              <div class="kpi-value">{{ simulationResult.simulation.cout | number:'1.0-0' }} €</div>
-              <div class="kpi-delta muted">inchangé si frais non modifiés</div>
-            </div>
-
-            <div class="kpi-card" [class.kpi-pos]="simulationResult.simulation.rentabilite >= 0" [class.kpi-neg]="simulationResult.simulation.rentabilite < 0">
-              <div class="kpi-label">Rentabilité simulée</div>
-              <div class="kpi-value" [class.pos]="simulationResult.simulation.rentabilite >= 0" [class.neg]="simulationResult.simulation.rentabilite < 0">
-                {{ simulationResult.simulation.rentabilite | number:'1.0-0' }} €
-              </div>
-              <div class="kpi-delta" [class.pos]="deltaRentabilite > 0" [class.neg]="deltaRentabilite < 0">
-                {{ deltaRentabilite | number:'+1.0-0' }} € vs réel
-              </div>
-            </div>
-
-            <div class="kpi-card">
-              <div class="kpi-label">Marge 3 mois</div>
-              <div class="kpi-value" [class.pos]="marge3Mois >= 0" [class.neg]="marge3Mois < 0">
-                {{ marge3Mois | number:'1.0-0' }} €
-              </div>
-              <div class="kpi-delta" [class.neg]="alerteGlobale">
-                {{ alerteGlobale ? '⚠ Alerte détectée' : '✓ Pas d\'alerte' }}
-              </div>
-            </div>
+            <span class="status-badge" [ngClass]="classificationClass(realData?.rentabilite && realData!.rentabilite > 500 ? 'BON_MOIS' : realData?.rentabilite && realData!.rentabilite < 0 ? 'MAUVAIS_MOIS' : 'MOYEN_MOIS')">
+              {{ paymentLabel(realData?.paye ?? currentValues.paye) }}
+            </span>
           </div>
 
-          <!-- Comparaison visuelle réel / simulé -->
-          <div class="compare-card">
-            <div class="compare-header">
-              <span>Comparaison réel / simulé</span>
-              <div class="compare-legend">
-                <span class="leg reel">── Réel</span>
-                <span class="leg simule">── Simulé</span>
-              </div>
+          <div class="kpi-grid">
+            <article class="metric-card">
+              <span>TJM réel</span>
+              <strong>{{ money(realData?.tjm) | number:'1.0-2' }} €</strong>
+            </article>
+            <article class="metric-card">
+              <span>Jours travaillés</span>
+              <strong>{{ money(realData?.jours) | number:'1.0-2' }}</strong>
+            </article>
+            <article class="metric-card">
+              <span>Facture réelle</span>
+              <strong>{{ money(realData?.facture) | number:'1.0-0' }} €</strong>
+            </article>
+            <article class="metric-card">
+              <span>Coût réel</span>
+              <strong>{{ money(realData?.cout) | number:'1.0-0' }} €</strong>
+            </article>
+            <article class="metric-card">
+              <span>Salaire net hors repas</span>
+              <strong>{{ money(realData?.salaire_net_hors_repas) | number:'1.0-0' }} €</strong>
+            </article>
+            <article class="metric-card emphasis" [ngClass]="money(realData?.rentabilite) >= 0 ? 'state-good' : 'state-bad'">
+              <span>Rentabilité réelle</span>
+              <strong>{{ money(realData?.rentabilite) | number:'1.0-0' }} €</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-surface" *ngIf="activeTab === 'simulation'">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Scénarios estimés</p>
+              <h2>Simulation estimée</h2>
             </div>
-            <div class="compare-bars">
-              <div class="compare-row" *ngFor="let item of [
-                {label:'Facture', reel: currentValues.facture,     sim: simulationResult.simulation.facture_sim},
-                {label:'Coût',    reel: currentValues.cout,        sim: simulationResult.simulation.cout},
-                {label:'Marge',   reel: currentValues.rentabilite, sim: simulationResult.simulation.rentabilite}
-              ]">
-                <span class="bar-label">{{ item.label }}</span>
-                <div class="bar-track">
-                  <div class="bar-fill bar-reel" [style.width]="getBarWidth(item.reel, item.sim, item.reel)"></div>
-                </div>
-                <span class="bar-val">{{ item.reel | number:'1.0-0' }} €</span>
-                <div class="bar-track">
-                  <div class="bar-fill bar-sim" [style.width]="getBarWidth(item.reel, item.sim, item.sim)"></div>
-                </div>
-                <span class="bar-val" [class.pos]="item.sim > item.reel" [class.neg]="item.sim < item.reel">
-                  {{ item.sim | number:'1.0-0' }} €
+            <span class="status-badge" [ngClass]="classificationClass(simulationResult.profil_dt.cas_paye.classe_ml)">
+              {{ classificationLabel(simulationResult.profil_dt.cas_paye.classe_ml) }}
+            </span>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="metric-card">
+              <span>TJM simulé</span>
+              <strong>{{ simulatedTjm | number:'1.0-2' }} €</strong>
+            </article>
+            <article class="metric-card">
+              <span>Jours simulés</span>
+              <strong>{{ simulatedJours | number:'1.0-2' }}</strong>
+            </article>
+            <article class="metric-card">
+              <span>Facture simulée</span>
+              <strong>{{ simulationResult.simulation.facture_sim | number:'1.0-0' }} €</strong>
+            </article>
+            <article class="metric-card">
+              <span>Coût simulé</span>
+              <strong>{{ simulationResult.simulation.cout | number:'1.0-0' }} €</strong>
+            </article>
+            <article class="metric-card">
+              <span>Salaire net hors repas</span>
+              <strong>{{ simulationResult.simulation.salaire_net_hors_repas | number:'1.0-0' }} €</strong>
+            </article>
+            <article class="metric-card emphasis" [ngClass]="simulationResult.simulation.rentabilite >= 0 ? 'state-good' : 'state-bad'">
+              <span>Rentabilité simulée</span>
+              <strong>{{ simulationResult.simulation.rentabilite | number:'1.0-0' }} €</strong>
+            </article>
+          </div>
+
+          <div class="scenario-grid">
+            <article class="scenario-card paid">
+              <div class="scenario-header">
+                <h3>Cas payé</h3>
+                <span class="status-badge" [ngClass]="classificationClass(simulationResult.profil_dt.cas_paye.classe_ml)">
+                  {{ classificationLabel(simulationResult.profil_dt.cas_paye.classe_ml) }}
                 </span>
               </div>
-            </div>
+              <div class="scenario-lines">
+                <p><span>Facture</span><strong>{{ simulationResult.profil_dt.cas_paye.totaleFacture | number:'1.0-0' }} €</strong></p>
+                <p><span>Rentabilité</span><strong>{{ simulationResult.profil_dt.cas_paye.rentabilite | number:'1.0-0' }} €</strong></p>
+                <p><span>Classe ML</span><strong>{{ classificationLabel(simulationResult.profil_dt.cas_paye.classe_ml) }}</strong></p>
+                <p><span>Confiance</span><strong>{{ simulationResult.profil_dt.cas_paye.confiance | percent:'1.0-1' }}</strong></p>
+              </div>
+            </article>
+
+            <article class="scenario-card unpaid">
+              <div class="scenario-header">
+                <h3>Cas non payé</h3>
+                <span class="status-badge" [ngClass]="classificationClass(simulationResult.profil_dt.cas_non_paye.classe_ml)">
+                  {{ classificationLabel(simulationResult.profil_dt.cas_non_paye.classe_ml) }}
+                </span>
+              </div>
+              <div class="scenario-lines">
+                <p><span>Facture</span><strong>{{ simulationResult.profil_dt.cas_non_paye.totaleFacture | number:'1.0-0' }} €</strong></p>
+                <p><span>Rentabilité</span><strong>{{ simulationResult.profil_dt.cas_non_paye.rentabilite | number:'1.0-0' }} €</strong></p>
+                <p><span>Classe ML</span><strong>{{ classificationLabel(simulationResult.profil_dt.cas_non_paye.classe_ml) }}</strong></p>
+                <p><span>Confiance</span><strong>{{ simulationResult.profil_dt.cas_non_paye.confiance | percent:'1.0-1' }}</strong></p>
+              </div>
+            </article>
           </div>
+        </section>
 
-          <!-- Métriques modèle -->
-          <div class="metrics-row">
-            <div class="metric-chip"><span>Fiabilité</span><strong>{{ simulationResult.metriques.fiabilite }}</strong></div>
-            <div class="metric-chip"><span>R²</span><strong>{{ simulationResult.metriques.r2 }}</strong></div>
-            <div class="metric-chip"><span>MAE</span><strong>{{ simulationResult.metriques.mae }} €</strong></div>
-            <div class="metric-chip"><span>Taux paiement hist.</span><strong>{{ simulationResult.metriques.taux_paiement_historique | percent:'1.0-0' }}</strong></div>
-          </div>
-        </div>
+        <section class="bottom-grid">
+          <article class="analysis-card">
+            <div class="section-heading compact-heading">
+              <div>
+                <p class="eyebrow">Conseils IA</p>
+                <h2>Actions recommandées</h2>
+              </div>
+              <span class="status-badge" [ngClass]="verdictClass">{{ verdictLabel }}</span>
+            </div>
 
-        <!-- ══ TAB 2 : PRÉVISIONS 3 MOIS ══════════════════════ -->
-        <div *ngIf="activeTab === 'previsions'" class="tab-content">
-          <div class="prev-grid">
-            <div class="prev-card" *ngFor="let p of simulationResult.predictions" [class.prev-alerte]="p.alerte">
-              <div class="prev-month">{{ p.mois }}</div>
-              <div class="prev-marge" [class.pos]="p.marge_probable >= 0" [class.neg]="p.marge_probable < 0">
-                {{ p.marge_probable | number:'1.0-0' }} €
-              </div>
-              <div class="prev-sublabel">marge probable</div>
-              <div class="prev-details">
-                <div class="prev-detail-row"><span>Facture estimée</span><strong>{{ p.facture_estime | number:'1.0-0' }} €</strong></div>
-                <div class="prev-detail-row"><span>Coût estimé</span><strong>{{ p.cout_estime | number:'1.0-0' }} €</strong></div>
-              </div>
-              <div class="prev-prob-block">
-                <div class="prev-prob-header">
-                  <span>Prob. paiement</span><strong>{{ p.prob_paiement | percent:'1.0-1' }}</strong>
-                </div>
-                <div class="prob-track">
-                  <div class="prob-fill" [style.width]="probBarWidth(p.prob_paiement)" [class.low]="p.prob_paiement < 0.5"></div>
+            <ng-container *ngIf="hasConseils; else noAdvice">
+              <p class="summary-text" *ngIf="simulationResult.conseils_ia.resume">{{ simulationResult.conseils_ia.resume }}</p>
+
+              <div class="advice-list" *ngIf="conseils.length">
+                <div class="advice-card" *ngFor="let conseil of conseils" [ngClass]="conseilTypeClass(conseil.type)">
+                  <div class="advice-header">
+                    <h3>{{ conseil.titre }}</h3>
+                    <span class="priority-badge" [ngClass]="priorityClass(conseil.priorite)">{{ conseil.priorite }}</span>
+                  </div>
+                  <p>{{ conseil.detail }}</p>
                 </div>
               </div>
-              <div class="prev-alerte-badge" *ngIf="p.alerte">⚠ Marge négative</div>
-            </div>
-          </div>
-        </div>
 
-        <!-- ══ TAB 3 : CONSEILS IA ════════════════════════════ -->
-        <div *ngIf="activeTab === 'conseils'" class="tab-content">
-          <ng-container *ngIf="simulationResult.conseils_ia as ia">
-            <div class="ia-verdict" [class]="verdictClass">
-              <div class="ia-verdict-icon">{{ verdictIcon }}</div>
-              <div class="ia-verdict-body">
-                <div class="ia-verdict-label">Verdict IA</div>
-                <div class="ia-verdict-resume">{{ ia.resume }}</div>
-              </div>
-            </div>
-            <div class="conseils-list">
-              <div class="conseil-card" *ngFor="let c of ia.conseils" [class]="'conseil-' + c.type">
-                <div class="conseil-header">
-                  <span class="conseil-icon">{{ conseilIcon(c.type) }}</span>
-                  <span class="conseil-titre">{{ c.titre }}</span>
-                  <span class="conseil-prio" [class]="prioriteClass(c.priorite)">{{ c.priorite }}</span>
+              <div class="micro-grid">
+                <div *ngIf="simulationResult.conseils_ia.conseil_tjm">
+                  <span>Conseil TJM</span>
+                  <p>{{ simulationResult.conseils_ia.conseil_tjm }}</p>
                 </div>
-                <p class="conseil-detail">{{ c.detail }}</p>
-              </div>
-            </div>
-            <div class="insights-grid">
-              <div class="insight-card" *ngIf="ia.conseil_tjm"><div class="insight-label">💼 Conseil TJM</div><p>{{ ia.conseil_tjm }}</p></div>
-              <div class="insight-card" *ngIf="ia.conseil_jours"><div class="insight-label">📅 Conseil Jours</div><p>{{ ia.conseil_jours }}</p></div>
-              <div class="insight-card insight-card--full" *ngIf="ia.seuil_rentabilite"><div class="insight-label">⚡ Seuil de rentabilité</div><p>{{ ia.seuil_rentabilite }}</p></div>
-            </div>
-          </ng-container>
-        </div>
-
-        <!-- ══ TAB 4 : PROFIL RISQUE (DECISION TREE) ═══════════ -->
-        <div *ngIf="activeTab === 'decision_tree'" class="tab-content">
-          <ng-container *ngIf="simulationResult.profil_dt as dt">
-            <!-- Carte principale (cas payé) -->
-            <div class="dt-main-card" [class]="dtClasseCss">
-              <div class="dt-main-left">
-                <div class="dt-icon">{{ dtClasseIcon }}</div>
-                <div>
-                  <div class="dt-sublabel">Classification du mois simulé <strong>(si payé)</strong></div>
-                  <div class="dt-classe">{{ dt.cas_paye.classe }}</div>
-                  <div class="dt-confiance">Confiance : <strong>{{ dt.cas_paye.confiance | percent:'1.0-0' }}</strong></div>
+                <div *ngIf="simulationResult.conseils_ia.conseil_jours">
+                  <span>Conseil jours</span>
+                  <p>{{ simulationResult.conseils_ia.conseil_jours }}</p>
+                </div>
+                <div *ngIf="simulationResult.conseils_ia.seuil_rentabilite">
+                  <span>Seuil rentabilité</span>
+                  <p>{{ simulationResult.conseils_ia.seuil_rentabilite }}</p>
                 </div>
               </div>
-              <div class="dt-main-right">
-                <div class="dt-ia-badge">
-                  <span class="dt-ia-label">Impact si non payé</span>
-                  <span class="verdict-text verdict-neg">
-                    {{ dt.cas_paye.rentabilite - dt.cas_non_paye.rentabilite | number:'1.0-0' }} €
-                  </span>
-                </div>
-              </div>
-            </div>
+            </ng-container>
 
-            <!-- Comparaison des deux scénarios -->
-            <div class="dt-section">
-              <h4 class="dt-section-title">Comparaison payé / non payé</h4>
-              <div class="dt-compare-grid">
-                <div class="dt-compare-card dt-paye">
-                  <div class="dt-compare-header">✔️ Si le client paie</div>
-                  <div class="dt-compare-line">Facture : <strong>{{ dt.cas_paye.totaleFacture | number:'1.0-0' }} €</strong></div>
-                  <div class="dt-compare-line">Rentabilité : <strong class="text-positive">{{ dt.cas_paye.rentabilite | number:'1.0-0' }} €</strong></div>
-                  <div class="dt-compare-line">Classe : {{ dt.cas_paye.classe }}</div>
-                </div>
-                <div class="dt-compare-card dt-non-paye">
-                  <div class="dt-compare-header">❌ Si le client ne paie pas</div>
-                  <div class="dt-compare-line">Facture : <strong>0 €</strong></div>
-                  <div class="dt-compare-line">Rentabilité : <strong class="text-negative">{{ dt.cas_non_paye.rentabilite | number:'1.0-0' }} €</strong></div>
-                  <div class="dt-compare-line">Classe : {{ dt.cas_non_paye.classe }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Légende des classes -->
-            <div class="dt-section dt-explain">
-              <h4 class="dt-section-title">Signification des classes</h4>
-              <div class="dt-explain-grid">
-                <div class="dt-explain-item dt-rentable"><span class="dt-explain-icon">✦</span><div><strong>BON MOIS</strong><p>Rentabilité > 500€</p></div></div>
-                <div class="dt-explain-item dt-fragile"><span class="dt-explain-icon">◈</span><div><strong>MOYEN MOIS</strong><p>Rentabilité entre 0 et 500€</p></div></div>
-                <div class="dt-explain-item dt-danger"><span class="dt-explain-icon">⚠</span><div><strong>MAUVAIS MOIS</strong><p>Rentabilité négative</p></div></div>
-              </div>
-            </div>
-
-            <!-- Recommandation -->
-            <div class="dt-section dt-conseil-section">
-              <h4 class="dt-section-title">Action recommandée</h4>
-              <div class="dt-conseil" [class]="dtClasseCss">
-                <span class="dt-conseil-icon">{{ dtClasseIcon }}</span>
-                <p *ngIf="dt.cas_paye.classe === 'BON_MOIS'">
-                  Avec ces paramètres, le mois serait <strong>très rentable</strong>. Veillez à sécuriser le paiement pour ne pas perdre <strong>{{ dt.cas_paye.rentabilite - dt.cas_non_paye.rentabilite | number:'1.0-0' }} €</strong>.
-                </p>
-                <p *ngIf="dt.cas_paye.classe === 'MOYEN_MOIS'">
-                  Rentabilité correcte mais perfectible. Envisagez d'augmenter le TJM ou de réduire les frais pour basculer en « BON MOIS ».
-                </p>
-                <p *ngIf="dt.cas_paye.classe === 'MAUVAIS_MOIS'">
-                  Situation critique. Une renégociation du TJM ou une réduction drastique des frais est indispensable.
-                </p>
-              </div>
-            </div>
-          </ng-container>
-        </div>
-
+            <ng-template #noAdvice>
+              <div class="inline-empty">Aucun conseil IA disponible pour cette simulation.</div>
+            </ng-template>
+          </article>
+        </section>
       </ng-container>
     </main>
   </div>

@@ -1012,6 +1012,14 @@
   }
 }
 /* ===== BOUTONS D'ACTION ET PAGINATION – MODE SOMBRE ===== */
+:host-context(body.dark-theme) .btn-reset-filter{
+  background: var(--elzei-green-light);
+  color: var(--elzei-green-dark);
+}
+:host-context(body.dark-theme) .btn-reset-filter:hover {
+  background: #722a2a;
+  color: #DC2626;
+}
 :host-context(body.dark-theme) .action-btn.view {
   background: var(--elzei-white);
   color: var(--elzei-gray);

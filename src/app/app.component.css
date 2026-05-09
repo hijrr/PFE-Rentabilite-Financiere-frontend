@@ -1,24 +1,18 @@
-*{
-  margin:0;
-
-}
-.main-content {
-
-  padding: 20px;
-
+* {
+  margin: 0;
+  box-sizing: border-box;
 }
 /* Contenu principal */
 .main-content {
   flex: 1;
+  min-width: 0;
+  min-height: 100vh;
   margin-left: 310px;
-  /*Largeurnormaledelasidebar*/padding: 2rem;
-  transition: margin-left 0.3s ease;
+  padding: clamp(1rem, 2vw, 2rem);
+  transition: margin-left 0.3s ease, width 0.3s ease, padding 0.3s ease;
   box-sizing: border-box;
   width: calc(100% - 310px);
-  -webkit-transition: margin-left 0.3s ease;
-  -moz-transition: margin-left 0.3s ease;
-  -ms-transition: margin-left 0.3s ease;
-  -o-transition: margin-left 0.3s ease;
+  overflow-x: clip;
 }
 /* Quand la sidebar est réduite - UNIQUEMENT le margin-left change */
 .main-content.sidebar-collapsed {
@@ -32,4 +26,29 @@
   margin-right: auto;
   max-width: 2000px;
    /* Ajustez cette valeur selon vos besoins */
+}
+
+@media (max-width: 1024px) {
+  .main-content,
+  .main-content.sidebar-collapsed {
+    margin-left: 130px;
+    width: calc(100% - 130px);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content,
+  .main-content.sidebar-collapsed {
+    width: 100%;
+    margin-left: 0;
+    padding: 8.75rem clamp(0.75rem, 4vw, 1rem) 1rem;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content,
+  .main-content.sidebar-collapsed {
+    padding-top: 8.25rem;
+  }
 }
