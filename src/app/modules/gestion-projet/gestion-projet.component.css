@@ -647,13 +647,14 @@
 .search-wrapper.small {
   position: relative;
   min-width: auto;
+  width: 100%;
+  margin-right: 0;
 }
 
 .client-autocomplete-list {
-  position: absolute;
-  top: 100%;
+  position: fixed;        /* ✅ fixed au lieu de absolute — sort du contexte du modal */
+  top: 0;
   left: 0;
-  right: 0;
   margin-top: 0.3rem;
   background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
@@ -661,7 +662,8 @@
   box-shadow: var(--shadow-lg);
   max-height: 200px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 99999;         /* ✅ au dessus de tout */
+  box-sizing: border-box;
 }
 
 .client-autocomplete-list ul {
@@ -1047,17 +1049,17 @@
 
 /* Autocomplete salarié (identique à client) */
 .autocomplete-list {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: 0;
   left: 0;
-  right: 0;
   background: var(--elzei-white);
   border: 1px solid var(--elzei-border);
   border-radius: 8px;
   max-height: 200px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 99999;
   box-shadow: var(--shadow-md);
+  box-sizing: border-box;
 }
 .autocomplete-item {
   padding: 0.5rem 0.8rem;

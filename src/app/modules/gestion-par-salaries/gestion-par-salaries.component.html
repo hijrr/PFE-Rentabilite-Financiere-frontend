@@ -4,7 +4,7 @@
   <div class="periode-header">
     <div class="header-icon"><i class="fas fa-calendar-alt"></i></div>
     <div class="header-title">
-      <h1>Gestion par période</h1>
+      <h1>Gestion par groupe de salariés</h1>
       <p>Importez les archives ZIP, choisissez un salarié, puis modifiez les données par période</p>
     </div>
   </div>
@@ -163,7 +163,7 @@
               <div *ngIf="period.filteredProjets && period.filteredProjets.length > 0 && period.projetSearchTerm" class="autocomplete-list">
                 <div *ngFor="let p of period.filteredProjets" class="autocomplete-item" (click)="selectProjetForPeriod(period, p)">
                   <div class="projet-name">{{ p.nom }}</div>
-                  <div class="projet-details"><span>{{ p.client }}</span><span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
+                  <div class="projet-details"><span>{{ p.client?.name }}</span><span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
                 </div>
               </div>
             </div>

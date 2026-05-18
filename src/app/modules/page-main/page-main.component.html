@@ -1,14 +1,14 @@
 <section class="dashboard-wrapper">
- <header class="dashboard-header">
-  <div>
-    <h1>Tableau de bord</h1>
-    <p>Vue synthétique des performances de rentabilité, des salariés, des clients et des projets.</p>
-  </div>
-  <div class="status-badge-header">
-    <i class="fas fa-circle"></i>
-    <span>Données à jour</span>
-  </div>
-</header>
+  <header class="dashboard-header">
+    <div>
+      <h1>Tableau de bord</h1>
+      <p>Vue synthétique des performances de rentabilité, des salariés, des clients et des projets.</p>
+    </div>
+    <div class="status-badge-header">
+      <i class="fas fa-circle"></i>
+      <span>Données à jour</span>
+    </div>
+  </header>
 
   <!-- KPIs améliorés -->
   <div class="kpi-grid">
@@ -29,25 +29,65 @@
     </article>
   </div>
 
-  <!-- Graphiques -->
+  <!-- Graphiques existants -->
   <div class="charts-grid">
     <div class="chart-card">
       <h3>Top 3 TJM salariés</h3>
-      <div class="chart-wrapper"><canvas baseChart [data]="tjmChartData" type="bar" [options]="barChartOptions"></canvas></div>
+      <div class="chart-wrapper">
+        <canvas baseChart [data]="tjmChartData" type="bar" [options]="barChartOptions"></canvas>
+      </div>
     </div>
     <div class="chart-card">
       <h3>Top clients (CA)</h3>
-      <div class="chart-wrapper"><canvas baseChart [data]="topClientsChartData" type="pie" [options]="pieChartOptions"></canvas></div>
+      <div class="chart-wrapper">
+        <canvas baseChart [data]="topClientsChartData" type="pie" [options]="pieChartOptions"></canvas>
+      </div>
     </div>
     <div class="chart-card">
       <h3>Top 3 salariés rentables</h3>
-      <div class="chart-wrapper"><canvas baseChart [data]="rentabiliteSalarieChartData" type="bar" [options]="barChartOptions"></canvas></div>
+      <div class="chart-wrapper">
+        <canvas baseChart [data]="rentabiliteSalarieChartData" type="bar" [options]="barChartOptions"></canvas>
+      </div>
     </div>
     <div class="chart-card">
       <h3>Top 3 projets rentables</h3>
-      <div class="chart-wrapper"><canvas baseChart [data]="topProjetsChartData" type="bar" [options]="barChartOptions"></canvas></div>
+      <div class="chart-wrapper">
+        <canvas baseChart [data]="topProjetsChartData" type="bar" [options]="barChartOptions"></canvas>
+      </div>
     </div>
-    <div class="chart-card full-width">
+
+     <!-- Nouvelle section : Factures impayées + Statut paiement projets -->
+    <!-- Bloc factures impayées -->
+    <article class="list-card">
+      <div class="chart-card-header">
+        <h3>Factures impayées</h3>
+        <span class="chart-badge">{{ facturesImpayees.length }}</span>
+      </div>
+      <div class="invoice-list" *ngIf="facturesImpayees.length; else noInvoices">
+        <div class="invoice-item" *ngFor="let facture of facturesImpayees">
+          <div>
+            <strong>{{ facture.reference || 'Sans réf' }}</strong>
+            <span>{{ facture.client }} · échéance {{ formatDate(facture.date_lim_reglement) }}</span>
+          </div>
+          <b>{{ facture.total_ttc| number:'1.0-0' }} €</b>
+        </div>
+      </div>
+      <ng-template #noInvoices>
+        <div class="empty-state">Aucune facture impayée prioritaire.</div>
+      </ng-template>
+    </article>
+
+    <!-- Bloc statut paiement projets (graphique doughnut) -->
+    <article class="chart-card">
+      <div class="chart-card-header">
+        <h3>Paiement des projets</h3>
+        <span class="chart-badge">{{ projetsStatutPaiement.length }} statut(s)</span>
+      </div>
+      <div class="chart-wrapper">
+        <canvas baseChart [data]="projetsStatutChartData" type="doughnut" [options]="doughnutOptions"></canvas>
+      </div>
+    </article>
+  <div class="chart-card full-width">
       <h3>Évolution du chiffre d'affaires</h3>
       <div class="filter-bar">
         <label>Filtrer par année :</label>
@@ -57,7 +97,12 @@
         </select>
         <button *ngIf="selectedYear" class="reset-btn" (click)="resetYearFilter()">Réinitialiser</button>
       </div>
-      <div class="chart-wrapper"><canvas baseChart [data]="evolutionCAChartData" type="line" [options]="lineChartOptions"></canvas></div>
+      <div class="chart-wrapper">
+        <canvas baseChart [data]="evolutionCAChartData" type="line" [options]="lineChartOptions"></canvas>
+      </div>
     </div>
   </div>
+
+
+
 </section>

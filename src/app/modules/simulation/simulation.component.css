@@ -1082,3 +1082,130 @@
 :host-context(body.dark-theme) .ia-verdict-icon {
   filter: brightness(0.9);
 }
+/* ============================================
+   RECHERCHE PROJET – STYLE ELZEI
+   ============================================ */
+
+.search-project-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid var(--elzei-border);
+  border-radius: 30px;
+  background: var(--elzei-white);
+  font-size: 0.85rem;
+  color: var(--elzei-gray-dark);
+  transition: var(--transition);
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--elzei-green);
+  box-shadow: 0 0 0 3px rgba(111, 207, 151, 0.15);
+}
+
+.project-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  max-height: 250px;
+  overflow-y: auto;
+  background: var(--elzei-white);
+  border: 1px solid var(--elzei-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+  z-index: 100;
+  animation: fadeInDown 0.2s ease;
+}
+
+.project-item {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  color: var(--elzei-gray-dark);
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--elzei-border);
+}
+
+.project-item:last-child {
+  border-bottom: none;
+}
+
+.project-item:hover {
+  background: var(--elzei-green-light);
+  color: var(--elzei-green-dark);
+}
+
+.no-result-dropdown {
+  padding: 0.8rem 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--elzei-gray-light);
+  font-style: italic;
+}
+
+.clear-selection-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--elzei-gray-light);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 2;
+}
+
+.clear-selection-btn:hover {
+  color: #DC2626;
+}
+
+/* Animation */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mode sombre */
+:host-context(body.dark-theme) .search-input {
+  background: var(--elzei-white);
+  border-color: var(--elzei-border);
+  color: var(--elzei-gray-dark);
+}
+
+:host-context(body.dark-theme) .search-input:focus {
+  border-color: #6FCF97;
+  box-shadow: 0 0 0 3px rgba(111, 207, 151, 0.2);
+}
+
+:host-context(body.dark-theme) .project-dropdown {
+  background: #1F2937;
+  border-color: #374151;
+}
+
+:host-context(body.dark-theme) .project-item {
+  color: #E5E7EB;
+  border-bottom-color: #374151;
+}
+
+:host-context(body.dark-theme) .project-item:hover {
+  background: #2D3748;
+  color: #6FCF97;
+}
+
+:host-context(body.dark-theme) .no-result-dropdown {
+  color: #9CA3AF;
+}

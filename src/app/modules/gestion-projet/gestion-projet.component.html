@@ -3,19 +3,14 @@
   <!-- KPI SECTION -->
   <div class="kpi-section">
     <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fa-solid fa-diagram-project"></i>
-      </div>
+      <div class="kpi-icon"><i class="fa-solid fa-diagram-project"></i></div>
       <div class="kpi-content">
         <span class="kpi-label">Total Projets</span>
         <span class="kpi-value">{{ totalProjets }}</span>
       </div>
     </div>
-
     <div class="kpi-card">
-      <div class="kpi-icon">
-        <i class="fas fa-percentage"></i>
-      </div>
+      <div class="kpi-icon"><i class="fas fa-percentage"></i></div>
       <div class="kpi-content">
         <span class="kpi-label">Marge Moyenne</span>
         <span class="kpi-value">{{ margeMoyen | number:'1.2-2' }} %</span>
@@ -26,19 +21,11 @@
   <!-- HEADER -->
   <div class="projet-header">
     <div class="header-title">
-      <div class="header-icon">
-        <i class="fa-solid fa-diagram-project"></i>
-      </div>
-
+      <div class="header-icon"><i class="fa-solid fa-diagram-project"></i></div>
       <h1>Gestion des Projets</h1>
-
-      <span class="projet-count">
-        {{ filteredProjets.length }} projet(s) affiché(s)
-      </span>
+      <span class="projet-count">{{ filteredProjets.length }} projet(s) affiché(s)</span>
     </div>
-
     <div class="header-actions">
-
       <div class="search-wrapper">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input
@@ -50,69 +37,64 @@
         >
       </div>
       <div class="status-filter-wrapper">
-    <select class="status-filter" [(ngModel)]="selectedStatusFilter" (change)="filterProjetsByStatus()">
-      <option value="">Tous les statuts</option>
-      <option value="payé">Payé</option>
-      <option value="en_attente">En attente</option>
-      <option value="retard">En retard</option>
-    </select>
-  </div>
- <!-- Bouton Réinitialiser -->
-  <button class="btn-reset-filters" (click)="resetFilters()" *ngIf="hasActiveFilters()">
-    <i class="fa-solid fa-rotate-left"></i> Réinitialiser
-  </button>
-      <button class="btn-add" (click)="openAddModal()" *ngIf="authService.isAdmin()">
-        <i class="fa-solid fa-plus"></i>
-        Ajouter un projet
+        <select class="status-filter" [(ngModel)]="selectedStatusFilter" (change)="filterProjetsByStatus()">
+          <option value="">Tous les statuts</option>
+          <option value="payé">Payé</option>
+          <option value="en_attente">En attente</option>
+          <option value="retard">En retard</option>
+        </select>
+      </div>
+      <button class="btn-reset-filters" (click)="resetFilters()" *ngIf="hasActiveFilters()">
+        <i class="fa-solid fa-rotate-left"></i> Réinitialiser
       </button>
-
+      <button class="btn-add" (click)="openAddModal()" *ngIf="authService.isAdmin()">
+        <i class="fa-solid fa-plus"></i> Ajouter un projet
+      </button>
     </div>
   </div>
-<div class="loading-container" *ngIf="isLoading">
-  <div class="spinnerr"></div>
-  <p>Chargement des projets...</p>
-</div>
+
+  <!-- LOADING -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinnerr"></div>
+    <p>Chargement des projets...</p>
+  </div>
 
   <!-- TABLE -->
-  <div class="table-wrapper"*ngIf="!isLoading">
-
+  <div class="table-wrapper" *ngIf="!isLoading">
     <table class="projet-table">
-
       <thead>
         <tr>
           <th>Projet</th>
           <th>Client</th>
-          <th>Salarie</th>
+          <th>Salarié</th>
           <th>TJM</th>
           <th>Marge Cible</th>
           <th>Statut paiement</th>
           <th *ngIf="authService.isAdmin()">Actions</th>
         </tr>
       </thead>
-
       <tbody>
-
         <tr *ngFor="let p of paginatedProjets">
 
           <td class="projet-cell">
             <div class="projet-info">
-              <div class="projet-icon">
-                <i class="fa-solid fa-folder"></i>
-              </div>
+              <div class="projet-icon"><i class="fa-solid fa-folder"></i></div>
               <div class="projet-details">
                 <span class="projet-name">{{ p.nom }}</span>
               </div>
             </div>
           </td>
 
-          <td>{{ p.client || '-' }}</td>
+          <!-- ✅ p.client est un objet { id, name } retourné par le backend -->
+          <td>{{ p.client?.name || '-' }}</td>
 
+          <!-- ✅ p.salarie est un objet complet retourné par le backend -->
           <td>{{ p.salarie?.username || '-' }}</td>
 
-          <td class="montant-cell">
-            {{ p.tjm || 0 }} €
-          </td>
-<td>{{ p.marge_cible || '-' }} %</td>
+          <td class="montant-cell">{{ p.tjm || 0 }} €</td>
+
+          <td>{{ p.marge_cible || '-' }} %</td>
+
           <td>
             <span class="status-badge" [ngClass]="getStatusClass(p.status_paiement || '')">
               {{ getStatusLabel(p.status_paiement || '') }}
@@ -120,27 +102,13 @@
           </td>
 
           <td class="actions-cell" *ngIf="authService.isAdmin()">
-
-            <button
-              class="action-btn view"
-              (click)="openDetailsModal(p)"
-              title="Voir détails"
-            >
+            <button class="action-btn view" (click)="openDetailsModal(p)" title="Voir détails">
               <i class="fa-solid fa-eye"></i>
             </button>
-
-            <button
-              class="action-btn edit"
-              (click)="openEditModal(p)"
-              title="Modifier"
-            >
+            <button class="action-btn edit" (click)="openEditModal(p)" title="Modifier">
               <i class="fa-solid fa-pen"></i>
             </button>
-             <button
-              class="action-btn delete"
-              (click)="deleteProjet(p.id)"
-              title="Supprimer"
-            >
+            <button class="action-btn delete" (click)="deleteProjet(p.id)" title="Supprimer">
               <i class="fa-solid fa-trash"></i>
             </button>
           </td>
@@ -153,11 +121,8 @@
             <p>Aucun projet trouvé</p>
           </td>
         </tr>
-
       </tbody>
-
     </table>
-
   </div>
 
   <!-- PAGINATION -->
@@ -166,10 +131,7 @@
       Affichage de {{ getPaginationStart() }} à {{ getPaginationEnd() }} sur {{ filteredProjets.length }} projets
     </span>
     <div class="pagination-controls" *ngIf="totalPages > 1">
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)">
+      <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
       <button
@@ -180,10 +142,7 @@
         (click)="onPageClick(page)">
         {{ page }}
       </button>
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="changePage(currentPage + 1)">
+      <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
@@ -192,47 +151,43 @@
 </div>
 
 
-<!-- MODAL AJOUT/MODIFICATION -->
+<!-- MODAL AJOUT / MODIFICATION -->
 <div class="modal-overlay" *ngIf="showModal && (modalMode === 'add' || modalMode === 'edit')">
-
-  <div class="modal-container">
+  <div class="modal-container" (scroll)="repositionAutocompleteLists()">
 
     <div class="modal-header">
       <h2>
         <i class="fa-solid" [ngClass]="modalMode === 'add' ? 'fa-folder-plus' : 'fa-folder-pen'"></i>
         {{ modalMode === 'add' ? 'Ajouter un projet' : 'Modifier le projet' }}
       </h2>
-      <button class="close-btn" (click)="closeModal()">
-        <i class="fa-solid fa-times"></i>
-      </button>
+      <button class="close-btn" (click)="closeModal()"><i class="fa-solid fa-times"></i></button>
     </div>
 
     <form [formGroup]="projetForm" (ngSubmit)="onSubmit()">
       <div class="modal-body">
-
         <div class="form-grid">
-  <!-- Client avec autocomplete -->
+
+          <!-- CLIENT autocomplete -->
           <div class="form-group">
             <label>Client <span class="required">*</span></label>
             <div class="search-wrapper small">
               <input
                 type="text"
-                class="form-control"
+                class="form-control client-autocomplete-input"
                 formControlName="client"
-                [class.is-invalid]="isFieldInvalid('client')"
+                [class.is-invalid]="isFieldInvalid('client_id')"
                 placeholder="Rechercher un client..."
                 (input)="onClientSearch($event)"
-                (focus)="showClientList = true"
+                (focus)="onClientFocus()"
                 (blur)="hideClientListWithDelay()"
               >
-              <!-- Liste des clients (autocomplete) -->
               <div class="client-autocomplete-list" *ngIf="showClientList && filteredClients.length > 0">
                 <ul>
                   <li *ngFor="let client of filteredClients" (mousedown)="selectClient(client)">
                     <div class="client-item">
                       <div class="client-avatar-small">
-                         <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client-logo">
-                        <div  *ngIf="!client.logoData" class="avatar-placeholder-small"[ngClass]="getAvatarClass(client)">
+                        <img *ngIf="client.logoData" [src]="client.logoData" alt="logo" class="client-logo">
+                        <div *ngIf="!client.logoData" class="avatar-placeholder-small" [ngClass]="getAvatarClass(client)">
                           {{ client.name?.charAt(0) || '?' }}
                         </div>
                       </div>
@@ -245,39 +200,43 @@
                 </ul>
               </div>
             </div>
-            <div class="error-message" *ngIf="isFieldInvalid('client')">
+            <!-- ✅ client_id caché, c'est lui qui est validé et envoyé -->
+            <input type="hidden" formControlName="client_id">
+            <div class="error-message" *ngIf="isFieldInvalid('client_id')">
               Le client est requis
             </div>
           </div>
 
-     <div class="form-group">
-  <label>Salarié <span class="required">*</span></label>
-  <div class="search-wrapper small">
-    <input
-      type="text"
-      class="form-control"
-      [(ngModel)]="searchSalarieTerm"
-      [ngModelOptions]="{standalone: true}"
-      (input)="onSalarieSearch(); updateNomProjet()"
-      (focus)="showSalarieList = true"
-      (blur)="hideSalarieListWithDelay()"
-      placeholder="Rechercher un salarié..."
-      [class.is-invalid]="isFieldInvalid('salarie_id')"
-      autocomplete="off"
-    >
-    <div class="autocomplete-list" *ngIf="showSalarieList && filteredSalaries.length > 0">
-      <div *ngFor="let s of filteredSalaries" class="autocomplete-item" (mousedown)="selectSalarie(s)">
-        <div class="salarie-name">{{ s.username }}</div>
-        <div class="salarie-details">{{ s.email }} - {{ s.role }}</div>
-      </div>
-    </div>
-  </div>
-  <input type="hidden" formControlName="salarie_id">
-  <div class="error-message" *ngIf="isFieldInvalid('salarie_id')">
-    Le salarié est requis
-  </div>
-</div>
-          <!-- Nom du projet -->
+          <!-- SALARIÉ autocomplete -->
+          <div class="form-group">
+            <label>Salarié <span class="required">*</span></label>
+            <div class="search-wrapper small">
+              <input
+                type="text"
+                class="form-control salarie-autocomplete-input"
+                [(ngModel)]="searchSalarieTerm"
+                [ngModelOptions]="{standalone: true}"
+                (input)="onSalarieSearch(); updateNomProjet()"
+                (focus)="onSalarieFocus()"
+                (blur)="hideSalarieListWithDelay()"
+                placeholder="Rechercher un salarié..."
+                [class.is-invalid]="isFieldInvalid('salarie_id')"
+                autocomplete="off"
+              >
+              <div class="autocomplete-list salarie-autocomplete-list" *ngIf="showSalarieList && filteredSalaries.length > 0">
+                <div *ngFor="let s of filteredSalaries" class="autocomplete-item" (mousedown)="selectSalarie(s)">
+                  <div class="salarie-name">{{ s.username }}</div>
+                  <div class="salarie-details">{{ s.email }} - {{ s.role }}</div>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" formControlName="salarie_id">
+            <div class="error-message" *ngIf="isFieldInvalid('salarie_id')">
+              Le salarié est requis
+            </div>
+          </div>
+
+          <!-- NOM -->
           <div class="form-group">
             <label>Nom du projet <span class="required">*</span></label>
             <input
@@ -287,14 +246,12 @@
               [class.is-invalid]="isFieldInvalid('nom')"
               placeholder="Ex: Site E-commerce"
             >
-            <div class="error-message" *ngIf="isFieldInvalid('nom')">
-              Le nom du projet est requis
-            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('nom')">Le nom du projet est requis</div>
           </div>
 
           <!-- TJM -->
           <div class="form-group">
-            <label>TJM (€)<span class="required">*</span></label>
+            <label>TJM (€) <span class="required">*</span></label>
             <input
               type="number"
               class="form-control"
@@ -304,22 +261,25 @@
               placeholder="0"
             >
           </div>
- <div class="form-group">
-  <label>Marge cible (%)</label>
-  <div class="slider-container">
-    <input
-      type="range"
-      class="form-range"
-      formControlName="marge_cible"
-      min="0"
-      max="100"
-      step="1"
-    >
-    <span class="slider-value">{{ projetForm.get('marge_cible')?.value || 0 }} %</span>
-  </div>
-</div>
-          <!-- Statut paiement -->
-          <div class="form-group"  *ngIf="showModal && (modalMode === 'edit')" >
+
+          <!-- MARGE CIBLE -->
+          <div class="form-group">
+            <label>Marge cible (%)</label>
+            <div class="slider-container">
+              <input
+                type="range"
+                class="form-range"
+                formControlName="marge_cible"
+                min="0"
+                max="100"
+                step="1"
+              >
+              <span class="slider-value">{{ projetForm.get('marge_cible')?.value || 0 }} %</span>
+            </div>
+          </div>
+
+          <!-- STATUT — seulement en mode édition -->
+          <div class="form-group" *ngIf="modalMode === 'edit'">
             <label>Statut paiement</label>
             <select class="form-control" formControlName="status_paiement">
               <option value="en_attente">En attente</option>
@@ -327,18 +287,18 @@
               <option value="retard">En retard</option>
             </select>
           </div>
- <div class="form-group">
-    <label>Champ remarque</label>
-    <textarea class="form-control" formControlName="champ_remarque"></textarea>
-  </div>
-        </div>
 
+          <!-- REMARQUE -->
+          <div class="form-group">
+            <label>Champ remarque</label>
+            <textarea class="form-control" formControlName="champ_remarque"></textarea>
+          </div>
+
+        </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn-secondary" (click)="closeModal()">
-          Annuler
-        </button>
+        <button type="button" class="btn-secondary" (click)="closeModal()">Annuler</button>
         <button type="submit" class="btn-primary" [disabled]="projetForm.invalid">
           <i class="fa-solid fa-check"></i>
           {{ modalMode === 'add' ? 'Ajouter' : 'Modifier' }}
@@ -347,58 +307,57 @@
     </form>
 
   </div>
-
 </div>
 
 
 <!-- MODAL DETAILS -->
 <div class="modal-overlay" *ngIf="showModal && modalMode === 'details'">
-
   <div class="modal-container">
 
     <div class="modal-header">
       <div class="modal-title">
-        <div class="projet-icon large">
-          <i class="fa-solid fa-folder"></i>
-        </div>
+        <div class="projet-icon large"><i class="fa-solid fa-folder"></i></div>
         <div>
           <h2>{{ selectedProjet?.nom }}</h2>
-          <p class="projet-subtitle">{{ selectedProjet?.client }}</p>
+          <!-- ✅ selectedProjet.client est un objet -->
+          <p class="projet-subtitle">{{ selectedProjet?.client?.name }}</p>
         </div>
       </div>
-      <button class="close-btn" (click)="closeModal()">
-        <i class="fa-solid fa-times"></i>
-      </button>
+      <button class="close-btn" (click)="closeModal()"><i class="fa-solid fa-times"></i></button>
     </div>
 
     <div class="modal-body">
-
       <div class="details-section">
-        <h3>
-          <i class="fa-solid fa-circle-info"></i>
-          Informations
-        </h3>
+        <h3><i class="fa-solid fa-circle-info"></i> Informations</h3>
         <div class="details-grid">
+
           <div class="detail-item">
             <span class="detail-label">Client</span>
-            <span class="detail-value">{{ selectedProjet?.client }}</span>
+            <!-- ✅ objet imbriqué -->
+            <span class="detail-value">{{ selectedProjet?.client?.name || '-' }}</span>
           </div>
-            <div class="detail-item">
-              <span class="detail-label">Salarie</span>
-              <span class="detail-value">{{ selectedProjet?.salarie.username || '-' }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">TJM</span>
-              <span class="detail-value">{{ selectedProjet?.tjm || 0 }} €</span>
-            </div>
-            <div class="detail-item">
+
+          <div class="detail-item">
+            <span class="detail-label">Salarié</span>
+            <!-- ✅ objet imbriqué -->
+            <span class="detail-value">{{ selectedProjet?.salarie?.username || '-' }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="detail-label">TJM</span>
+            <span class="detail-value">{{ selectedProjet?.tjm || 0 }} €</span>
+          </div>
+
+          <div class="detail-item">
             <span class="detail-label">Marge cible</span>
-            <span class="detail-value">{{ selectedProjet?.marge_cible || '-' }} %</span>
+            <span class="detail-value">{{ selectedProjet?.marge_cible ?? '-' }} %</span>
           </div>
-           <div class="detail-item">
-            <span class="detail-label">champ remarque</span>
+
+          <div class="detail-item">
+            <span class="detail-label">Remarque</span>
             <span class="detail-value">{{ selectedProjet?.champ_remarque || '-' }}</span>
           </div>
+
           <div class="detail-item">
             <span class="detail-label">Statut paiement</span>
             <span class="detail-value">
@@ -407,25 +366,22 @@
               </span>
             </span>
           </div>
+
           <div class="detail-item">
             <span class="detail-label">ID</span>
             <span class="detail-value">{{ selectedProjet?.id }}</span>
           </div>
+
         </div>
       </div>
-
     </div>
 
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeModal()">
-        Fermer
-      </button>
-      <button class="btn-primary" (click)="openEditModal(selectedProjet)">
-        <i class="fa-solid fa-pen"></i>
-        Modifier
+      <button class="btn-secondary" (click)="closeModal()">Fermer</button>
+      <button class="btn-primary" (click)="openEditModal(selectedProjet)" *ngIf="authService.isAdmin()">
+        <i class="fa-solid fa-pen"></i> Modifier
       </button>
     </div>
 
   </div>
-
 </div>

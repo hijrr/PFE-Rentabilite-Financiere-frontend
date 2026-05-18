@@ -63,7 +63,7 @@
            (click)="selectProjet(projet)">
         <div class="projet-name">{{ projet.nom }}</div>
         <div class="projet-details">
-          <span class="projet-client">{{ projet.client }}</span>
+          <span class="projet-client">{{ projet.client?.name }}</span>
           <span class="projet-tjm">TJM: {{ projet.tjm }} €</span>
         </div>
       </div>
@@ -72,7 +72,7 @@
   <!-- Affichage du projet sélectionné -->
   <div *ngIf="selectedProjetObj" class="selected-projet">
     <i class="fa-solid fa-check-circle"></i>
-    {{ selectedProjetObj.nom }} (TJM: {{ selectedProjetObj.tjm }} € - Client: {{ selectedProjetObj.client }})
+    {{ selectedProjetObj.nom }} (TJM: {{ selectedProjetObj.tjm }} € - Client: {{ selectedProjetObj.client?.name }})
     <button type="button" class="clear-btn" (click)="clearProjetSelection()">✖</button>
   </div>
 </div>

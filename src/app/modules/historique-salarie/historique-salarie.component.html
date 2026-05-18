@@ -118,7 +118,7 @@
           <div *ngIf="filteredProjets.length > 0 && projetSearchTerm" class="hs-autocomplete">
             <div *ngFor="let p of filteredProjets" class="hs-autocomplete__item" (click)="selectProjet(p)">
               <span class="hs-autocomplete__name">{{ p.nom }}</span>
-              <span class="hs-autocomplete__meta">{{ p.client }}<span *ngIf="p.tjm"> · {{ p.tjm }} €/j</span></span>
+              <span class="hs-autocomplete__meta">{{ p.client?.name }}<span *ngIf="p.tjm"> · {{ p.tjm }} €/j</span></span>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@
       <!-- Selected project -->
       <div *ngIf="selectedProjetObj" class="hs-proj-selected">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span><strong>{{ selectedProjetObj.nom }}</strong> · {{ selectedProjetObj.client }} · TJM {{ selectedProjetObj.tjm }} €</span>
+        <span><strong>{{ selectedProjetObj.nom }}</strong> · {{ selectedProjetObj.client?.name }} · TJM {{ selectedProjetObj.tjm }} €</span>
         <div class="hs-proj-selected__actions">
           <button class="hs-btn-export" (click)="exportToCSV()">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

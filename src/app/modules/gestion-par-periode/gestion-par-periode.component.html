@@ -166,7 +166,7 @@
               <div *ngIf="period.filteredProjets && period.filteredProjets.length > 0 && period.projetSearchTerm" class="autocomplete-list">
                 <div *ngFor="let p of period.filteredProjets" class="autocomplete-item" (click)="selectProjetForPeriod(period, p)">
                   <div class="projet-name">{{ p.nom }}</div>
-                  <div class="projet-details"><span>{{ p.client }}</span><span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
+                  <div class="projet-details"><span>{{ p.client?.name }}</span><span *ngIf="p.tjm">TJM: {{ p.tjm }} €</span></div>
                 </div>
               </div>
             </div>

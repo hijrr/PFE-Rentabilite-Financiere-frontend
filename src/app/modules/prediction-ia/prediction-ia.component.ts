@@ -8,7 +8,9 @@ import { PredictionIAService } from 'src/app/services/prediction-ia.service';
   styleUrls: ['./prediction-ia.component.css']
 })
 export class PredictionIAComponent implements OnInit {
-
+searchTerm = '';
+  currentPage = 1;
+  itemsPerPage = 3;
   // ── State ──────────────────────────────────────────
   data: any = null;
   mois: number = 3;
@@ -67,7 +69,45 @@ export class PredictionIAComponent implements OnInit {
       point: { radius: 4, hoverRadius: 7 }
     }
   };
+get filteredProjects(): any[] {
+    if (!this.projets.length) return [];
+    const term = this.searchTerm.trim().toLowerCase();
+    if (!term) return [...this.projets];
+    return this.projets.filter(p =>
+      p.nom.toLowerCase().includes(term)
+    );
+  }
+  // Pagination : projets en danger sur la page courante
+  get paginatedDangerProjects(): any[] {
+    const danger = this.filteredProjects.filter(p => p.alerte);
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return danger.slice(start, end);
+  }
 
+  // Pagination : projets sains sur la page courante
+  get paginatedSafeProjects(): any[] {
+    const safe = this.filteredProjects.filter(p => !p.alerte);
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return safe.slice(start, end);
+  }
+
+  // Nombre total de pages (basé sur le nombre total de projets filtrés)
+  get totalPages(): number {
+    return Math.ceil(this.filteredProjects.length / this.itemsPerPage);
+  }
+
+  // Gestion du changement de page
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+  }
+
+  // Lorsque la recherche change, on revient à la première page
+  onSearchChange(): void {
+    this.currentPage = 1;
+  }
   // ── Analyse courbe computed ─────────────────────────
   get analyseCourbe(): any  { return this.data?.analyse_courbe || {}; }
   get analyseIA(): string   { return this.data?.analyse_ia || ''; }

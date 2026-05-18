@@ -19,10 +19,36 @@
     <aside class="control-panel">
       <section class="panel-card">
         <label class="field-label" for="projet">Projet</label>
-        <select id="projet" class="select-input" [(ngModel)]="selectedProjetId" (change)="onProjetChange()">
-          <option [ngValue]="null">Choisir un projet</option>
-          <option *ngFor="let projet of projets" [ngValue]="projet.id">{{ projet.nom }}</option>
-        </select>
+       <div class="search-project-container">
+  <input
+    type="text"
+    class="search-input"
+    placeholder="Rechercher un projet en attente..."
+    [(ngModel)]="searchProjet"
+    (input)="filterProjet()"
+    (focus)="showProjetDropdown = true"
+    (blur)="hideDropdown()"
+  />
+
+  <div class="project-dropdown" *ngIf="showProjetDropdown && filteredProjets.length > 0">
+    <div
+      class="project-item"
+      *ngFor="let projet of filteredProjets"
+      (mousedown)="selectProjet(projet)"
+    >
+      {{ projet.nom }} ({{ projet.client?.name }})
+    </div>
+  </div>
+
+  <div *ngIf="showProjetDropdown && filteredProjets.length === 0 && searchProjet.trim() !== ''" class="no-result-dropdown">
+    Aucun projet trouvé
+  </div>
+</div>
+
+<!-- Bouton pour effacer la sélection (optionnel) -->
+<button *ngIf="selectedProjetId" class="clear-selection-btn" (click)="clearProjectSelection()">
+  ✖
+</button>
         <div class="mini-loader" *ngIf="loadingProjets"></div>
       </section>
 

@@ -45,7 +45,7 @@ onSearchProjet(): void {
   const term = this.searchProjetTerm.toLowerCase().trim();
   this.filteredProjets = this.projets.filter(projet =>
     projet.nom?.toLowerCase().includes(term) ||
-    projet.client?.toLowerCase().includes(term) ||
+    projet.client?.name?.toLowerCase().includes(term) ||  // ✅
     projet.tjm?.toString().includes(term)
   );
 }
@@ -152,7 +152,7 @@ onProjetChange(): void {
   this.projetselectionner = projet;
 
   const tjmProjet = Number(projet.tjm);
-  const clientName = projet.client;
+  const clientName = projet.client?.name; 
   const clientIdProjet = this.getClientIdByName(clientName);
 
   if (clientIdProjet === null) {

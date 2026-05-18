@@ -179,71 +179,93 @@
 
       </div>
 
-      <!-- ── Colonne droite : projets ── -->
-      <div class="dai-col-side">
+   <!-- ── Colonne droite : projets ── -->
+<div class="dai-col-side">
 
-        <div class="dai-side-header">
-          <span class="dai-side-title">Projets</span>
-          <span class="dai-side-count">{{ projets.length }}</span>
-        </div>
+  <div class="dai-side-header">
+    <div class="dai-side-header__top">
+      <span class="dai-side-title">Projets</span>
+      <span class="dai-side-count">{{ filteredProjects.length }}</span>
+    </div>
+    <!-- Barre de recherche -->
+    <div class="dai-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        type="text"
+        class="dai-search__input"
+        placeholder="Rechercher un projet..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+      />
+    </div>
+  </div>
 
-        <!-- Projets en risque -->
-        <div *ngIf="projetsDanger.length" class="dai-proj-group">
-          <div class="dai-proj-group__label dai-proj-group__label--danger">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-            En risque
-          </div>
-          <div class="dai-proj-card dai-proj-card--danger" *ngFor="let p of projetsDanger">
-            <div class="dai-proj-card__top">
-              <div class="dai-proj-card__avatar dai-proj-card__avatar--danger">
-                {{ p.nom.charAt(0) }}
-              </div>
-              <div class="dai-proj-card__info">
-                <div class="dai-proj-card__name">{{ p.nom }}</div>
-                <div class="dai-proj-card__meta">
-                  Fiabilité : {{ p.fiabilite }}
-                  · Taux paiement : {{ (p.taux_paiement * 100) | number:'1.0-0' }}%
-                </div>
-              </div>
-              <span class="dai-proj-badge dai-proj-badge--danger">Risque</span>
-            </div>
-            <div class="dai-proj-card__marge dai-proj-card__marge--neg">{{ formatEur(p.marge_moyenne) }}/mois</div>
-            <div class="dai-proj-bar">
-              <div class="dai-proj-bar__fill dai-proj-bar__fill--danger" [style.width.%]="barWidth(p.marge_moyenne)"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Projets sains -->
-        <div *ngIf="projetsSains.length" class="dai-proj-group">
-          <div class="dai-proj-group__label dai-proj-group__label--ok">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Sains
-          </div>
-          <div class="dai-proj-card" *ngFor="let p of projetsSains">
-            <div class="dai-proj-card__top">
-              <div class="dai-proj-card__avatar">{{ p.nom.charAt(0) }}</div>
-              <div class="dai-proj-card__info">
-                <div class="dai-proj-card__name">{{ p.nom }}</div>
-                <div class="dai-proj-card__meta">
-                  Fiabilité : {{ p.fiabilite }}
-                  · Taux paiement : {{ (p.taux_paiement * 100) | number:'1.0-0' }}%
-                </div>
-              </div>
-            </div>
-            <div class="dai-proj-card__marge dai-proj-card__marge--pos">{{ formatEur(p.marge_moyenne) }}/mois</div>
-            <div class="dai-proj-bar">
-              <div class="dai-proj-bar__fill" [style.width.%]="barWidth(p.marge_moyenne)"></div>
-            </div>
+  <!-- Projets en risque (paginated) -->
+  <div *ngIf="paginatedDangerProjects.length" class="dai-proj-group">
+    <div class="dai-proj-group__label dai-proj-group__label--danger">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+      En risque
+    </div>
+    <div class="dai-proj-card dai-proj-card--danger" *ngFor="let p of paginatedDangerProjects">
+      <!-- contenu identique -->
+      <div class="dai-proj-card__top">
+        <div class="dai-proj-card__avatar dai-proj-card__avatar--danger">{{ p.nom.charAt(0) }}</div>
+        <div class="dai-proj-card__info">
+          <div class="dai-proj-card__name">{{ p.nom }}</div>
+          <div class="dai-proj-card__meta">
+            Fiabilité : {{ p.fiabilite }} · Taux paiement : {{ (p.taux_paiement * 100) | number:'1.0-0' }}%
           </div>
         </div>
-
-        <div *ngIf="!projets.length" class="dai-empty">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-          <p>Aucun projet trouvé</p>
-        </div>
-
+        <span class="dai-proj-badge dai-proj-badge--danger">Risque</span>
       </div>
+      <div class="dai-proj-card__marge dai-proj-card__marge--neg">{{ formatEur(p.marge_moyenne) }}/mois</div>
+      <div class="dai-proj-bar">
+        <div class="dai-proj-bar__fill dai-proj-bar__fill--danger" [style.width.%]="barWidth(p.marge_moyenne)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projets sains (paginated) -->
+  <div *ngIf="paginatedSafeProjects.length" class="dai-proj-group">
+    <div class="dai-proj-group__label dai-proj-group__label--ok">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Sains
+    </div>
+    <div class="dai-proj-card" *ngFor="let p of paginatedSafeProjects">
+      <div class="dai-proj-card__top">
+        <div class="dai-proj-card__avatar">{{ p.nom.charAt(0) }}</div>
+        <div class="dai-proj-card__info">
+          <div class="dai-proj-card__name">{{ p.nom }}</div>
+          <div class="dai-proj-card__meta">
+            Fiabilité : {{ p.fiabilite }} · Taux paiement : {{ (p.taux_paiement * 100) | number:'1.0-0' }}%
+          </div>
+        </div>
+      </div>
+      <div class="dai-proj-card__marge dai-proj-card__marge--pos">{{ formatEur(p.marge_moyenne) }}/mois</div>
+      <div class="dai-proj-bar">
+        <div class="dai-proj-bar__fill" [style.width.%]="barWidth(p.marge_moyenne)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="dai-pagination" *ngIf="filteredProjects.length > itemsPerPage">
+    <button class="dai-pagination__btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="dai-pagination__info">{{ currentPage }} / {{ totalPages }}</span>
+    <button class="dai-pagination__btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <div *ngIf="!filteredProjects.length" class="dai-empty">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    <p>Aucun projet trouvé</p>
+  </div>
+</div>
     </div>
 
   </ng-container>

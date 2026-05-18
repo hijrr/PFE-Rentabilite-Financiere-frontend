@@ -252,7 +252,7 @@ export class GestionParSalariesComponent implements OnInit {
 
   period.filteredProjets = base.filter(p =>
     (p.nom || '').toLowerCase().includes(term) ||
-    (p.client || '').toLowerCase().includes(term) ||
+    (p.client?.name || '').toLowerCase().includes(term) ||
     (p.tjm || '').toString().includes(term)
   );
 }
@@ -278,7 +278,7 @@ export class GestionParSalariesComponent implements OnInit {
       return;
     }
     const tjmProjet = Number(projet.tjm);
-    const clientName = projet.client;
+    const clientName = projet.client?.name; 
     const clientIdProjet = this.getClientIdByName(clientName);
     if (!clientIdProjet) {
       console.warn(`Client non trouvé : ${clientName}`);

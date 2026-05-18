@@ -174,16 +174,15 @@ export class HistoriqueSalarieComponent implements OnInit {
     });
   }
 
-  onProjetSearch(): void {
-    const term = this.projetSearchTerm.toLowerCase().trim();
-    if (!term) { this.filteredProjets = []; return; }
-    this.filteredProjets = this.projetsSalarie.filter(p =>
-      p.nom?.toLowerCase().includes(term) ||
-      p.client?.toLowerCase().includes(term) ||
-      p.tjm?.toString().includes(term)
-    );
-  }
-
+onProjetSearch(): void {
+  const term = this.projetSearchTerm.toLowerCase().trim();
+  if (!term) { this.filteredProjets = []; return; }
+  this.filteredProjets = this.projetsSalarie.filter(p =>
+    p.nom?.toLowerCase().includes(term) ||
+    p.client?.name?.toLowerCase().includes(term) ||  // ✅ objet imbriqué
+    p.tjm?.toString().includes(term)
+  );
+}
   selectProjet(projet: any): void {
     this.selectedProjetObj = projet;
     this.projetSearchTerm = projet.nom;

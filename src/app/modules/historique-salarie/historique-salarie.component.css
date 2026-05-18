@@ -833,3 +833,7 @@
   background: #3a1e1e;
   color: #ff8a8a;
 }
+:host-context(body.dark-theme) .hs-btn-reset {   background: #722a2a;
+  color: #DC2626;}
+:host-context(body.dark-theme) .hs-btn-reset:hover { background: #DC2626; color: white; }
+

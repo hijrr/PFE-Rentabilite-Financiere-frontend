@@ -77,9 +77,7 @@
         {{ isLoading ? 'Synchronisation en cours...' : 'Synchroniser clients & factures' }}
       </button>
 
-      <button class="btn-danger" (click)="resetDatabase()">
-        <i class="fas fa-trash-alt"></i> Vider la base locale
-      </button>
+     
     </div>
 
     <div *ngIf="syncMessage" class="alert" [ngClass]="{'alert-success': syncMessage.type === 'success', 'alert-error': syncMessage.type === 'error'}">

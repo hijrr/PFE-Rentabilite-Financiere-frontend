@@ -107,6 +107,9 @@ export class SimulationComponent implements OnInit {
 
   activeTab: ActiveTab = 'reel';
   simulationResult: SimulationResult | null = null;
+  searchProjet = '';
+filteredProjets: Projet[] = [];
+showProjetDropdown = false;
 
   currentValues: CurrentValues = this.createEmptyCurrentValues();
 
@@ -129,20 +132,24 @@ export class SimulationComponent implements OnInit {
   ngOnInit(): void {
     this.loadProjets();
   }
+loadProjets(): void {
+  this.loadingProjets = true;
+  this.projetService.getProjets().subscribe({
+    next: (data) => {
+      // ✅ Filtrer les projets avec status_paiement = 'EN_ATTENTE'
+      this.projets = (data || []).filter(
+        (p: any) => p.status_paiement === 'en_attente'
+      );
+      this.filteredProjets = [...this.projets];
+      this.loadingProjets = false;
+    },
+    error: () => {
+      this.loadingProjets = false;
+      this.errorMessage = 'Impossible de charger les projets.';
+    }
+  });
+}
 
-  loadProjets(): void {
-    this.loadingProjets = true;
-    this.projetService.getProjets().subscribe({
-      next: (data) => {
-        this.projets = data || [];
-        this.loadingProjets = false;
-      },
-      error: () => {
-        this.loadingProjets = false;
-        this.errorMessage = 'Impossible de charger les projets.';
-      }
-    });
-  }
 
   onProjetChange(): void {
     this.simulationResult = null;
@@ -157,7 +164,49 @@ export class SimulationComponent implements OnInit {
 
     this.loadLastHistorique();
   }
+ filterProjet(): void {
+  const search = this.searchProjet.toLowerCase().trim();
+  if (search === '') {
+    this.filteredProjets = [...this.projets];
+  } else {
+    this.filteredProjets = this.projets.filter((p) =>
+      p.nom.toLowerCase().includes(search)
+    );
+  }
+  this.showProjetDropdown = true;
+}
 
+selectProjet(projet: Projet): void {
+  // Si on sélectionne le même projet, ne rien faire
+  if (this.selectedProjetId === projet.id) {
+    this.showProjetDropdown = false;
+    return;
+  }
+
+  this.selectedProjetId = projet.id;
+  this.searchProjet = projet.nom;
+  this.showProjetDropdown = false;
+
+  // Recharger les données du nouveau projet
+  this.simulationResult = null;
+  this.activeTab = 'reel';
+  this.resetSimulationForm();
+  this.loadLastHistorique();
+}hideDropdown(): void {
+  // On laisse 200ms pour que le clic sur un élément du dropdown soit capté
+  setTimeout(() => {
+    this.showProjetDropdown = false;
+  }, 200);
+}
+clearProjectSelection(): void {
+  this.selectedProjetId = null;
+  this.searchProjet = '';
+  this.filteredProjets = [...this.projets];
+  this.showProjetDropdown = false;
+  this.simulationResult = null;
+  this.currentValues = this.createEmptyCurrentValues();
+  this.resetSimulationForm();
+}
   loadLastHistorique(): void {
     this.loadingLastData = true;
     this.financeService.getHistoriques().subscribe({

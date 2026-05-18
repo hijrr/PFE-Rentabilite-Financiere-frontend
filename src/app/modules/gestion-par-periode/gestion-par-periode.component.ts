@@ -278,7 +278,7 @@ removeFile(type: 'paie' | 'frais' | 'km'): void {
     }
     period.filteredProjets = this.projetsSalarie.filter(p =>
       p.nom?.toLowerCase().includes(term) ||
-      p.client?.toLowerCase().includes(term) ||
+      p.client?.name.toLowerCase().includes(term) ||
       p.tjm?.toString().includes(term)
     );
   }
@@ -305,7 +305,7 @@ removeFile(type: 'paie' | 'frais' | 'km'): void {
     }
 
     const tjmProjet = Number(projet.tjm);
-    const clientName = projet.client;
+    const clientName = projet.client?.name;
     const clientIdProjet = this.getClientIdByName(clientName);
 
     if (!clientIdProjet) {

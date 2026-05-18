@@ -5,7 +5,8 @@ import { Salarie } from './salarie-service.service';
 export interface Projet {
   id:number;
   nom: string;
-  client: string;
+  client?:any;
+  client_id?: number | null;   
   tjm?: number | null;
   status_paiement?: string | null;
   marge_cible?: number | null;

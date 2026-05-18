@@ -39,4 +39,14 @@ getGlobalKPI() {
   if (annee) url += `?annee=${annee}`;
   return this.http.get(url);
 }
+getDashboardFacturesImpayees(limit: number = 10): Observable<any> {
+  return this.http.get(
+    `http://localhost:8000/dashboard/factures/impayees?limit=${limit}`
+  );
+}
+getDashboardProjetsStatutPaiement(): Observable<any> {
+  return this.http.get(
+    'http://localhost:8000/dashboard/projets/statut-paiement'
+  );
+}
 }
